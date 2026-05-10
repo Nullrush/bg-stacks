@@ -890,8 +890,23 @@ tbody.addEventListener('click', e => {
       b.classList.toggle('active', on);
       if (tag === 'want') b.textContent = on ? '♥' : '♡';
     });
-    // Only full re-render if tag filtering is active (affects which rows show)
-    if (state.tags.want || state.tags.played) render();
+    // If a tag filter is active and this change makes the row no longer match,
+    // animate the row out then re-render.
+    const willDisappear =
+      (state.tags.unplayed && tag === 'played'  &&  on) ||
+      (state.tags.played   && tag === 'played'  && !on) ||
+      (state.tags.want     && tag === 'want'    && !on);
+    if (willDisappear) {
+      const rowEl = tbody.querySelector(`tr[data-id="${id}"]`);
+      if (rowEl) {
+        rowEl.classList.add('row-exit');
+        setTimeout(() => render(), 280);
+      } else {
+        render();
+      }
+    } else if (state.tags.want || state.tags.played || state.tags.unplayed) {
+      render();
+    }
     return;
   }
   if (e.target.closest('a')) return;

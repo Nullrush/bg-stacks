@@ -624,6 +624,13 @@ tbody tr.picked td {
   100% { background: var(--accent-bg); }
 }
 
+tbody tr.row-exit {
+  opacity: 0;
+  transform: translateX(-16px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
 .loading {
   text-align: center;
   padding: 32px;
