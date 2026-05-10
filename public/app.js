@@ -51,7 +51,7 @@ const DEFAULTS = {
   mechanicsMode: 'OR',
   categories: [],
   categoriesMode: 'OR',
-  sortKey: 'a',
+  sortKey: 'n',
   sortDir: -1,
   extraRankCols: [],  // array of sub-rank keys e.g. ['strategy','family']
 };
