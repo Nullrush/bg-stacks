@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'pnw-v4';
+const CACHE_VERSION = 'pnw-v5';
 
 // Assets to pre-cache on install (app shell + data)
 const PRECACHE = [
@@ -8,8 +8,10 @@ const PRECACHE = [
   '/styles.css',
   '/manifest.json',
   '/icon.svg',
-  '/games-enriched.json',
-  '/mechanics-enriched.json',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/games.json',
+  '/mechanics.json',
   '/categories.json',
 ];
 
