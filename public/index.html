@@ -34,6 +34,7 @@
         Filters
       </span>
       <span class="filter-active-badge" id="filterBadge" hidden></span>
+      <button type="button" class="filter-reset-btn" id="filterResetBtn" hidden>Reset</button>
     </summary>
     <div class="filters">
       <div class="chip-group" data-name="players">
@@ -98,34 +99,10 @@
         <button type="button" class="chip mode-toggle" id="categoryMode" title="Toggle OR / AND matching">OR</button>
       </div>
 
-      <!-- HIDE UNRANKED + SORT (always visible, was previously scattered) -->
+      <!-- HIDE UNRANKED -->
       <div class="chip-group filter-row-bottom">
         <span class="chip-label">Options</span>
         <label class="chip-best"><input type="checkbox" id="hideUnranked"> Hide unranked</label>
-      </div>
-
-      <div class="chip-group filter-row-sort">
-        <span class="chip-label">Sort</span>
-        <div class="sort-dd" id="sortDd">
-          <button type="button" class="sort-dd-trigger" id="sortDdBtn" aria-haspopup="listbox" aria-expanded="false">
-            <span class="sort-dd-text" id="sortDdText">Avg rating</span>
-            <span class="sort-dd-caret" aria-hidden="true">▾</span>
-          </button>
-          <ul class="sort-dd-menu" id="sortDdMenu" role="listbox" hidden>
-            <li role="option" data-k="n">Game</li>
-            <li role="option" data-k="tags">My list</li>
-            <li role="option" data-k="rank">Rank</li>
-            <li role="option" data-k="pmn">Players</li>
-            <li role="option" data-k="ob">Best at</li>
-            <li role="option" data-k="or">Recommended</li>
-            <li role="option" data-k="w">Weight</li>
-            <li role="option" data-k="tmn">Time</li>
-            <li role="option" data-k="a">Avg rating</li>
-            <li role="option" data-k="g">Geek rating</li>
-            <li role="option" data-k="v">Votes</li>
-          </ul>
-        </div>
-        <button type="button" class="btn sort-dir-chip" id="sortDirBtn">▼</button>
       </div>
     </div>
   </details>
@@ -133,6 +110,28 @@
   <div class="controls">
     <input type="text" id="search" placeholder="Filter by name…" autocomplete="off">
     <span class="meta" id="count"></span>
+    <div class="chip-group filter-row-sort">
+      <span class="chip-label">Sort</span>
+      <div class="sort-dd" id="sortDd">
+        <button type="button" class="sort-dd-trigger" id="sortDdBtn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="sort-dd-text" id="sortDdText">Avg rating</span>
+          <span class="sort-dd-caret" aria-hidden="true">▾</span>
+        </button>
+        <ul class="sort-dd-menu" id="sortDdMenu" role="listbox" hidden>
+          <li role="option" data-k="n">Name</li>
+          <li role="option" data-k="rank">Rank</li>
+          <li role="option" data-k="pmn">Players</li>
+          <li role="option" data-k="ob">Best at</li>
+          <li role="option" data-k="or">Rec. Players</li>
+          <li role="option" data-k="w">Weight</li>
+          <li role="option" data-k="tmn">Time</li>
+          <li role="option" data-k="a">Avg rating</li>
+          <li role="option" data-k="g">Geek rating</li>
+          <li role="option" data-k="v">Votes</li>
+        </ul>
+      </div>
+      <button type="button" class="btn sort-dir-chip" id="sortDirBtn">▼</button>
+    </div>
     <button type="button" class="btn icon-btn pick-icon-btn" id="pickBtn" title="Pick a random game (r)" aria-label="Pick a random game">🎲</button>
   </div>
 

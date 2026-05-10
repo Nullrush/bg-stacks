@@ -141,7 +141,7 @@ h1 {
   position: sticky;
   top: 0;
   z-index: 20;
-  padding: 8px 0 4px;
+  padding: 8px 0 6px;
   margin-top: -12px;
   background: var(--bg);
 }
@@ -214,6 +214,9 @@ h1 {
   display: none;
   align-items: center;
 }
+/* When inside .controls, the sort group fills remaining space */
+.controls .filter-row-sort { flex: 1; }
+.controls .filter-row-sort .chip-label { display: none; }
 
 @media (max-width: 700px) {
   .chip-group.filter-row-sort { display: flex; }
@@ -222,6 +225,10 @@ h1 {
 .filter-row-sort .sort-dd {
   width: 200px;
   flex: none;
+}
+
+@media (max-width: 700px) {
+  .filter-row-sort .sort-dd { width: auto; flex: 1; }
 }
 
 .sort-dir-chip {
@@ -352,12 +359,27 @@ h1 {
   height: 20px;
   padding: 0 6px;
   border-radius: 10px;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-bg);
+  color: var(--accent);
   font-size: .7rem;
   font-weight: 700;
   line-height: 1;
 }
+.filter-active-badge[hidden] { display: none; }
+
+.filter-reset-btn {
+  font: inherit;
+  font-size: .75rem;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  margin-left: auto;
+}
+.filter-reset-btn:hover { background: var(--bg-hover); color: var(--text); }
+.filter-reset-btn[hidden] { display: none; }
 
 .filter-panel[open] .filter-panel-summary {
   border-bottom: 1px solid var(--border);
@@ -468,10 +490,12 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  touch-action: manipulation;
 }
 
 .tag-btn:hover { background: var(--bg-hover); color: var(--text); }
 .tag-btn.active { color: var(--accent); }
+.tag-btn[data-tag="want"].active { color: #e05252; }
 
 .tbl-wrap {
   border: 1px solid var(--border);
@@ -546,7 +570,8 @@ tbody tr:last-child td { border-bottom: none; }
   color: var(--accent);
 }
 
-.card-summary, .card-chevron, .card-players { display: none; }
+.card-summary, .card-chevron, .card-players, .card-controls { display: none; }
+.card-name-body { display: contents; }
 .rating-part { white-space: nowrap; }
 .rating-part + .rating-part { margin-left: 10px; }
 .rating-label { color: var(--text-3); margin-right: 3px; }
@@ -809,12 +834,10 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
 
 /* ===== hover tooltips ===== */
 
-.name,
-.rank-col { position: relative; }
-
-.hover-tooltip {
+/* Image tooltip — fixed-position, driven by JS to escape table overflow clipping */
+#img-tooltip {
   display: none;
-  position: absolute;
+  position: fixed;
   z-index: 200;
   background: var(--bg);
   border: 1px solid var(--border);
@@ -822,39 +845,38 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
   box-shadow: 0 4px 16px rgba(0,0,0,.15);
   pointer-events: none;
   white-space: nowrap;
-}
-
-.name:hover .hover-tooltip,
-.rank-col:hover .hover-tooltip { display: block; }
-
-/* Image tooltip — appears below the name cell */
-.img-tooltip {
-  top: calc(100% + 4px);
-  left: 0;
   padding: 8px;
   flex-direction: column;
   gap: 4px;
   align-items: flex-start;
+  transform: translateY(-50%);
 }
-.name:hover .img-tooltip { display: flex; }
-.img-tooltip img {
+#img-tooltip img {
   display: block;
   border-radius: 6px;
   max-width: 200px;
   height: auto;
 }
-.img-tooltip .tt-year {
+#img-tooltip .tt-year {
   font-size: 11px;
   color: var(--text-3);
 }
 
-/* Rank tooltip — compact, appears above the rank cell aligned to right edge */
-.rank-tooltip {
-  bottom: calc(100% + 6px);
-  right: 0;
+/* Rank tooltip — fixed-position, driven by JS to escape table overflow clipping */
+#rank-tooltip {
+  display: none;
+  position: fixed;
+  z-index: 200;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  pointer-events: none;
+  white-space: nowrap;
   padding: 6px 10px;
   font-size: 12px;
   line-height: 1.6;
+  transform: translate(-100%, -50%);
 }
 .rt-row {
   display: flex;
@@ -942,11 +964,25 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
 }
 #rankTh, .extra-rank-th { text-align: center; }
 
+/* Hide mobile-only elements on desktop */
+.card-detail,
+.card-tags-mobile,
+.card-cover-img { display: none; }
+
 @media (max-width: 700px) {
   .page { padding: 20px 12px 40px; }
   h1 { font-size: 28px; }
 
   .sort-mobile { display: none; }
+
+  .chip-label {
+    width: 100%;
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2px;
+  }
+
+  .filters { gap: 12px; }
 
   .tbl-wrap {
     border: none;
@@ -969,42 +1005,98 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
   }
   tbody tr:nth-child(even) td { background: transparent; }
   tbody tr:hover td { background: transparent; }
-  tbody tr:last-child td { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child td { border-bottom: none; }
 
-  tbody tr:not(.expanded) td:not(.name) { display: none; }
+  tbody tr:not(.expanded) td:not(.name):not(.card-detail) { display: none; }
+  tbody tr.expanded td:not(.name):not(.card-detail) { display: none; }
+
+  /* Break out of table layout when expanded so both cells take full width */
+  tbody tr.expanded { display: block; }
+  tbody tr.expanded td.name,
+  tbody tr.expanded td.card-detail { display: block; width: 100%; box-sizing: border-box; }
 
   tbody tr .card-summary {
     display: block;
-    margin-top: 4px;
+    margin-top: 3px;
     font-family: 'Geist Mono', ui-monospace, monospace;
     font-size: 11px;
     color: var(--text-2);
     letter-spacing: 0.02em;
   }
-  tbody tr.expanded .card-summary { display: none; }
+  tbody tr .card-summary .sort-active { color: var(--text-2); font-weight: normal; }
+  tbody tr .card-summary .sort-active .rating-label { color: var(--text-3); }
+  tbody tr.expanded .card-summary { /* keep visible to prevent layout jump */ }
+
+  .card-name-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    min-width: 0;
+  }
+  .card-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    align-self: stretch;
+    padding-left: 10px;
+    margin-left: 8px;
+    border-left: 1px solid var(--border);
+  }
 
   tbody tr .card-chevron {
-    display: inline-block;
-    float: right;
-    margin-left: 10px;
-    font-size: 11px;
-    color: var(--text-3);
-    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
   }
-  tbody tr:not(.expanded) .card-chevron::before { content: "▾"; }
-  tbody tr.expanded .card-chevron::before { content: "▴"; }
+  tbody tr .card-chevron::before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--text-3);
+    border-bottom: 2px solid var(--text-3);
+    transition: transform 0.2s ease;
+    transform: translateY(-2px) rotate(45deg);
+    transform-origin: center;
+  }
+  tbody tr.expanded .card-chevron::before { transform: translateY(2px) rotate(-135deg); }
   tbody tr td.loading { cursor: default; }
   tbody tr:has(td.loading) .card-chevron { display: none; }
 
-  tbody tr:not(.expanded) .card-players {
-    display: inline-block;
-    float: right;
-    margin-left: 10px;
-    font-family: 'Geist Mono', ui-monospace, monospace;
-    font-size: 12px;
-    color: var(--text-2);
-    line-height: 1.5;
+  /* Tag buttons inside card-controls */
+  .card-tags-mobile {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
+  .card-tags-mobile .tag-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+    padding: 0;
+    border-color: var(--border);
+    background: var(--bg-3);
+  }
+  .card-tags-mobile .tag-btn.active {
+    background: var(--accent-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .card-tags-mobile .tag-btn[data-tag="want"].active {
+    background: rgba(224, 82, 82, 0.12);
+    border-color: #e05252;
+    color: #e05252;
+  }
+
+  /* Hide the desktop tags-cell entirely on mobile */
+  tbody .tags-cell { display: none !important; }
+
 
   tbody td {
     display: flex;
@@ -1024,14 +1116,24 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
   }
 
   tbody td.name {
-    display: block;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
     font-size: 16px;
     text-align: left;
     padding: 0;
   }
-  tbody td.name a { color: var(--accent); }
+  /* Name is plain text on mobile — link lives in expanded detail panel */
+  tbody td.name a {
+    color: var(--text);
+    pointer-events: none;
+    cursor: default;
+    text-decoration: none;
+  }
 
   tbody tr.expanded td.name {
+    display: flex;
     border-bottom: 1px solid var(--border);
     padding-bottom: 8px;
     margin-bottom: 6px;
@@ -1060,6 +1162,111 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
 
   .tag-btn { width: 30px; height: 30px; font-size: 16px; }
 
-  /* multi-select on mobile: full-width */
-  .multi-select { min-width: 0; flex-basis: 100%; }
+  /* multi-select on mobile: full-width, OR button stays inline */
+  .multi-select { min-width: 0; flex: 1; }
+
+  /* Card detail panel — animated expand/collapse via grid trick */
+  .card-detail {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: hidden;
+    transition: grid-template-rows 0.25s ease;
+    padding: 0;
+    border: none;
+    text-align: left;
+  }
+  .card-detail::before { display: none; }
+  tbody tr.expanded .card-detail { display: grid; grid-template-rows: 1fr; }
+  .cd-inner { min-height: 0; overflow: hidden; }
+
+  .cd-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 4px;
+  }
+
+  /* Top: image | rank+rating | players+weight (1:1:1) */
+  .cd-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .card-cover-img {
+    display: block;
+    width: 100%;
+    border-radius: 6px;
+  }
+  .cd-stats-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Bottom: full-width sections */
+  .cd-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cd-pair {
+    display: flex;
+    gap: 12px;
+  }
+  .cd-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cd-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .cd-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    color: var(--text-3);
+  }
+  .cd-val {
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  .cd-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .cd-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 11px;
+    color: var(--text-2);
+  }
+  .cd-chip-cat { color: var(--text-3); }
+  .cd-chip-val { font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+  .cd-bgg-link {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-3);
+    text-align: center;
+    text-decoration: none;
+  }
+  .cd-bgg-link:hover { color: var(--accent); }
 }

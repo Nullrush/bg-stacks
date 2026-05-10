@@ -2206,18 +2206,29 @@
       "wargames": null
     },
     "mechanics": [
-      "Worker Placement",
-      "Logistics",
-      "Resource Management"
+      "Follow",
+      "Set Collection",
+      "Variable Set-up",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Dockside merchants expand harbor operations and shipping contracts in a bustling maritime economy.",
-    "thumbnail": null,
+    "categories": [
+      "Economic",
+      "Medieval"
+    ],
+    "families": [
+      "Crowdfunding: Kickstarter",
+      "Misc: LongPack Games",
+      "Series: Key (Richard Breese)"
+    ],
+    "designers": [
+      "Richard Breese",
+      "Dávid Turczi"
+    ],
+    "description": "Move boats into the harbor, then put their wares to use in your village.",
+    "thumbnail": "https://cf.geekdo-images.com/uVq7iCHH3qRJLA6GtBc9YA__small/img/PxHHr_-GN3IHqoEbMOO6uHjakts=/fit-in/200x150/filters:strip_icc()/pic8028262.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 454103,
@@ -2252,18 +2263,34 @@
       "wargames": null
     },
     "mechanics": [
-      "Racing",
-      "Dice Rolling",
-      "Chaos/Party Game"
+      "Open Drafting",
+      "Race",
+      "Roll / Spin and Move",
+      "Track Movement",
+      "Variable Player Powers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Absurd fantasy athletes compete in wildly unpredictable races with asymmetric abilities and random effects.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Dice",
+      "Racing"
+    ],
+    "families": [
+      "Animals: Bears",
+      "Animals: Elephants",
+      "Animals: Rabbits / Hares",
+      "Animals: Snakes",
+      "Food & Drink: Bananas",
+      "Sports: Athletics / Track and Field"
+    ],
+    "designers": [
+      "Richard Garfield",
+      "Takashi Ishida"
+    ],
+    "description": "Pit a cast of crazy characters against each other in a madcap race to the finish.",
+    "thumbnail": "https://cf.geekdo-images.com/1uW8t9AkuqOF0xjv_sXKgw__small/img/tWEmoT1EaoYUpbwrTGCLMHaaZGs=/fit-in/200x150/filters:strip_icc()/pic9106864.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 6
   },
   {
     "id": 425549,
@@ -2298,18 +2325,31 @@
       "wargames": null
     },
     "mechanics": [
-      "Survival",
-      "Resource Management",
-      "Cooperative/Competitive"
+      "Deck, Bag, and Pool Building",
+      "Delayed Purchase",
+      "Events",
+      "Simultaneous Action Selection",
+      "Variable Phase Order"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Lunar colonists struggle to survive crises while balancing cooperation and personal objectives.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game",
+      "Science Fiction"
+    ],
+    "families": [
+      "Mechanism: Tableau Building",
+      "Space: Colonization / Extraterrestrial Colonisation",
+      "Space: Earth's Moon",
+      "Theme: Robots",
+      "Theme: Survival"
+    ],
+    "designers": [
+      "Donald X. Vaccarino"
+    ],
+    "description": "Whatever can go wrong will go wrong. Players compete to keep their colonists alive.",
+    "thumbnail": "https://cf.geekdo-images.com/KDrRxEKQMmHyM0QQ2ONX4Q__small/img/EusjojuWYxwkxaP7eAnaBn1QzLg=/fit-in/200x150/filters:strip_icc()/pic8638247.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 391752,
@@ -2345,18 +2385,37 @@
       "wargames": null
     },
     "mechanics": [
-      "Economic",
-      "Route Building",
-      "Resource Management"
+      "Chaining",
+      "Connections",
+      "Contracts",
+      "Hexagon Grid",
+      "Network and Route Building",
+      "Ownership",
+      "Pick-up and Deliver",
+      "Tile Placement",
+      "Variable Set-up"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Compete to build rail and industrial networks during the age of steam-powered expansion.",
-    "thumbnail": null,
+    "categories": [
+      "Economic",
+      "Industry / Manufacturing",
+      "Territory Building",
+      "Trains",
+      "Transportation"
+    ],
+    "families": [
+      "Continents: North America",
+      "Country: USA",
+      "Crowdfunding: Gamefound",
+      "Digital Implementations: Tabletopia"
+    ],
+    "designers": [
+      "Martin Wallace"
+    ],
+    "description": "Build your rail network, establish your factories and reap the rewards.",
+    "thumbnail": "https://cf.geekdo-images.com/d5JR5FekM_PsanGOHBdSMA__small/img/RKxhi5xFFrDm9KbjTiNYA27WwKI=/fit-in/200x150/filters:strip_icc()/pic7720019.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 427388,
@@ -2392,18 +2451,36 @@
       "wargames": null
     },
     "mechanics": [
-      "Drafting",
-      "Set Collection",
-      "Light Strategy"
+      "Action / Event",
+      "Chaining",
+      "Grid Coverage",
+      "Paper-and-Pencil",
+      "Simultaneous Action Selection"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A simple, fast card game about adapting and evolving patterns over time.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Farming",
+      "Science Fiction"
+    ],
+    "families": [
+      "Components: Stamps",
+      "Creatures: Aliens / Extraterrestrials",
+      "Crowdfunding: Kickstarter",
+      "Mechanism: Flip-and-Write",
+      "Occupation: Farmer",
+      "Theme: Fishing / Angling"
+    ],
+    "designers": [
+      "Max Anderson",
+      "Zac Dixon",
+      "Austin Harrison",
+      "Toby Sarnelle"
+    ],
+    "description": "Farm, explore, and fish on an alien world.",
+    "thumbnail": "https://cf.geekdo-images.com/4bKDiaLMWzIrbaAL6VlkDQ__small/img/OSdMpbIrG9KYcZaIKaXuhPVhJnw=/fit-in/200x150/filters:strip_icc()/pic8386182.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 418059,
@@ -2437,18 +2514,36 @@
       "wargames": null
     },
     "mechanics": [
-      "Engine Building",
-      "Resource Management",
-      "Scientific Simulation"
+      "Area Majority / Influence",
+      "End Game Bonuses",
+      "Income",
+      "Multi-Use Cards",
+      "Resource to Move",
+      "Solo / Solitaire Game",
+      "Turn Order: Progressive",
+      "Variable Set-up"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Lead space agencies in searching for alien life using telescope networks and research systems.",
-    "thumbnail": null,
+    "categories": [
+      "Science Fiction",
+      "Space Exploration"
+    ],
+    "families": [
+      "Components: RE-Wood",
+      "Creatures: Aliens / Extraterrestrials",
+      "Misc: GettingGames Tutorial Videos",
+      "Players: Games with Solitaire Rules",
+      "Space: Earth's Solar System",
+      "Theme: Astronomy",
+      "Theme: Science"
+    ],
+    "designers": [
+      "Tomáš Holek"
+    ],
+    "description": "Search for signs of alien life by launching probes and analyzing distant signals.",
+    "thumbnail": "https://cf.geekdo-images.com/_BUXOVRDU9g_eRwgpR5ZZw__small/img/icamIZ4nP3HHH3vczZqTr1hQgKY=/fit-in/200x150/filters:strip_icc()/pic8160466.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 14
   },
   {
     "id": 429411,
@@ -2481,18 +2576,24 @@
       "wargames": null
     },
     "mechanics": [
-      "Trick-Taking",
-      "Deduction",
-      "Variable Powers"
+      "Team-Based Game",
+      "Track Movement",
+      "Trick-taking"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Mythical fox spirits use clever trick-taking tactics and hidden information to outmaneuver opponents.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game"
+    ],
+    "families": [
+      "Digital Implementations: Game Park"
+    ],
+    "designers": [
+      "Thomas Favrelière"
+    ],
+    "description": "Do the trick to make your Kitsune clan win.",
+    "thumbnail": "https://cf.geekdo-images.com/FqJK4RkGf47bcs1udNnO2A__small/img/408IdRC-xUWrY2FBdpSUEJSvKMM=/fit-in/200x150/filters:strip_icc()/pic8562099.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 10
   },
   {
     "id": 448116,
@@ -2523,18 +2624,35 @@
       "wargames": null
     },
     "mechanics": [
-      "Worker Placement",
-      "Exploration",
-      "Resource Management"
+      "End Game Bonuses",
+      "Hand Management",
+      "Open Drafting",
+      "Pattern Recognition",
+      "Race",
+      "Set Collection",
+      "Slide / Push",
+      "Track Movement",
+      "Variable Set-up",
+      "Victory Points as a Resource"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Lead Arctic expeditions through icy landscapes while researching wildlife and surviving harsh conditions.",
-    "thumbnail": null,
+    "categories": [
+      "Abstract Strategy",
+      "Environmental"
+    ],
+    "families": [
+      "Misc: LongPack Games",
+      "Occupation: Researcher / Scientist",
+      "Region: Arctic",
+      "Theme: Photography"
+    ],
+    "designers": [
+      "Dariusz Mindur"
+    ],
+    "description": "Head North with a team of sliding scientists to snap photos of adorable animals.",
+    "thumbnail": "https://cf.geekdo-images.com/Ke3AIo4Prk1fbVvs7RMQtQ__small/img/Ynw4WVJM3delRmwrmHj7ioBD2mY=/fit-in/200x150/filters:strip_icc()/pic8936390.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 10
   },
   {
     "id": 396619,
@@ -2570,18 +2688,31 @@
       "wargames": null
     },
     "mechanics": [
-      "Cooperative Play",
-      "Campaign",
-      "Dice Combat"
+      "Cooperative Game",
+      "Deck, Bag, and Pool Building",
+      "Dice Rolling",
+      "Solo / Solitaire Game",
+      "Variable Player Powers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Based on the video game, players control members of the Bergson family battling corruption in a fantasy campaign.",
-    "thumbnail": null,
+    "categories": [
+      "Adventure",
+      "Fantasy",
+      "Video Game Theme"
+    ],
+    "families": [
+      "Category: Dungeon Crawler",
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Tabletopia",
+      "Players: Games with Solitaire Rules"
+    ],
+    "designers": [
+      "Amir Salamati"
+    ],
+    "description": "A family unites against the wicked corruption spreading in their beloved land!",
+    "thumbnail": "https://cf.geekdo-images.com/5FC2NoQKleju-vJmMFAnRQ__small/img/KAU65IPkzm4G1fQs-pmhgYLybMk=/fit-in/200x150/filters:strip_icc()/pic7998413.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 12
   },
   {
     "id": 451297,
@@ -2614,18 +2745,29 @@
       "wargames": null
     },
     "mechanics": [
-      "Pattern Building",
-      "Stack Building",
-      "Family Game"
+      "Dice Rolling",
+      "Push Your Luck",
+      "Race",
+      "Re-rolling and Locking",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players build cat-themed pyramids while managing stacking rules and playful spatial constraints.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Dice",
+      "Racing"
+    ],
+    "families": [
+      "Animals: Cats",
+      "Misc: LongPack Games"
+    ],
+    "designers": [
+      "Reiner Knizia"
+    ],
+    "description": "Help Grandma create a purrr-fect pyramid of sleeping kittens.",
+    "thumbnail": "https://cf.geekdo-images.com/SACYt7fVYU15ZDCC1-CJaw__small/img/rQL79RSLoJ1DnsSCLAgSoaJZM6g=/fit-in/200x150/filters:strip_icc()/pic9107936.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 8
   },
   {
     "id": 418062,
@@ -2659,18 +2801,30 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Route Building",
-      "Set Collection"
+      "Connections",
+      "Map Addition",
+      "Pattern Building",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Build expanding railway networks by carefully placing tiles and connecting efficient transport routes.",
-    "thumbnail": null,
+    "categories": [
+      "Trains",
+      "Transportation"
+    ],
+    "families": [
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Tabletopia",
+      "Game: Railroad Ink",
+      "Versions & Editions: Card Versions of Non-Card Games"
+    ],
+    "designers": [
+      "Hjalmar Hach",
+      "Lorenzo Silva"
+    ],
+    "description": "Build a transportation network and populate it with cars, trains, and travelers.",
+    "thumbnail": "https://cf.geekdo-images.com/yTbY__1knIb6nnekvUHGkw__small/img/m1JE8msKppM_dhkvocj1GlHHyTU=/fit-in/200x150/filters:strip_icc()/pic8296003.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 8
   },
   {
     "id": 447649,
@@ -2702,18 +2856,32 @@
       "wargames": null
     },
     "mechanics": [
-      "Worker Placement",
+      "End Game Bonuses",
+      "Hand Management",
+      "Multi-Use Cards",
+      "Open Drafting",
+      "Physical Removal",
       "Set Collection",
-      "Hand Management"
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players guide tribes along magical rivers, placing workers to intercept rolling pearls and fulfill villager scoring objectives in a light strategy game with strong table presence.",
-    "thumbnail": null,
+    "categories": [
+      "Fantasy"
+    ],
+    "families": [
+      "Animals: Llamas / Alpacas",
+      "Components: 3-Dimensional (3D)",
+      "Components: Marbles",
+      "Components: Unique Items",
+      "Creatures: Fairies / Elves / Pixies"
+    ],
+    "designers": [
+      "Romain Caterdjian"
+    ],
+    "description": "Collect magic pearls as they flow downriver in this kinetic worker placement game.",
+    "thumbnail": "https://cf.geekdo-images.com/S39N_AX6rXD9f3XWFkGhMA__small/img/ZLWW_LNvxIcYbp3rebiFFOAqMuw=/fit-in/200x150/filters:strip_icc()/pic8923324.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 429020,
@@ -2746,18 +2914,31 @@
       "wargames": null
     },
     "mechanics": [
-      "Card Drafting",
-      "Set Collection",
-      "Hand Management"
+      "Contracts",
+      "End Game Bonuses",
+      "Hand Management",
+      "Layering",
+      "Pattern Building",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Build a layered world of paper landscapes by drafting terrain and assembling efficient scoring combinations.",
-    "thumbnail": null,
+    "categories": [
+      "Abstract Strategy",
+      "Number",
+      "Puzzle"
+    ],
+    "families": [
+      "Components: 3 x 3 Grids",
+      "Digital Implementations: Board Game Arena"
+    ],
+    "designers": [
+      "Alexandre Aguilar",
+      "Benoit Turpin"
+    ],
+    "description": "Traveler discovering the most beautiful landscape in a paper world.",
+    "thumbnail": "https://cf.geekdo-images.com/DGcck5rkKZ_dyVcMaVV0xA__small/img/V5ixHFDELXmYThICd0f_A0vc_tA=/fit-in/200x150/filters:strip_icc()/pic8795216.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 8
   },
   {
     "id": 438534,
@@ -2791,18 +2972,29 @@
       "wargames": null
     },
     "mechanics": [
-      "Worker Placement",
-      "Resource Management",
-      "Ancient Civilization"
+      "Action Drafting",
+      "End Game Bonuses",
+      "Movement Points",
+      "Rondel",
+      "Solo / Solitaire Game",
+      "Tile Placement",
+      "Variable Set-up",
+      "Worker Placement"
     ],
-    "categories": [],
+    "categories": [
+      "Ancient",
+      "Civilization",
+      "Territory Building"
+    ],
     "families": [],
-    "designers": [],
-    "description": "Develop ancient papyrus-based civilizations through trade, innovation, and cultural expansion.",
-    "thumbnail": null,
+    "designers": [
+      "Bernd Eisenstein"
+    ],
+    "description": "Build up your civilization to lead the Mesopotamian region.",
+    "thumbnail": "https://cf.geekdo-images.com/eZJjgWJAPA7KI7g6ZSvx6Q__small/img/ESwI5kyNJN2ISVqwKAi6k9kRxK0=/fit-in/200x150/filters:strip_icc()/pic9497668.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 441850,
@@ -2835,18 +3027,30 @@
       "wargames": null
     },
     "mechanics": [
-      "Time Travel",
-      "Worker Placement",
-      "Scenario Play"
+      "End Game Bonuses",
+      "Hand Management",
+      "Multi-Use Cards",
+      "Tags"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Manipulate historical timelines and paradoxes to alter the future in a narrative-driven strategy game.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Card Game",
+      "Fantasy"
+    ],
+    "families": [
+      "Admin: Better Description Needed!",
+      "Digital Implementations: TableTop Simulator Mod (TTS)",
+      "Theme: Anthropomorphic Animals"
+    ],
+    "designers": [
+      "Simone Luciani",
+      "Roberto Pellei"
+    ],
+    "description": "​Create your fellowship to conquer the sources of power and control the flow of time.",
+    "thumbnail": "https://cf.geekdo-images.com/rU_Ce-FjPz26aGxMyHgyag__small/img/Fyu_ROcaOPdOSdUt_c9E8AWG8Pk=/fit-in/200x150/filters:strip_icc()/pic8791732.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 12
   },
   {
     "id": 448271,
@@ -2877,15 +3081,33 @@
       "thematic": 239,
       "wargames": null
     },
-    "mechanics": [],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "",
-    "thumbnail": null,
+    "mechanics": [
+      "Communication Limits",
+      "Cooperative Game",
+      "Scenario / Mission / Campaign Game",
+      "Trick-taking"
+    ],
+    "categories": [
+      "Adventure",
+      "Card Game",
+      "Fantasy",
+      "Novel-based"
+    ],
+    "families": [
+      "Authors: J.R.R. Tolkien",
+      "Players: Games with Solitaire Rules",
+      "Series: The Lord of the Rings – Trick-Taking Game",
+      "Theme: Stained Glass",
+      "Theme: Wizards"
+    ],
+    "designers": [
+      "Bryan Bornmueller"
+    ],
+    "description": "Continue the ring's journey to Mordor.",
+    "thumbnail": "https://cf.geekdo-images.com/TSwHNId9CUCq-bxAGmNJiQ__small/img/uE1O2NY7E58aOF6w6000g_ZL1aA=/fit-in/200x150/filters:strip_icc()/pic9044877.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 10
   },
   {
     "id": 447174,
@@ -2916,18 +3138,29 @@
       "wargames": null
     },
     "mechanics": [
-      "Worker Placement",
-      "Adventure",
-      "Tableau Building"
+      "Hand Management",
+      "Set Collection"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Compete as pulp-fiction authors exploring mysterious lands and crafting stories inspired by classic adventure literature.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Card Game",
+      "Fantasy"
+    ],
+    "families": [
+      "Misc: Made by Panda",
+      "Occupation: Adventurer / Explorer",
+      "Players: Games with Solitaire Rules",
+      "Players: Two-Player Only Games",
+      "Theme: Anthropomorphic Animals"
+    ],
+    "designers": [
+      "Iain Everett"
+    ],
+    "description": "A fierce yet friendly competition for the most celebrated adventurer of the village.",
+    "thumbnail": "https://cf.geekdo-images.com/TMMfAqvZP3g4HdgYyCpHPQ__small/img/nXwfLcmGgg99f-O3guvB2vXMM2Q=/fit-in/200x150/filters:strip_icc()/pic8920149.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 367220,
@@ -2960,18 +3193,41 @@
       "wargames": null
     },
     "mechanics": [
-      "Set Collection",
       "Hand Management",
-      "Push Your Luck"
+      "Melding and Splaying",
+      "Open Drafting",
+      "Push Your Luck",
+      "Score-and-Reset Game",
+      "Set Collection",
+      "Sudden Death Ending",
+      "Take That"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A beautifully illustrated card game where players collect marine-themed sets with timing-based scoring.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Card Game"
+    ],
+    "families": [
+      "Animals: Crabs",
+      "Animals: Fish / Fishes",
+      "Animals: Octopuses",
+      "Animals: Penguins",
+      "Animals: Sharks",
+      "Card Games: Draw and Discard",
+      "Components: Bombyx Score Scoring App",
+      "Creatures: Mermaids",
+      "Digital Implementations: Board Game Arena",
+      "Game: Sea Salt & Paper",
+      "Theme: Origami"
+    ],
+    "designers": [
+      "Bruno Cathala",
+      "Théo Rivière"
+    ],
+    "description": "A few delicate Origami-style illustrations and a whole marine universe comes to life!",
+    "thumbnail": "https://cf.geekdo-images.com/CIh_rXKoRw9z8K0PJxT8nQ__small/img/Jh6NjibuHeYrZtSsAUXq82B1fTQ=/fit-in/200x150/filters:strip_icc()/pic6973911.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2022,
+    "minAge": 8
   },
   {
     "id": 415465,
@@ -3004,18 +3260,36 @@
       "wargames": null
     },
     "mechanics": [
-      "Worker Placement",
-      "Engine Building",
-      "Variable Powers"
+      "Follow",
+      "Increase Value of Unchosen Resources",
+      "Layering",
+      "Melding and Splaying",
+      "Open Drafting",
+      "Set Collection",
+      "Solo / Solitaire Game",
+      "Variable Set-up"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Fantasy inventors and guilds collaborate and compete to restore a fading magical civilization.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Card Game",
+      "Science Fiction"
+    ],
+    "families": [
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Tabletopia",
+      "Mechanism: Tableau Building",
+      "Misc: LongPack Games",
+      "Theme: Anthropomorphic Animals",
+      "Theme: City"
+    ],
+    "designers": [
+      "Philip duBarry"
+    ],
+    "description": "Recruit the strongest and most brilliant animal citizens to your city.",
+    "thumbnail": "https://cf.geekdo-images.com/Ngki1QK4tOw-8z-PvBDpSQ__small/img/PjCSjs3Vx1ht7NtS67wZvQkoHfE=/fit-in/200x150/filters:strip_icc()/pic8058973.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 447587,
@@ -3049,18 +3323,23 @@
       "wargames": null
     },
     "mechanics": [
-      "Area Control",
-      "Hand Management",
-      "Fantasy Strategy"
+      "Pattern Building",
+      "Tile Placement",
+      "Variable Player Powers"
     ],
-    "categories": [],
+    "categories": [
+      "City Building"
+    ],
     "families": [],
-    "designers": [],
-    "description": "Competing guilds battle for territory and influence in a richly illustrated fantasy kingdom.",
-    "thumbnail": null,
+    "designers": [
+      "Ken Boyter",
+      "Kedric Winks"
+    ],
+    "description": "A city building tile laying game with asymmetric powers dependent on guild selection.",
+    "thumbnail": "https://cf.geekdo-images.com/CSJCc5ujq4PktChkmLIcPg__small/img/Pr_tK2rqQ0IcZ6Xd3XCvVHJ4gKE=/fit-in/200x150/filters:strip_icc()/pic8955025.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 393429,
@@ -3095,18 +3374,34 @@
       "wargames": null
     },
     "mechanics": [
-      "Worker Placement",
-      "Recipe Fulfillment",
-      "Simultaneous Action"
+      "Auction: Sealed Bid",
+      "Contracts",
+      "Programmed Movement",
+      "Variable Player Powers",
+      "Worker Placement, Different Worker Types"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Woodland chefs race to prepare elaborate meals while gathering ingredients and upgrading kitchens.",
-    "thumbnail": null,
+    "categories": [
+      "Animals"
+    ],
+    "families": [
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: TableTop Simulator Mod (TTS)",
+      "Misc: LongPack Games",
+      "Organizations: Game Designers of North Carolina",
+      "Players: Games with expansions that change player count",
+      "Theme: Anthropomorphic Animals",
+      "Theme: Food / Cooking",
+      "Theme: Restaurant/Café"
+    ],
+    "designers": [
+      "Alex Cutler",
+      "Peter C. Hayward"
+    ],
+    "description": "Gather ingredients to satisfy food challenges and impress a celebrity critic.",
+    "thumbnail": "https://cf.geekdo-images.com/w72-A0u4uH2j_YqGwu4E0w__small/img/qFG2IdCRk89cQpOXZIQTyM-mcWQ=/fit-in/200x150/filters:strip_icc()/pic7594267.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 12
   },
   {
     "id": 430563,
@@ -3139,18 +3434,23 @@
       "wargames": null
     },
     "mechanics": [
-      "Drafting",
-      "Set Collection",
-      "Light Economic"
+      "Deck, Bag, and Pool Building"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Run a cinema snack stand, balancing popcorn production and customer demand for maximum profit.",
-    "thumbnail": null,
+    "categories": [
+      "Economic",
+      "Movies / TV / Radio theme"
+    ],
+    "families": [
+      "Digital Implementations: Board Game Arena"
+    ],
+    "designers": [
+      "Victor Saumont"
+    ],
+    "description": "Pair the right films with the right guests to score popcorn.",
+    "thumbnail": "https://cf.geekdo-images.com/79sRNcylJAgftl7Q39HAjg__small/img/WhtNJlNuyyqUkLFnq63gnljpE3k=/fit-in/200x150/filters:strip_icc()/pic8623640.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 445673,
@@ -3183,18 +3483,23 @@
       "wargames": null
     },
     "mechanics": [
-      "Route Building",
-      "Engine Building",
-      "Resource Management"
+      "Deck, Bag, and Pool Building"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Build high-speed rail networks while optimizing cargo flow and technological upgrades.",
-    "thumbnail": null,
+    "categories": [
+      "Trains"
+    ],
+    "families": [
+      "Admin: Better Description Needed!",
+      "Misc: LongPack Games"
+    ],
+    "designers": [
+      "Paul Dennen"
+    ],
+    "description": "Overcome the odds to deliver goods with your railway company.",
+    "thumbnail": "https://cf.geekdo-images.com/zFwQQ8dyRdnLCt2usmnBfg__small/img/4vSKbL_1UcpPBOacTNbl9avkPJ0=/fit-in/200x150/filters:strip_icc()/pic9005043.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 13
   },
   {
     "id": 411894,
@@ -3228,18 +3533,32 @@
       "wargames": null
     },
     "mechanics": [
-      "Cooperative Play",
-      "Tableau Building",
-      "Fantasy Adventure"
+      "Events",
+      "Prisoner's Dilemma",
+      "Variable Player Powers",
+      "Voting",
+      "Worker Placement",
+      "Worker Placement, Different Worker Types"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players unite fantasy factions to repel spreading darkness while developing unique council abilities.",
-    "thumbnail": null,
+    "categories": [
+      "City Building",
+      "Political"
+    ],
+    "families": [
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Tabletopia",
+      "Misc: LongPack Games",
+      "Players: Games with expansions that add solo play",
+      "Setting: Kinfire Chronicles"
+    ],
+    "designers": [
+      "Kevin Wilson"
+    ],
+    "description": "Compete to rebuild the great city of Din'Lux and defend it from many dangers",
+    "thumbnail": "https://cf.geekdo-images.com/BlXCt-fbTsJLRbp_-65aKg__small/img/au-olemEA-C_l--qyU05Dlgo-_M=/fit-in/200x150/filters:strip_icc()/pic8953815.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 447002,
@@ -3272,18 +3591,35 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
+      "End Game Bonuses",
+      "Open Drafting",
+      "Ordering",
       "Pattern Building",
-      "Family Strategy"
+      "Tile Placement",
+      "Turn Order: Time Track",
+      "Variable Set-up"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Build a scenic coastal island landscape while optimizing placement of natural features.",
-    "thumbnail": null,
+    "categories": [
+      "Environmental",
+      "Exploration",
+      "Nautical",
+      "Puzzle",
+      "Travel"
+    ],
+    "families": [
+      "States: Florida",
+      "Theme: Beaches",
+      "Theme: Nature",
+      "Theme: Seashells"
+    ],
+    "designers": [
+      "Elizabeth Hargrave"
+    ],
+    "description": "Collect seashells that come and go with the tide on the beaches of Sanibel.",
+    "thumbnail": "https://cf.geekdo-images.com/Q75vVTPPTugVK7JH4XX0BA__small/img/Hf6awfh-Cm9rAFH-HQRII3qLQ2o=/fit-in/200x150/filters:strip_icc()/pic8897139.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 10
   },
   {
     "id": 456459,
@@ -3310,18 +3646,35 @@
       "wargames": null
     },
     "mechanics": [
-      "Set Collection",
-      "Economic",
-      "Market Simulation"
+      "Area Majority / Influence",
+      "Grid Coverage",
+      "Market",
+      "Matching",
+      "Open Drafting",
+      "Stacking and Balancing",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players manage produce stalls, responding to shifting demand in a competitive farmer’s market.",
-    "thumbnail": null,
+    "categories": [
+      "Abstract Strategy",
+      "Economic",
+      "Farming",
+      "Puzzle"
+    ],
+    "families": [
+      "Admin: Upcoming Releases",
+      "Food & Drink: Fruit",
+      "Food & Drink: Vegetables",
+      "Occupation: Merchant"
+    ],
+    "designers": [
+      "Michael Kiesling",
+      "Wolfgang Kramer"
+    ],
+    "description": "Stack fresh Produce Crates as you compete at your local Farmers Market.",
+    "thumbnail": "https://cf.geekdo-images.com/Py_SXgSE7y4-v2CH109OsQ__small/img/M9F_W7FHqJT6lur63WWjsl9jGz8=/fit-in/200x150/filters:strip_icc()/pic9164189.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 8
   },
   {
     "id": 445044,
@@ -3355,18 +3708,35 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
+      "Grid Coverage",
+      "Open Drafting",
       "Pattern Building",
-      "Fantasy Puzzle"
+      "Score-and-Reset Game",
+      "Solo / Solitaire Game",
+      "Square Grid",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Guide glowing wisps through enchanted forests, forming patterns to unlock magical scoring effects.",
-    "thumbnail": null,
+    "categories": [
+      "Abstract Strategy",
+      "Fantasy"
+    ],
+    "families": [
+      "Animals: Cats",
+      "Components: Ultraviolet light (blacklight)",
+      "Creatures: Fairies / Elves / Pixies",
+      "Digital Implementations: Board Game Arena",
+      "Digital Implementations: Yucata",
+      "Holidays: Halloween",
+      "Theme: Trees and Forests"
+    ],
+    "designers": [
+      "Reed Ambrose"
+    ],
+    "description": "Light up a magical forest and lure in a curious cat with glowing wisps.",
+    "thumbnail": "https://cf.geekdo-images.com/OymEgib8Sh3Mhup64pJX-A__small/img/wXH1XB5k_jQ8-oZdkcaSbdVzcjo=/fit-in/200x150/filters:strip_icc()/pic8857307.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 393322,
@@ -3400,18 +3770,31 @@
       "wargames": null
     },
     "mechanics": [
-      "Deck Building",
-      "Mutation",
-      "Combat"
+      "Contracts",
+      "End Game Bonuses",
+      "Solo / Solitaire Game",
+      "Tile Placement",
+      "Worker Placement, Different Worker Types"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Scientists engineer evolving creatures in tactical battles using adaptive genetic upgrades.",
-    "thumbnail": null,
+    "categories": [
+      "Environmental",
+      "Horror",
+      "Science Fiction"
+    ],
+    "families": [
+      "Components:  Meeples",
+      "Crowdfunding: Kickstarter",
+      "Decades: The 1920's",
+      "Theme: Steampunk"
+    ],
+    "designers": [
+      "Alexandros Kapidakis"
+    ],
+    "description": "A new biopunk world where biological enhancements are the best way to victory.",
+    "thumbnail": "https://cf.geekdo-images.com/bqh1xaHoUb6tV8kmyRjBXA__small/img/tjArrkGZIg_8eKICUyASRfF0_UA=/fit-in/200x150/filters:strip_icc()/pic7605615.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 12
   },
   {
     "id": 446231,
@@ -3450,18 +3833,36 @@
       "wargames": null
     },
     "mechanics": [
+      "Bingo",
       "Dice Rolling",
-      "Resource Management",
-      "Civilization Building"
+      "Die Icon Resolution",
+      "Paper-and-Pencil",
+      "Simultaneous Action Selection"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A standalone dice-driven adaptation of the 7 Wonders system where players develop ancient cities through dice drafting and engine building.",
-    "thumbnail": null,
+    "categories": [
+      "Ancient",
+      "City Building",
+      "Dice"
+    ],
+    "families": [
+      "Admin: Upcoming Releases",
+      "Components: Dice Cup / Dice Tower / Dice Tray",
+      "Components: Dice with Icons",
+      "Constructions: Lighthouses",
+      "Digital Implementations: Board Game Arena",
+      "Game: 7 Wonders",
+      "Mechanism: Roll-and-Write",
+      "Versions & Editions: Dice Versions of Non-Dice Games",
+      "Versions & Editions: Roll- or Flip-and-Write Versions of Non-Writing Games"
+    ],
+    "designers": [
+      "Antoine Bauza"
+    ],
+    "description": "Manage your resources to develop your city.",
+    "thumbnail": "https://cf.geekdo-images.com/FJtnBtuDIkRO95pGLSd5aA__small/img/T65TI1JX8FsVSIT_VvmSGKC_B2U=/fit-in/200x150/filters:strip_icc()/pic8871909.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 312633,
@@ -3498,17 +3899,32 @@
       "wargames": null
     },
     "mechanics": [
-      "Speed Matching",
-      "Pattern Recognition"
+      "Communication Limits",
+      "Cooperative Game",
+      "Deduction",
+      "Real-Time",
+      "Roles with Asymmetric Information",
+      "Targeted Clues",
+      "Team-Based Game"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A lighthearted breakfast-themed party game centered on rapid card matching and reflexes.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game",
+      "Children's Game",
+      "Deduction",
+      "Real-time",
+      "Word Game"
+    ],
+    "families": [
+      "Digital Implementations: TableTop Simulator Mod (TTS)"
+    ],
+    "designers": [
+      "Peter C. Hayward"
+    ],
+    "description": "Guess the word purely by comparing it to French Toast.",
+    "thumbnail": "https://cf.geekdo-images.com/NgY6zLy0EGdhfHdufrgxFQ__small/img/EeNA5aXqAF4MxQlrjT9eUc78R90=/fit-in/200x150/filters:strip_icc()/pic9202756.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2021,
+    "minAge": 6
   },
   {
     "id": 220,
@@ -3542,18 +3958,26 @@
       "wargames": null
     },
     "mechanics": [
-      "Auction/Bidding",
-      "Set Collection",
-      "Push Your Luck"
+      "Auction / Bidding",
+      "Auction: Turn Order Until Pass",
+      "Constrained Bidding",
+      "Hand Management"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players bid on luxury items and status symbols while avoiding bankruptcy in this classic Knizia auction game.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game"
+    ],
+    "families": [
+      "Series: Bookshelf (Gryphon Games)",
+      "Theme: Art style – Art Nouveau"
+    ],
+    "designers": [
+      "Reiner Knizia"
+    ],
+    "description": "Enhance your status via ostentatious expenditure but avoid scandal and shame.",
+    "thumbnail": "https://cf.geekdo-images.com/lNRG273h6gkd3szSY3EswQ__small/img/NZ-oIqqX02QUBX2GhB3hSRwpNcg=/fit-in/200x150/filters:strip_icc()/pic9202764.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 1995,
+    "minAge": 10
   },
   {
     "id": 433205,
@@ -3586,18 +4010,25 @@
       "wargames": null
     },
     "mechanics": [
-      "Dungeon Crawl",
-      "Cooperative Play",
-      "Dice Combat"
+      "Trick-taking"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Adventurers explore torch-lit dungeons, fighting monsters and managing light-based survival mechanics.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game"
+    ],
+    "families": [
+      "Creatures: Dragons",
+      "Creatures: Ghosts",
+      "Creatures: Goblins",
+      "Creatures: Monsters"
+    ],
+    "designers": [
+      "David Spalinski"
+    ],
+    "description": "Delve into dungeons to defeat monsters by the light of your torch.",
+    "thumbnail": "https://cf.geekdo-images.com/SNYtiVdD8cAF87ri7GLq7w__small/img/A4GjDDUDVVGNLwT05TfKp8cQnr8=/fit-in/200x150/filters:strip_icc()/pic9202766.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 10
   },
   {
     "id": 408280,
@@ -3632,18 +4063,41 @@
       "wargames": null
     },
     "mechanics": [
-      "Memory",
-      "Family Game",
-      "Light Strategy"
+      "Connections",
+      "Grid Coverage",
+      "Map Addition",
+      "Open Drafting",
+      "Pattern Building",
+      "Set Collection",
+      "Solo / Solitaire Game",
+      "Square Grid",
+      "Tile Placement",
+      "Turn Order: Claim Action",
+      "Variable Set-up"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A simple star-themed memory game where players match constellations and light patterns.",
-    "thumbnail": null,
+    "categories": [
+      "Space Exploration"
+    ],
+    "families": [
+      "Components: Dry Erase Markers / Dry Erase Surfaces",
+      "Components: Standees",
+      "Components: Transparent Elements",
+      "Containers: Drawstring Bag",
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Board Game Arena",
+      "Occupation: Astronaut",
+      "Space: Asteroids",
+      "Space: Comets",
+      "Theme: Astronomy"
+    ],
+    "designers": [
+      "Ammon Anderson"
+    ],
+    "description": "Draft tiles and connect constellations in the puzzly tile-layer with modular scoring.",
+    "thumbnail": "https://cf.geekdo-images.com/1XZdv7Fop6Py-jDfulAZXg__small/img/OHZ_HKg-y6rOyRVMhwT-RM1a-oQ=/fit-in/200x150/filters:strip_icc()/pic8638673.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 8
   },
   {
     "id": 436516,
@@ -3676,18 +4130,28 @@
       "wargames": null
     },
     "mechanics": [
+      "Area Majority / Influence",
+      "Auction / Bidding",
+      "Auction: Dutch",
+      "Events",
+      "Voting"
+    ],
+    "categories": [
       "Economic",
-      "Trading",
+      "Real-time",
       "Space Exploration"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Interstellar traders negotiate contracts and build supply chains across alien star systems.",
-    "thumbnail": null,
+    "families": [
+      "Crowdfunding: Kickstarter"
+    ],
+    "designers": [
+      "Reiner Knizia"
+    ],
+    "description": "Compete in intergalactic mini-games and Dutch auctions. Most money wins!",
+    "thumbnail": "https://cf.geekdo-images.com/GINqipWTQ4BdR-zC-LLbPg__small/img/nDmHL2bzCA9DVSDzra9_QdpbAL0=/fit-in/200x150/filters:strip_icc()/pic8634817.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 13
   },
   {
     "id": 421974,
@@ -3721,18 +4185,32 @@
       "wargames": null
     },
     "mechanics": [
+      "Contracts",
+      "Open Drafting",
       "Set Collection",
-      "Push Your Luck",
-      "Light Strategy"
+      "Solo / Solitaire Game",
+      "Turn Order: Claim Action",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Pirate crews compete for treasure while managing tea-themed resources and risky expeditions.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game",
+      "Pirates"
+    ],
+    "families": [
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Tabletopia",
+      "Food & Drink: Tea",
+      "Players: Games with Solitaire Rules",
+      "Theme: Pirates"
+    ],
+    "designers": [
+      "Emily Vincent"
+    ],
+    "description": "Pirates compete to serve their Captain the best afternoon tea.",
+    "thumbnail": "https://cf.geekdo-images.com/RE3NfhG4sltDSa4tzOfT0w__small/img/hmVxlC6Q9I0oDZ3gUQIEFkQ0Rek=/fit-in/200x150/filters:strip_icc()/pic8713272.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 10
   },
   {
     "id": 461932,
@@ -3766,18 +4244,29 @@
       "wargames": null
     },
     "mechanics": [
-      "Engine Building",
-      "Card Drafting",
-      "Set Collection"
+      "Hand Management",
+      "Open Drafting",
+      "Solo / Solitaire Game"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Expands Wingspan with new bird species from the Americas and additional end-of-round abilities.",
-    "thumbnail": null,
+    "categories": [
+      "Expansion for Base-game"
+    ],
+    "families": [
+      "Animals: Birds",
+      "Digital Implementations: Tabletopia",
+      "Game: Wingspan",
+      "Region: Caribbean Sea",
+      "Region: Central America",
+      "Theme: Nature"
+    ],
+    "designers": [
+      "Elizabeth Hargrave"
+    ],
+    "description": "Travel to the Americas to discover new birds for your wildlife preserve.",
+    "thumbnail": "https://cf.geekdo-images.com/DidRjYgGarrVcK1fXkbCIA__small/img/L9rEO1gmcQVmHDr6hrnhe4OUSyU=/fit-in/200x150/filters:strip_icc()/pic9326617.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 14
   },
   {
     "id": 462369,
@@ -3813,18 +4302,26 @@
       "wargames": null
     },
     "mechanics": [
-      "Worker Placement",
-      "Engine Building",
-      "Expansion Content"
+      "Market",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Adds new modules and strategies focused on wine aging, contracts, and advanced vineyard management for Viticulture.",
-    "thumbnail": null,
+    "categories": [
+      "Expansion for Base-game"
+    ],
+    "families": [
+      "Admin: Upcoming Releases",
+      "Cities: Bordeaux (France)",
+      "Digital Implementations: Tabletopia",
+      "Game: Viticulture"
+    ],
+    "designers": [
+      "Jamey Stegmaier"
+    ],
+    "description": "Venture beyond old-world Italy to Bordeaux via this new 4-season board.",
+    "thumbnail": "https://cf.geekdo-images.com/DAe50nSwheTHeOUs4wJWsQ__small/img/Wcmiz0ucB3QttumjQp0kWPUZgKs=/fit-in/200x150/filters:strip_icc()/pic9338844.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 14
   },
   {
     "id": 133848,
@@ -3860,18 +4357,38 @@
       "wargames": null
     },
     "mechanics": [
+      "Dice Rolling",
+      "Hand Management",
+      "Race",
+      "Set Collection",
+      "Trading",
+      "Variable Player Powers",
       "Worker Placement",
-      "Dice Workers",
-      "Area Control"
+      "Worker Placement with Dice Workers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players manage workers and resources in a satirical dystopian society while balancing morale and authority.",
-    "thumbnail": null,
+    "categories": [
+      "Science Fiction"
+    ],
+    "families": [
+      "Components: Dice with Icons",
+      "Components: Game Trayz Inside",
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: BoardSpace",
+      "Digital Implementations: TableTop Simulator Mod (TTS)",
+      "Digital Implementations: Tabletopia",
+      "Game: Euphoria",
+      "Misc: Mensa Select",
+      "Players: Games with expansions that add solo play"
+    ],
+    "designers": [
+      "Jamey Stegmaier",
+      "Alan Stone"
+    ],
+    "description": "Place worker dice strategically to build your authority and take over a dystopia.",
+    "thumbnail": "https://cf.geekdo-images.com/aaEdtCTpdlDLTn_tuDuC0g__small/img/9BsIaNTaCuhQtx806N8Clm1fGO0=/fit-in/200x150/filters:strip_icc()/pic1615561.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2013,
+    "minAge": 13
   },
   {
     "id": 436126,
@@ -3906,18 +4423,37 @@
       "wargames": null
     },
     "mechanics": [
-      "Engine Building",
-      "Card Drafting",
-      "Combo Building"
+      "End Game Bonuses",
+      "Hand Management",
+      "Once-Per-Game Abilities",
+      "Solo / Solitaire Game",
+      "Tags"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Inspired by Wingspan, players discover and study aquatic life while building efficient marine ecosystems.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Card Game",
+      "Educational"
+    ],
+    "families": [
+      "Animals: Fish / Fishes",
+      "Category: DIZED Tutorial",
+      "Digital Implementations: Tabletopia",
+      "Game: Wingspan",
+      "Mechanism: Tableau Building",
+      "Misc: GettingGames Tutorial Videos",
+      "Misc: Made by Panda",
+      "Organizations: Automa Factory",
+      "Players: Games with Solitaire Rules"
+    ],
+    "designers": [
+      "David Gordon (I)",
+      "Michael O'Connell (II)"
+    ],
+    "description": "Dive into the watery depths to find and observe a vast array of aquatic life.",
+    "thumbnail": "https://cf.geekdo-images.com/BBefMnVYBDS3EbJ9fPaC8A__small/img/Wo2snzBQJMaVXkFdYl-zXL8PrbA=/fit-in/200x150/filters:strip_icc()/pic8634453.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 408636,
@@ -3951,18 +4487,34 @@
       "wargames": null
     },
     "mechanics": [
-      "Worker Placement",
-      "Resource Management",
-      "Archaeology"
+      "Chaining",
+      "Open Drafting",
+      "Solo / Solitaire Game",
+      "Track Movement",
+      "Turn Order: Pass Order",
+      "Variable Player Powers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Reconstruct prehistoric settlements while managing limited resources and archaeological discovery.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game",
+      "Prehistoric"
+    ],
+    "families": [
+      "Animals: Wild boar",
+      "Country: Scotland",
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Board Game Arena",
+      "Islands: Orkney (Scotland)",
+      "Players: Games with Solitaire Rules",
+      "Series: Ancient Anthology (Garphill Games)"
+    ],
+    "designers": [
+      "Shem Phillips"
+    ],
+    "description": "Gather resources and shelter the settlers of Neolithic Northern Scotland.",
+    "thumbnail": "https://cf.geekdo-images.com/v10bXNbLAYa5PSrCYTbEUA__small/img/OjEhoOb49kU4vpePRba-FNs-gJE=/fit-in/200x150/filters:strip_icc()/pic7906024.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 13
   },
   {
     "id": 448182,
@@ -3997,18 +4549,31 @@
       "wargames": null
     },
     "mechanics": [
-      "Card Drafting",
+      "End Game Bonuses",
+      "Multi-Use Cards",
+      "Open Drafting",
       "Set Collection",
-      "Combo Building"
+      "Tags",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players recruit quirky castle inhabitants and chain together scoring combinations in a light tactical card game.",
-    "thumbnail": null,
+    "categories": [
+      "Expansion for Base-game",
+      "Card Game",
+      "Medieval"
+    ],
+    "families": [
+      "Admin: Upcoming Releases",
+      "Digital Implementations: Board Game Arena"
+    ],
+    "designers": [
+      "Grégory Grard",
+      "Mathieu Roussel"
+    ],
+    "description": "Add twelve outlaws to your party for even greater combos!",
+    "thumbnail": "https://cf.geekdo-images.com/q8z1jLt70WjTwtVEXvPbvQ__small/img/pS4iaDTSZwm_sQdYHFRMOVSPOvs=/fit-in/200x150/filters:strip_icc()/pic9086369.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 374134,
@@ -4042,18 +4607,26 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Urban Planning",
-      "Area Control"
+      "Pattern Building",
+      "Point to Point Movement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Design a modern Indian city through strategic zoning, infrastructure planning, and civic development.",
-    "thumbnail": null,
+    "categories": [
+      "City Building"
+    ],
+    "families": [
+      "Country: India",
+      "Digital Implementations: Board Game Arena",
+      "Misc: LongPack Games",
+      "Theme: City"
+    ],
+    "designers": [
+      "Toni López"
+    ],
+    "description": "A pattern matching game based on the architectural work of Le Corbusier.",
+    "thumbnail": "https://cf.geekdo-images.com/GHMJDnPmqvL3o4fLkG3mIQ__small/img/o2M9CmDWWArDnH1zYWKtVNtvl8I=/fit-in/200x150/filters:strip_icc()/pic7794453.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 10
   },
   {
     "id": 420931,
@@ -4088,18 +4661,33 @@
       "wargames": null
     },
     "mechanics": [
-      "Party Game",
-      "Memory",
-      "Light Strategy"
+      "Area Movement",
+      "Set Collection",
+      "Solo / Solitaire Game",
+      "Variable Player Powers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A Halloween-themed game of spooky challenges, memory tricks, and light competition.",
-    "thumbnail": null,
+    "categories": [
+      "Horror",
+      "Movies / TV / Radio theme",
+      "Science Fiction"
+    ],
+    "families": [
+      "Components:  Meeples",
+      "Components: Meeples (Monster)",
+      "Creatures: Monsters",
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Tabletopia",
+      "Holidays: Halloween",
+      "Theme: Movies"
+    ],
+    "designers": [
+      "D. Brad Talton, Jr."
+    ],
+    "description": "A riveting board game of cinematic horror where YOU become the monsters!",
+    "thumbnail": "https://cf.geekdo-images.com/6MhSo4tSxkMlhXJ362nqHg__small/img/4L9xE3d42fI3tKIdfNl6RR3ON6c=/fit-in/200x150/filters:strip_icc()/pic8356842.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 12
   },
   {
     "id": 231733,
@@ -4133,18 +4721,37 @@
       "wargames": null
     },
     "mechanics": [
-      "Worker Placement",
-      "Economic",
-      "Victorian Theme"
+      "Action Retrieval",
+      "Closed Drafting",
+      "Deck, Bag, and Pool Building",
+      "Hand Management",
+      "Solo / Solitaire Game",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Rebuild a prestigious Victorian estate and attract aristocratic guests to restore family honor.",
-    "thumbnail": null,
+    "categories": [
+      "Post-Napoleonic"
+    ],
+    "families": [
+      "Components:  Meeples",
+      "Country: England",
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Board Game Arena",
+      "Game: Obsession",
+      "History: Regency Era",
+      "Mechanism: Tableau Building",
+      "Misc: Made by Panda",
+      "Players: Games with expansions that change player count",
+      "Players: Games with Solitaire Rules",
+      "Theme: Love / Romance"
+    ],
+    "designers": [
+      "Dan Hallagan"
+    ],
+    "description": "Renovate an estate, manage servants, and pursue romance in Victorian England.",
+    "thumbnail": "https://cf.geekdo-images.com/sy89BiuZXfbSnG7Cag9tBQ__small/img/eTnMwfCC2jCGDPXC08SIaMXNOTM=/fit-in/200x150/filters:strip_icc()/pic5902073.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2018,
+    "minAge": 14
   },
   {
     "id": 438442,
@@ -4177,18 +4784,34 @@
       "wargames": null
     },
     "mechanics": [
+      "Area Movement",
+      "End Game Bonuses",
+      "Hexagon Grid",
+      "Income",
+      "Roles with Asymmetric Information",
       "Tile Placement",
-      "Exploration",
-      "Set Collection"
+      "Variable Player Powers",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Navigate a mystical swamp while gathering magical ingredients and avoiding dangerous terrain.",
-    "thumbnail": null,
+    "categories": [
+      "Civilization",
+      "Economic",
+      "Fantasy",
+      "Territory Building"
+    ],
+    "families": [
+      "Theme: Anthropomorphic Animals",
+      "Theme: Wetlands / Swamps / Bogs / Fens / Marshland"
+    ],
+    "designers": [
+      "Helge Ostertag",
+      "Anselm Ostertag"
+    ],
+    "description": "Rise as the most prosperous clan in this magical swamp.",
+    "thumbnail": "https://cf.geekdo-images.com/lxzo9PekKd4TRyBUlLH7Yw__small/img/1cEL93SEH6KEoO7CAlde9Sqi12s=/fit-in/200x150/filters:strip_icc()/pic8703614.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 12
   },
   {
     "id": 425081,
@@ -4215,18 +4838,32 @@
       "wargames": null
     },
     "mechanics": [
-      "Party Game",
-      "Dexterity",
-      "Humor"
+      "Catch the Leader",
+      "Hand Management",
+      "Lose a Turn",
+      "Set Collection"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A chaotic cat-themed dexterity game involving quick reflexes and comedic mishaps.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Card Game",
+      "Humor",
+      "Party Game"
+    ],
+    "families": [
+      "Animals: Cats",
+      "Card Games: Draw and Discard",
+      "Card Games: Exchange",
+      "Mechanism: Partially overlapping cards"
+    ],
+    "designers": [
+      "Jeff Pritchett",
+      "Chloe Pritchett"
+    ],
+    "description": "Collect kittens & evade a variety of sabotage to win. Easy as herding cats!",
+    "thumbnail": "https://cf.geekdo-images.com/6ML9--L06TQd34uZekOoQQ__small/img/0_0iFGgE3zRAMakUIULRwpgyt60=/fit-in/200x150/filters:strip_icc()/pic8395481.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 7
   },
   {
     "id": 9209,
@@ -4260,18 +4897,41 @@
       "wargames": null
     },
     "mechanics": [
-      "Route Building",
-      "Set Collection",
-      "Network Building"
+      "Connections",
+      "Contracts",
+      "End Game Bonuses",
+      "Hand Management",
+      "Network and Route Building",
+      "Open Drafting",
+      "Push Your Luck",
+      "Set Collection"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Build railway routes across maps while completing destination tickets and blocking opponents.",
-    "thumbnail": null,
+    "categories": [
+      "Trains"
+    ],
+    "families": [
+      "Components: Map (Continental / National scale)",
+      "Continents: North America",
+      "Country: USA",
+      "Digital Implementations: Apple App Store",
+      "Digital Implementations: Board Game Arena",
+      "Digital Implementations: Google Play",
+      "Digital Implementations: Steam",
+      "Game: Ticket to Ride (Official)",
+      "Misc: BGG Hall of Fame",
+      "Misc: Dice Tower Hall of Fame",
+      "Misc: Watch It Played How To Videos",
+      "Players: Games with expansions that change player count",
+      "Theme: Trains"
+    ],
+    "designers": [
+      "Alan R. Moon"
+    ],
+    "description": "All aboard!  Collect trains, choo-choo-choose your routes, fulfill your destination!",
+    "thumbnail": "https://cf.geekdo-images.com/kdWYkW-7AqG63HhqPL6ekA__small/img/5G46jv8MFh_BfX67iMSouTMhKxc=/fit-in/200x150/filters:strip_icc()/pic8937637.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2004,
+    "minAge": 8
   },
   {
     "id": 230802,
@@ -4304,18 +4964,38 @@
       "wargames": null
     },
     "mechanics": [
+      "Chaining",
+      "End Game Bonuses",
+      "Grid Coverage",
+      "Open Drafting",
       "Pattern Building",
-      "Drafting",
-      "Set Collection"
+      "Set Collection",
+      "Square Grid",
+      "Tile Placement",
+      "Turn Order: Claim Action"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players draft colorful tiles to decorate palace walls while balancing efficiency and penalties.",
-    "thumbnail": null,
+    "categories": [
+      "Abstract Strategy",
+      "Renaissance"
+    ],
+    "families": [
+      "Components: 5 x 5 Grids",
+      "Country: Portugal",
+      "Digital Implementations: Apple App Store",
+      "Digital Implementations: Board Game Arena",
+      "Game: Azul",
+      "Misc: Mensa Select",
+      "Theme: Art",
+      "Versions & Editions: Travel Versions of Non-Travel Games"
+    ],
+    "designers": [
+      "Michael Kiesling"
+    ],
+    "description": "Artfully embellish the walls of your palace by drafting the most beautiful tiles.",
+    "thumbnail": "https://cf.geekdo-images.com/aPSHJO0d0XOpQR5X-wJonw__small/img/ccsXKrdGJw-YSClWwzVUwk5Nh9Y=/fit-in/200x150/filters:strip_icc()/pic6973671.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2017,
+    "minAge": 8
   },
   {
     "id": 13,
@@ -4347,18 +5027,53 @@
       "wargames": null
     },
     "mechanics": [
+      "Chaining",
+      "Dice Rolling",
+      "Hand Management",
+      "Hexagon Grid",
+      "Hidden Victory Points",
+      "Income",
+      "Market",
+      "Modular Board",
+      "Network and Route Building",
+      "Race",
+      "Random Production",
+      "Take That",
       "Trading",
-      "Route Building",
-      "Dice Rolling"
+      "Variable Set-up"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players colonize an island by gathering resources, trading, and building settlements to earn victory points.",
-    "thumbnail": null,
+    "categories": [
+      "Economic",
+      "Negotiation"
+    ],
+    "families": [
+      "Animals: Sheep",
+      "Components: Hexagonal Tiles",
+      "Components: HexHex3 Grids",
+      "Components: Wooden pieces & boards",
+      "Digital Implementations: Apple App Store",
+      "Digital Implementations: Board Game Arena",
+      "Digital Implementations: BrettspielWelt",
+      "Digital Implementations: Screentop.gg",
+      "Digital Implementations: Steam",
+      "Game: Catan",
+      "Islands: Fictional",
+      "Misc: BGG Hall of Fame",
+      "Misc: Dice Tower Hall of Fame",
+      "Misc: Watch It Played How To Videos",
+      "Players: Games with expansions that change player count",
+      "Promotional: Board Games",
+      "Series: World's Smallest (Super Impulse)",
+      "Theme: Colonial"
+    ],
+    "designers": [
+      "Klaus Teuber"
+    ],
+    "description": "Collect and trade resources to build up the island of Catan in this modern classic.",
+    "thumbnail": "https://cf.geekdo-images.com/0XODRpReiZBFUffEcqT5-Q__small/img/SNVfF23OQafv3u8xdFolJnMkBoM=/fit-in/200x150/filters:strip_icc()/pic9156909.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 1995,
+    "minAge": 10
   },
   {
     "id": 439310,
@@ -4391,18 +5106,28 @@
       "wargames": null
     },
     "mechanics": [
-      "Team-Based Play",
       "Communication Limits",
-      "Pattern Building"
+      "Pattern Building",
+      "Race",
+      "Real-Time",
+      "Team-Based Game"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Teams race to recreate hidden brick constructions using verbal instructions under time pressure.",
-    "thumbnail": null,
+    "categories": [
+      "Party Game",
+      "Real-time"
+    ],
+    "families": [
+      "Components: 3-Dimensional (3D)",
+      "Toys: LEGO"
+    ],
+    "designers": [
+      "Luca Bellini"
+    ],
+    "description": "Can you guide a teammate to place LEGO bricks the right way?",
+    "thumbnail": "https://cf.geekdo-images.com/CZKKeMBDeyPCRvFmOKsqKQ__small/img/JzxeNsSqDDQSrhWVdzxmfFX-wV4=/fit-in/200x150/filters:strip_icc()/pic9048844.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 7
   },
   {
     "id": 412911,
@@ -4435,18 +5160,37 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Construction",
-      "Family Strategy"
+      "End Game Bonuses",
+      "Hot Potato",
+      "Income",
+      "Open Drafting",
+      "Pattern Building",
+      "Pieces as Map",
+      "Three Dimensional Movement",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Build elaborate jungle structures while managing playful monkey mechanics and spatial constraints.",
-    "thumbnail": null,
+    "categories": [
+      "Abstract Strategy",
+      "Animals",
+      "Children's Game"
+    ],
+    "families": [
+      "Animals: Apes / Monkeys",
+      "Mechanism: Tower Stacking",
+      "Series: LEGO Games",
+      "Theme: Construction",
+      "Theme: Trees and Forests",
+      "Toys: LEGO"
+    ],
+    "designers": [
+      "David Gordon (I)",
+      "TAM"
+    ],
+    "description": "Rebuild a breathtaking palace for a community of monkeys.",
+    "thumbnail": "https://cf.geekdo-images.com/E0_jjeKtADvRnn0vSVGgeQ__small/img/oZkmJTRjIayLYOCs8eStlOVEEgo=/fit-in/200x150/filters:strip_icc()/pic8445137.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 10
   },
   {
     "id": 434001,
@@ -4479,18 +5223,28 @@
       "wargames": null
     },
     "mechanics": [
-      "Dexterity",
-      "Real-Time",
-      "Party Game"
+      "Set Collection",
+      "Simultaneous Action Selection",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Fast-paced climbing race game where players scramble to reach the top first under chaotic conditions.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Fantasy"
+    ],
+    "families": [
+      "Admin: Upcoming Releases",
+      "Animals: Squirrels / Chipmunks",
+      "Theme: Anthropomorphic Animals"
+    ],
+    "designers": [
+      "David Gordon (I)",
+      "TAM"
+    ],
+    "description": "Take on the role of a squirrel racing for nuts and berries!",
+    "thumbnail": "https://cf.geekdo-images.com/z1kQuT__knMhvJFYBWNyGg__small/img/28czQE0cLfFZXhwMzGZX5O0uUNs=/fit-in/200x150/filters:strip_icc()/pic8598500.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 8
   },
   {
     "id": 393333,
@@ -4524,18 +5278,29 @@
       "wargames": null
     },
     "mechanics": [
-      "Engine Building",
-      "Action Selection",
-      "Scientific Research"
+      "Area Majority / Influence",
+      "End Game Bonuses",
+      "Rondel",
+      "Variable Set-up"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players advance astronomy and scientific discovery during the Renaissance through research and observation.",
-    "thumbnail": null,
+    "categories": [
+      "Renaissance"
+    ],
+    "families": [
+      "Admin: Better Description Needed!",
+      "Game: Galileo Galilei",
+      "Historical Figures: Galileo Galilei",
+      "Theme: Astronomy",
+      "Theme: Science"
+    ],
+    "designers": [
+      "Tomáš Holek"
+    ],
+    "description": "Discover what Galileo himself didn't, find new planets and star systems!",
+    "thumbnail": "https://cf.geekdo-images.com/VxVtboFXPDhqw6Zd5Pcsrg__small/img/pfH4t_A06XVpeM2A8WWF3am29OQ=/fit-in/200x150/filters:strip_icc()/pic7883604.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 12
   },
   {
     "id": 422042,
@@ -4568,18 +5333,27 @@
       "wargames": null
     },
     "mechanics": [
-      "Deck Building",
-      "Resource Management",
-      "Engine Building"
+      "Automatic Resource Growth",
+      "Deck, Bag, and Pool Building",
+      "End Game Bonuses"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Cultivate tea plantations and optimize trade routes across evolving market demands.",
-    "thumbnail": null,
+    "categories": [
+      "Ancient",
+      "Economic",
+      "Farming"
+    ],
+    "families": [
+      "Food & Drink: Tea",
+      "Players: Games with expansions that add solo play"
+    ],
+    "designers": [
+      "Tomáš Holek"
+    ],
+    "description": "Witness the birth of tea culture in ancient China.",
+    "thumbnail": "https://cf.geekdo-images.com/LIIX8JddEnTiwVV_cQ-mCA__small/img/Gz04y-9W33ODQ2VxlpuVxahf7lM=/fit-in/200x150/filters:strip_icc()/pic8238877.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 12
   },
   {
     "id": 435330,
@@ -4613,18 +5387,28 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Spatial Puzzle",
-      "Set Collection"
+      "Grid Coverage",
+      "Hand Management"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Create tranquil pond ecosystems filled with wildlife and balanced natural features.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Card Game",
+      "Environmental"
+    ],
+    "families": [
+      "Animals: Frogs / Toads",
+      "Components: 4 x 5 Grids",
+      "Digital Implementations: Board Game Arena",
+      "Players: Games with Solitaire Rules"
+    ],
+    "designers": [
+      "Tomáš Holek"
+    ],
+    "description": "The most vibrant frog pond you’ve ever seen!",
+    "thumbnail": "https://cf.geekdo-images.com/qDpRayhnFA-BbcMytyHkqg__small/img/mAeN6m_KO-Sb6nwYnUErtcnR2so=/fit-in/200x150/filters:strip_icc()/pic8746745.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 7
   },
   {
     "id": 441696,
@@ -4659,18 +5443,39 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
+      "Action Queue",
+      "Hand Management",
+      "Hexagon Grid",
+      "Open Drafting",
       "Set Collection",
-      "Engine Building"
+      "Solo / Solitaire Game",
+      "Tile Placement",
+      "Variable Set-up"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Design a thriving wildlife sanctuary by placing habitats and supporting biodiversity.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Environmental",
+      "Territory Building"
+    ],
+    "families": [
+      "Category: DIZED Tutorial",
+      "Game: Ark Nova",
+      "Mechanism: Tableau Building",
+      "Misc: LongPack Games",
+      "Players: Games with Solitaire Rules",
+      "Theme: Ecology",
+      "Theme: Environmental Protection / Degradation / Pollution",
+      "Theme: Science",
+      "Theme: Zoos, Aquaria, Safari Parks"
+    ],
+    "designers": [
+      "Mathias Wigge"
+    ],
+    "description": "Build a modern zoo for animals and achieve conservation goals.",
+    "thumbnail": "https://cf.geekdo-images.com/C6V2VCtf1_7cavenn7Is3A__small/img/ZJJOWNSKk81xpvNkMpGd5T0ybLo=/fit-in/200x150/filters:strip_icc()/pic8932906.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 12
   },
   {
     "id": 437383,
@@ -4704,18 +5509,30 @@
       "wargames": null
     },
     "mechanics": [
-      "4X",
-      "Tableau Building",
-      "Variable Powers"
+      "Action Drafting",
+      "Action Points",
+      "Income",
+      "Solo / Solitaire Game",
+      "Tech Trees / Tech Tracks",
+      "Turn Order: Stat-Based",
+      "Variable Player Powers",
+      "Worker Placement"
     ],
-    "categories": [],
+    "categories": [
+      "Civilization",
+      "Economic",
+      "Science Fiction",
+      "Space Exploration"
+    ],
     "families": [],
-    "designers": [],
-    "description": "A compact civilization-style game where factions explore, expand, exploit, and exterminate across a modular galaxy.",
-    "thumbnail": null,
+    "designers": [
+      "Jeffrey CCH"
+    ],
+    "description": "Explore, expand, and build your galactic empire using over 30 unique factions.",
+    "thumbnail": "https://cf.geekdo-images.com/M6tQ8rCB09ryMmTq5Fopbw__small/img/JxgZucWuh9yCK-B4gtue33DLlek=/fit-in/200x150/filters:strip_icc()/pic8654473.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 421823,
@@ -4748,18 +5565,26 @@
       "wargames": null
     },
     "mechanics": [
-      "Engine Building",
-      "Worker Placement",
-      "Area Control"
+      "Area Majority / Influence",
+      "Hand Management",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Rival Roman families compete for influence through politics, trade, and military power across multiple eras of Rome.",
-    "thumbnail": null,
+    "categories": [
+      "Ancient",
+      "Card Game"
+    ],
+    "families": [
+      "Admin: Better Description Needed!",
+      "Ancient: Rome"
+    ],
+    "designers": [
+      "Martin Wallace"
+    ],
+    "description": "The Roman gentes strategically fight for power.",
+    "thumbnail": "https://cf.geekdo-images.com/2nK2uzqBfba_A3zwXLBXhw__small/img/MOTSyBKc5y4WTPJ-Z_KDtl0azS0=/fit-in/200x150/filters:strip_icc()/pic8224690.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 428440,
@@ -4792,18 +5617,36 @@
       "wargames": null
     },
     "mechanics": [
+      "End Game Bonuses",
+      "Grid Coverage",
+      "Open Drafting",
+      "Pattern Building",
+      "Set Collection",
+      "Solo / Solitaire Game",
       "Tile Placement",
-      "Ecosystem Building",
-      "Pattern Building"
+      "Variable Set-up"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Create thriving shallow-water ecosystems filled with marine life interactions.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Puzzle"
+    ],
+    "families": [
+      "Animals: Coral / Jellyfish / Anemones",
+      "Animals: Fish / Fishes",
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Tabletopia",
+      "Region: Coral Sea",
+      "Region: Oceania",
+      "Theme: Sealife, Seas, and Oceans"
+    ],
+    "designers": [
+      "Yeom.C.W"
+    ],
+    "description": "A multi-layer puzzle board game featuring marine animals of the Great Barrier Reef",
+    "thumbnail": "https://cf.geekdo-images.com/i8ohLkXX_9a7uTWZ7l7Kqw__small/img/rzLUb9DW7cT08eLQwF1i9GClnB8=/fit-in/200x150/filters:strip_icc()/pic8418427.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 400366,
@@ -4837,18 +5680,40 @@
       "wargames": null
     },
     "mechanics": [
-      "Tableau Building",
+      "End Game Bonuses",
+      "Hand Management",
+      "Hexagon Grid",
+      "Open Drafting",
+      "Set Collection",
+      "Tags",
+      "Variable Player Powers",
       "Worker Placement",
-      "Engine Building"
+      "Worker Placement, Different Worker Types"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Discover and study fantastical creatures while building synergies between habitats and research actions.",
-    "thumbnail": null,
+    "categories": [
+      "Fantasy"
+    ],
+    "families": [
+      "Components: Magnets",
+      "Components: Meeples (Animal) / Animeeples",
+      "Components: Sand Timers",
+      "Components: Wooden pieces & boards",
+      "Containers: Book-like",
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Board Game Arena",
+      "Digital Implementations: TableTop Simulator Mod (TTS)",
+      "Digital Implementations: Tabletopia",
+      "Mechanism: Tableau Building",
+      "Players: Games with Solitaire Rules"
+    ],
+    "designers": [
+      "Yeom.C.W"
+    ],
+    "description": "Build the best reserve in the world for 100+ fantastic creatures!",
+    "thumbnail": "https://cf.geekdo-images.com/3ue_3La0WYopTSDER3shUA__small/img/4SreytxNoZL435EkTriKB08W5W0=/fit-in/200x150/filters:strip_icc()/pic8389014.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 14
   },
   {
     "id": 381249,
@@ -4884,18 +5749,31 @@
       "wargames": null
     },
     "mechanics": [
-      "Trick-Taking",
-      "Humor",
-      "Party Game"
+      "Events",
+      "Trick-taking",
+      "Variable Player Powers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A light trick-taking game with fairy tale twists where princesses reject traditional roles.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game"
+    ],
+    "families": [
+      "Digital Implementations: TableTop Simulator Mod (TTS)",
+      "Folk Tales & Fairy Tales: The Frog Prince",
+      "Organizations: Board Games Association of Creators in Spain (LUDO)",
+      "Series: Beveled Boxes (Gigamic)",
+      "Theme: Love / Romance"
+    ],
+    "designers": [
+      "Daniel Byrne",
+      "José Gerardo Guerrero",
+      "Kevin Peláez",
+      "Tirso Virgós"
+    ],
+    "description": "Avoid marriage proposals and become the only single princess at the end of the party!",
+    "thumbnail": "https://cf.geekdo-images.com/HuWvVU2tcff-vu3EjPtk6Q__small/img/O50Jyvp_CPWRBdYidjQedORzwqc=/fit-in/200x150/filters:strip_icc()/pic7605211.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2023,
+    "minAge": 8
   },
   {
     "id": 438119,
@@ -4930,18 +5808,28 @@
       "wargames": null
     },
     "mechanics": [
-      "Cooperative Play",
-      "Survival",
-      "Tactical Movement"
+      "Commodity Speculation",
+      "Market",
+      "Push Your Luck"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Villagers work together to defend their settlement from escalating threats and disasters.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game",
+      "Economic",
+      "Fantasy",
+      "Medieval"
+    ],
+    "families": [
+      "Creatures: Dragons",
+      "Digital Implementations: Board Game Arena"
+    ],
+    "designers": [
+      "Simon Weinberg"
+    ],
+    "description": "Villagers bribe a dragon to spare their village from burning.",
+    "thumbnail": "https://cf.geekdo-images.com/jW6SFTUKTDNAiMlXJ9R60A__small/img/PE3qy0snjAI5uGwSdPH4r3tjDkQ=/fit-in/200x150/filters:strip_icc()/pic8677734.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 199561,
@@ -4975,18 +5863,50 @@
       "wargames": null
     },
     "mechanics": [
-      "Dice Drafting",
+      "Contracts",
+      "Dice Rolling",
+      "End Game Bonuses",
+      "Grid Coverage",
+      "Open Drafting",
       "Pattern Building",
-      "Set Collection"
+      "Set Collection",
+      "Solo / Solitaire Game",
+      "Turn Order: Progressive",
+      "Variable Set-up"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players draft dice to craft stained-glass windows while balancing color and number restrictions.",
-    "thumbnail": null,
+    "categories": [
+      "Abstract Strategy",
+      "Dice",
+      "Puzzle"
+    ],
+    "families": [
+      "Category: DIZED Tutorial",
+      "Cities: Barcelona (Spain)",
+      "Components: Coloured Dice",
+      "Components: Dice as Playing Units",
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Apple App Store",
+      "Digital Implementations: Dire Wolf Game Room",
+      "Digital Implementations: Google Play",
+      "Digital Implementations: Steam",
+      "Game: Sagrada",
+      "Mechanism: Dice Drafting",
+      "Misc: Watch It Played How To Videos",
+      "Organizations: The Game Artisans of Canada",
+      "Players: Games with Solitaire Rules",
+      "Theme: Art",
+      "Theme: Art style – Art Nouveau",
+      "Theme: Stained Glass"
+    ],
+    "designers": [
+      "Adrian Adamescu",
+      "Daryl Andrews"
+    ],
+    "description": "Craft the best stained-glass windows by carefully placing colorful translucent dice.",
+    "thumbnail": "https://cf.geekdo-images.com/77OxPP4ckbOgK9sPg-6KDw__small/img/zCe7i6vc7LoJZDDnVUQQlU-uw4w=/fit-in/200x150/filters:strip_icc()/pic9374520.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2017,
+    "minAge": 14
   },
   {
     "id": 424816,
@@ -5019,18 +5939,27 @@
       "wargames": null
     },
     "mechanics": [
-      "Climbing",
       "Hand Management",
-      "Card Shedding"
+      "Ladder Climbing"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A fast-playing card game where players strategically shed cards using escalating combinations and timing.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Card Game"
+    ],
+    "families": [
+      "Animals: Apes / Monkeys",
+      "Card Games: Climbing",
+      "Card Games: Draw and Discard",
+      "Card Games: Shedding / Stops"
+    ],
+    "designers": [
+      "荒尾 俊樹 (Toshiki Arao)"
+    ],
+    "description": "Be the first to get rid of your cards by playing combos and enhancing your hand.",
+    "thumbnail": "https://cf.geekdo-images.com/-s3g7tvzTk-aylhc7Uy2pw__small/img/s2po1RsewfUXnUPOLaTGEIVs5jE=/fit-in/200x150/filters:strip_icc()/pic8918687.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 8
   },
   {
     "id": 423013,
@@ -5061,18 +5990,33 @@
       "wargames": null
     },
     "mechanics": [
-      "Worker Placement",
-      "Resource Collection",
-      "Area Control"
+      "Action Points",
+      "End Game Bonuses",
+      "Events",
+      "Modular Board",
+      "Network and Route Building",
+      "Pick-up and Deliver",
+      "Set Collection",
+      "Square Grid",
+      "Tile Placement",
+      "Variable Player Powers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Arctic tribes compete to gather resources and construct sacred monuments before the thaw arrives.",
-    "thumbnail": null,
+    "categories": [
+      "Adventure",
+      "Exploration"
+    ],
+    "families": [
+      "Crowdfunding: Kickstarter",
+      "Region: Arctic"
+    ],
+    "designers": [
+      "Mat Hanson"
+    ],
+    "description": "Adventurers manipulate pathways to research idols in a frozen temple.",
+    "thumbnail": "https://cf.geekdo-images.com/qpdcaHi-3WeQ3Se-1VhGVw__small/img/BPeirzdN2YXBG2vTvXE35T_I4J8=/fit-in/200x150/filters:strip_icc()/pic8999804.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 436907,
@@ -5104,18 +6048,30 @@
       "wargames": null
     },
     "mechanics": [
+      "Closed Drafting",
+      "Contracts",
       "Dice Rolling",
-      "Push Your Luck",
-      "Fantasy Sports"
+      "Hand Management",
+      "Predictive Bid",
+      "Trick-taking"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Adventurers compete in chaotic arena-style competitions using dice-driven abilities and tactical risk-taking.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game",
+      "Dice",
+      "Fantasy"
+    ],
+    "families": [
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Tabletopia"
+    ],
+    "designers": [
+      "Pete Wissinger"
+    ],
+    "description": "A tavern trick-taker where each suit changes the win condition of the trick.",
+    "thumbnail": "https://cf.geekdo-images.com/D8KVw6zRpRzzbXA2IOX1Jg__small/img/Wzu8flJsdlEuPfSumRUT6ZjmZFI=/fit-in/200x150/filters:strip_icc()/pic8644669.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 14
   },
   {
     "id": 447737,
@@ -5146,18 +6102,28 @@
       "wargames": null
     },
     "mechanics": [
-      "Area Control",
-      "Survival",
-      "Resource Management"
+      "Card Play Conflict Resolution",
+      "Constrained Bidding",
+      "Deduction",
+      "Hand Management"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Survive harsh northern conditions while competing for territory and scarce resources.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game"
+    ],
+    "families": [
+      "Digital Implementations: Tabletopia",
+      "History: Viking Expansion",
+      "Mythology: Norse",
+      "Theme: Vikings"
+    ],
+    "designers": [
+      "James Dickinson"
+    ],
+    "description": "Conquer outposts with your raiders and heroes for Ragnarok is upon us.",
+    "thumbnail": "https://cf.geekdo-images.com/r15zLVwm_yADURF-7A995w__small/img/NiGDDY5xduNdLyPN479TtUYd0hQ=/fit-in/200x150/filters:strip_icc()/pic8935192.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 450685,
@@ -5190,18 +6156,25 @@
       "wargames": null
     },
     "mechanics": [
-      "Party Game",
-      "Bluffing",
-      "Dexterity"
+      "Modular Board",
+      "Set Collection"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A light comedic game of sneaky grabbing, timing, and bluffing under chaotic group conditions.",
-    "thumbnail": null,
+    "categories": [
+      "Bluffing",
+      "Deduction"
+    ],
+    "families": [
+      "Theme: Mystery / Crime"
+    ],
+    "designers": [
+      "Jonathan Gilmour-Long",
+      "David Gordon (I)"
+    ],
+    "description": "Scheme and plan the perfect heist as The Mastermind to pinch valuables.",
+    "thumbnail": "https://cf.geekdo-images.com/22AnFHoTPMpjQwR9PB1xMw__small/img/SJPO5ROtaVYG9zotXY5jWyKj72k=/fit-in/200x150/filters:strip_icc()/pic8999350.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 417197,
@@ -5234,18 +6207,38 @@
       "wargames": null
     },
     "mechanics": [
-      "Area Control",
-      "Tile Placement",
-      "Civilization Building"
+      "Area Majority / Influence",
+      "Contracts",
+      "End Game Bonuses",
+      "Hexagon Grid",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Rebuild civilizations after collapse through strategic land development and resource planning.",
-    "thumbnail": null,
+    "categories": [
+      "Environmental",
+      "Fantasy",
+      "Farming",
+      "Science Fiction"
+    ],
+    "families": [
+      "Components: Map (Continental / National scale)",
+      "Components: RE-Wood",
+      "Country: Ireland",
+      "Country: Scotland",
+      "Crowdfunding: Kickstarter",
+      "Crowdfunding: Xinwuji",
+      "Misc: LongPack Games",
+      "Misc: Watch It Played How To Videos",
+      "Theme: Environmental Protection / Degradation / Pollution",
+      "Theme: Nature"
+    ],
+    "designers": [
+      "Reiner Knizia"
+    ],
+    "description": "Rebuild old lands in a lush, hopeful future.",
+    "thumbnail": "https://cf.geekdo-images.com/tyv6lPMlyU7YIUztlILQYQ__small/img/_CXQQbXsewUlde4R22XCRApxZ5k=/fit-in/200x150/filters:strip_icc()/pic8587890.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 10
   },
   {
     "id": 432705,
@@ -5278,18 +6271,31 @@
       "wargames": null
     },
     "mechanics": [
-      "Set Collection",
-      "Tile Placement",
-      "Cultural Theme"
+      "Contracts",
+      "End Game Bonuses",
+      "Increase Value of Unchosen Resources",
+      "Open Drafting",
+      "Pattern Building",
+      "Solo / Solitaire Game"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Build offerings for Día de los Muertos celebrations while balancing memory, color, and tradition.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game",
+      "Educational",
+      "Puzzle"
+    ],
+    "families": [
+      "Country: Mexico",
+      "Holidays: Day of the Dead"
+    ],
+    "designers": [
+      "Orlando Sá",
+      "André Santos"
+    ],
+    "description": "Build an altar to celebrate your loved ones for the Mexican Day of the Dead.",
+    "thumbnail": "https://cf.geekdo-images.com/9ZFHtzDq5LIV-t3x_oM-tQ__small/img/vvSMCznidJHIzqfA1QZ17lo4M0w=/fit-in/200x150/filters:strip_icc()/pic8574369.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 429438,
@@ -5322,18 +6328,36 @@
       "wargames": null
     },
     "mechanics": [
-      "Deck Building",
-      "Area Control",
-      "Variable Powers"
+      "Area Majority / Influence",
+      "Highest-Lowest Scoring",
+      "Point to Point Movement",
+      "Set Collection",
+      "Solo / Solitaire Game",
+      "Tile Placement",
+      "Track Movement",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Mythological Incan factions battle for influence and divine favor in a richly thematic strategy game.",
-    "thumbnail": null,
+    "categories": [
+      "Ancient",
+      "Civilization",
+      "Educational"
+    ],
+    "families": [
+      "Animals: Llamas / Alpacas",
+      "Cities: Cusco (Peru)",
+      "Continents: South America",
+      "Country: Inca Empire",
+      "Misc: GettingGames Tutorial Videos"
+    ],
+    "designers": [
+      "Mandela Fernandez-Grandon",
+      "Fabio Lopiano"
+    ],
+    "description": "Advance your clan & seek the favour of the gods at the dawn of the Inca civilisation",
+    "thumbnail": "https://cf.geekdo-images.com/Bpomnj9RBdTwQNcuFrAmVg__small/img/wkTKinRioV7dwaupRnywU5MpQ1Y=/fit-in/200x150/filters:strip_icc()/pic8444642.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 371330,
@@ -5367,18 +6391,41 @@
       "wargames": null
     },
     "mechanics": [
-      "Engine Building",
-      "Resource Management",
-      "Crafting"
+      "Area Majority / Influence",
+      "Auction / Bidding",
+      "Dice Rolling",
+      "End Game Bonuses",
+      "Open Drafting",
+      "Solo / Solitaire Game",
+      "Turn Order: Claim Action",
+      "Variable Phase Order",
+      "Variable Player Powers",
+      "Worker Placement",
+      "Worker Placement, Different Worker Types"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Master instrument makers compete to craft legendary musical pieces and fulfill patron commissions.",
-    "thumbnail": null,
+    "categories": [
+      "Age of Reason",
+      "Industry / Manufacturing",
+      "Music"
+    ],
+    "families": [
+      "Components: Official Music Soundtrack",
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: Tabletopia",
+      "Misc: GettingGames Tutorial Videos",
+      "Misc: Made by Panda",
+      "Music: Classical",
+      "Theme: Music Making & Makers"
+    ],
+    "designers": [
+      "Dave Beck",
+      "Abe Burson"
+    ],
+    "description": "Craft musical instruments for patrons through worker placement and hidden bidding.",
+    "thumbnail": "https://cf.geekdo-images.com/NNOCMpxKchQb_ByLmvDfRQ__small/img/hgZk4xlsFSfbXyMy2Y32dFqXCHM=/fit-in/200x150/filters:strip_icc()/pic8145392.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 438214,
@@ -5412,18 +6459,30 @@
       "wargames": null
     },
     "mechanics": [
-      "Cooperative Play",
       "Action Points",
-      "Pick-up and Deliver"
+      "Area Movement",
+      "Cooperative Game",
+      "Dice Rolling",
+      "Pick-up and Deliver",
+      "Solo / Solitaire Game",
+      "Variable Player Powers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players coordinate rescue operations to save endangered animals from natural disasters and habitat collapse.",
-    "thumbnail": null,
+    "categories": [
+      "Animals"
+    ],
+    "families": [
+      "Category: DIZED Tutorial",
+      "Players: Games with Solitaire Rules"
+    ],
+    "designers": [
+      "Matt Leacock",
+      "Lisa Towell"
+    ],
+    "description": "Join a team of specialists performing daring animal rescues!",
+    "thumbnail": "https://cf.geekdo-images.com/C4M7fvCw6ano4v9P17Hz3Q__small/img/lkbJyrQ1qb00CE9ng0l-cV23_XQ=/fit-in/200x150/filters:strip_icc()/pic9036946.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 8
   },
   {
     "id": 385331,
@@ -5459,18 +6518,35 @@
       "wargames": null
     },
     "mechanics": [
-      "Tableau Building",
+      "Hand Management",
+      "Modular Board",
+      "Movement Points",
+      "Multi-Use Cards",
       "Set Collection",
-      "Open Drafting"
+      "Simultaneous Action Selection",
+      "Worker Placement with Dice Workers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Assemble magical creatures into traveling caravans while optimizing synergies and destination goals.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game",
+      "Fantasy",
+      "Travel"
+    ],
+    "families": [
+      "Crowdfunding: Gamefound",
+      "Mechanism: Tableau Building",
+      "Misc: Made by Panda",
+      "Players: Games with expansions that change player count",
+      "Players: Games with Solitaire Rules",
+      "Setting: World of Arzium"
+    ],
+    "designers": [
+      "Ryan Laukat"
+    ],
+    "description": "Caravans of fantasy creatures travel through a dangerous land.",
+    "thumbnail": "https://cf.geekdo-images.com/uNHX1bzPjFuSlJSTbTsEPA__small/img/p7BAc_ujUEaoC1gOUarNLojOprg=/fit-in/200x150/filters:strip_icc()/pic7497404.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 8
   },
   {
     "id": 457571,
@@ -5502,18 +6578,29 @@
       "wargames": null
     },
     "mechanics": [
-      "City Building",
+      "Closed Drafting",
+      "Contracts",
+      "Pattern Building",
+      "Set Collection",
       "Tile Placement",
-      "Contract Fulfillment"
+      "Variable Set-up",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Compete to build thriving American cities by balancing growth, tourism, and infrastructure.",
-    "thumbnail": null,
+    "categories": [
+      "City Building"
+    ],
+    "families": [
+      "Country: USA"
+    ],
+    "designers": [
+      "Steve Finn",
+      "Phil Walker-Harding"
+    ],
+    "description": "Urban planners transform a bustling metropolis into a modern masterpiece.",
+    "thumbnail": "https://cf.geekdo-images.com/QoJS52XoluGyuorES5j2dg__small/img/1vWtRnD2PT8qCXZiqGGDe1zaN9w=/fit-in/200x150/filters:strip_icc()/pic9202710.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 10
   },
   {
     "id": 419720,
@@ -5545,18 +6632,29 @@
       "wargames": null
     },
     "mechanics": [
-      "Area Majority",
-      "Route Building",
-      "Resource Collection"
+      "Dice Rolling",
+      "Open Drafting"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Competing expeditions explore Australia while building infrastructure and claiming territory for prestige.",
-    "thumbnail": null,
+    "categories": [
+      "Animals"
+    ],
+    "families": [
+      "Animals: Turtles",
+      "Components: Coloured Dice",
+      "Country: Australia",
+      "Region: Pacific Ocean",
+      "Theme: Nature",
+      "Theme: Sealife, Seas, and Oceans"
+    ],
+    "designers": [
+      "Leo Colovini",
+      "Alessandro Zucchini"
+    ],
+    "description": "Discover life as a sea turtle off the coast of Australia.",
+    "thumbnail": "https://cf.geekdo-images.com/9HiBaejsfSLdMyQ3qAprOg__small/img/Nnwh3ZKSAZa2u76oz1LaiM0DGjk=/fit-in/200x150/filters:strip_icc()/pic8647670.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 10
   },
   {
     "id": 438936,
@@ -5586,15 +6684,37 @@
       "thematic": null,
       "wargames": null
     },
-    "mechanics": [],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "",
-    "thumbnail": null,
+    "mechanics": [
+      "Action Drafting",
+      "End Game Bonuses",
+      "Income",
+      "Multi-Use Cards",
+      "Open Drafting",
+      "Variable Set-up",
+      "Worker Placement"
+    ],
+    "categories": [
+      "Economic",
+      "Medieval"
+    ],
+    "families": [
+      "Category: Combinatorial",
+      "Components:  Meeples",
+      "Components: Control Boards",
+      "Country: Japan",
+      "Players: Two-Player Only Games",
+      "Theme: Samurai",
+      "Versions & Editions: Two-Player Versions of More-Player Games"
+    ],
+    "designers": [
+      "Isra C.",
+      "Shei S."
+    ],
+    "description": "Confront a rival clan in this exclusive two-player version of The White Castle.",
+    "thumbnail": "https://cf.geekdo-images.com/7jnU8jv4wym7vtDG3n4xYA__small/img/Ep_GWy6XNlBV794L3lYwcK4dqoc=/fit-in/200x150/filters:strip_icc()/pic8918307.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 367842,
@@ -5627,18 +6747,23 @@
       "wargames": null
     },
     "mechanics": [
-      "Area Control",
-      "Network Building",
-      "Hand Management"
+      "Market",
+      "Programmed Movement"
     ],
-    "categories": [],
+    "categories": [
+      "Economic",
+      "Fantasy"
+    ],
     "families": [],
-    "designers": [],
-    "description": "Players manipulate mystical energy lines across a fantasy map to control regions and score influence.",
-    "thumbnail": null,
+    "designers": [
+      "Daryl Andrews",
+      "Wolfgang Kramer"
+    ],
+    "description": "Gather magical resources from the land and seek out markets to sell at!",
+    "thumbnail": "https://cf.geekdo-images.com/lvln-x6bXErGg209vlL4Cw__small/img/hv27eyMedWqKy6wZ8FqqahAcTtc=/fit-in/200x150/filters:strip_icc()/pic7004385.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 451305,
@@ -5686,18 +6811,27 @@
       "wargames": null
     },
     "mechanics": [
-      "Logic Puzzle",
-      "Pattern Building",
-      "Solo/Co-op"
+      "Dice Rolling",
+      "Die Icon Resolution",
+      "Paper-and-Pencil",
+      "Solo / Solitaire Game",
+      "Square Grid"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Solve numerical and spatial puzzles inspired by sudoku-style constraints.",
-    "thumbnail": null,
+    "categories": [
+      "Party Game",
+      "Puzzle"
+    ],
+    "families": [
+      "Mechanism: Roll-and-Write"
+    ],
+    "designers": [
+      "Sandro Blasich"
+    ],
+    "description": "Fit the shapes into your Sudoku-style grid using strategy and wits.",
+    "thumbnail": "https://cf.geekdo-images.com/oA9DsnuMDTWOsa1yjTC_-w__small/img/IteDObgBJ6hPNn2pBXqatlilZyg=/fit-in/200x150/filters:strip_icc()/pic9042357.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 7
   },
   {
     "id": 453282,
@@ -5731,18 +6865,26 @@
       "wargames": null
     },
     "mechanics": [
-      "Pattern Building",
-      "Tile Placement",
-      "Set Collection"
+      "Contracts",
+      "Set Collection",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players weave intricate patterns using thread mechanics to maximize scoring efficiency.",
-    "thumbnail": null,
+    "categories": [
+      "Industry / Manufacturing"
+    ],
+    "families": [
+      "Admin: Better Description Needed!",
+      "Admin: Upcoming Releases",
+      "Theme: Sewing / Knitting / Cloth-Making"
+    ],
+    "designers": [
+      "Ellie Dix"
+    ],
+    "description": "Can you create the best bargello tapestries?",
+    "thumbnail": "https://cf.geekdo-images.com/5IRw7YdaJnyLZIrfFMwkrw__small/img/W7-KgVINVpkZnGweWGUKdO759ng=/fit-in/200x150/filters:strip_icc()/pic9160491.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 14
   },
   {
     "id": 406684,
@@ -5777,18 +6919,35 @@
       "wargames": null
     },
     "mechanics": [
-      "Roll-and-Write",
-      "Racing",
-      "Dexterity"
+      "Cooperative Game",
+      "Dice Rolling",
+      "Push Your Luck",
+      "Re-rolling and Locking",
+      "Scenario / Mission / Campaign Game",
+      "Semi-Cooperative Game",
+      "Solo / Solitaire Game",
+      "Team-Based Game",
+      "Track Movement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Fast sonic-inspired racing game using dice rolls to navigate obstacle courses.",
-    "thumbnail": null,
+    "categories": [
+      "Adventure",
+      "Card Game",
+      "Dice",
+      "Video Game Theme"
+    ],
+    "families": [
+      "Mechanism: Campaign Games",
+      "Misc: LongPack Games",
+      "Video Game Theme: Sonic the Hedgehog"
+    ],
+    "designers": [
+      "Anthony Thorp"
+    ],
+    "description": "Sonic and friends go through iconic Zones in this fast-paced, dice rolling adventure!",
+    "thumbnail": "https://cf.geekdo-images.com/Th_T4H6L-SjY7NI_3kUhEQ__small/img/xuYtx9ViCszrZxAni52hUNVtd1A=/fit-in/200x150/filters:strip_icc()/pic7882796.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 14
   },
   {
     "id": 370210,
@@ -5820,18 +6979,27 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Pattern Recognition",
-      "Spatial Puzzle"
+      "Pattern Building",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players grow microscopic aquatic organisms into beautiful interconnected colonies for points.",
-    "thumbnail": null,
+    "categories": [
+      "Puzzle"
+    ],
+    "families": [
+      "Components: Hexagonal Tiles",
+      "Crowdfunding: Kickstarter",
+      "Misc: Mensa Select",
+      "Theme: Art",
+      "Theme: Science"
+    ],
+    "designers": [
+      "Sabrina Culyba"
+    ],
+    "description": "Create a beautiful microscopic mosaic.",
+    "thumbnail": "https://cf.geekdo-images.com/ZzSmYZD8Iix-QuHtSWaHbw__small/img/liLlPBAA9x_KvRDCJ3c0TaVTkHY=/fit-in/200x150/filters:strip_icc()/pic8518419.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 8
   },
   {
     "id": 380784,
@@ -5866,18 +7034,34 @@
       "wargames": 2556
     },
     "mechanics": [
-      "Area Control",
-      "Combat",
-      "Engine Building"
+      "Cooperative Game",
+      "Deck Construction",
+      "Grid Movement",
+      "Hand Management",
+      "Market",
+      "Resource to Move",
+      "Take That",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Compete for dominance in a solar system through fleet battles and strategic expansion.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game",
+      "Fighting",
+      "Science Fiction",
+      "Wargame"
+    ],
+    "families": [
+      "Crowdfunding: Kickstarter",
+      "Digital Implementations: TableTop Simulator Mod (TTS)"
+    ],
+    "designers": [
+      "Phillip Gee",
+      "Xian Wu"
+    ],
+    "description": "Build your own ship and destroy your enemy ships by building the strongest card deck.",
+    "thumbnail": "https://cf.geekdo-images.com/TPVHKtLGBeXMCbyjTUDhyQ__small/img/sYnOoAZ63sJI3gz1fH6dj59uGAA=/fit-in/200x150/filters:strip_icc()/pic8856529.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2023,
+    "minAge": 14
   },
   {
     "id": 421217,
@@ -5910,18 +7094,32 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Pattern Building",
-      "Family Game"
+      "Area Majority / Influence",
+      "Dice Rolling",
+      "End Game Bonuses",
+      "Pick-up and Deliver",
+      "Track Movement",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Build festive winter villages filled with attractions, decorations, and scenic holiday landscapes.",
-    "thumbnail": null,
+    "categories": [
+      "Abstract Strategy",
+      "Dice",
+      "Fantasy"
+    ],
+    "families": [
+      "Components: 3-Dimensional (3D)",
+      "Components: Wooden pieces & boards",
+      "Crowdfunding: Kickstarter",
+      "Holidays: Christmas"
+    ],
+    "designers": [
+      "Chris Porter"
+    ],
+    "description": "Elves and humans compete to decorate the town in time for the Christmas Parade.",
+    "thumbnail": "https://cf.geekdo-images.com/dNF0se1To1Ht_GFjLh_maA__small/img/rhh6RQ0NGnwbewFyVdi-zkh4ULk=/fit-in/200x150/filters:strip_icc()/pic8531398.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 434367,
@@ -5955,18 +7153,36 @@
       "wargames": null
     },
     "mechanics": [
-      "Economic",
-      "Engine Building",
-      "Area Control"
+      "Area Majority / Influence",
+      "Contracts",
+      "End Game Bonuses",
+      "Income",
+      "Open Drafting",
+      "Solo / Solitaire Game",
+      "Variable Set-up",
+      "Worker Placement",
+      "Worker Placement, Different Worker Types"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Industrial corporations compete to dominate Japan’s modernization through factories and logistics networks.",
-    "thumbnail": null,
+    "categories": [
+      "Economic",
+      "Industry / Manufacturing"
+    ],
+    "families": [
+      "Components: Map (Continental / National scale)",
+      "Country: Japan",
+      "Crowdfunding: Kickstarter",
+      "History: Industrial Revolution",
+      "Misc: GettingGames Tutorial Videos"
+    ],
+    "designers": [
+      "Nuno Bizarro Sentieiro",
+      "Paulo Soledade"
+    ],
+    "description": "Control conglomerates of companies driving Japan’s economy.",
+    "thumbnail": "https://cf.geekdo-images.com/bOs_Um4cUUOpKnypCMykJA__small/img/WLGTv9N3yOkGWZSki-c0nc-L_oY=/fit-in/200x150/filters:strip_icc()/pic8844519.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 12
   },
   {
     "id": 415507,
@@ -6001,18 +7217,30 @@
       "wargames": null
     },
     "mechanics": [
+      "Open Drafting",
       "Pattern Building",
-      "Set Collection",
-      "Drafting"
+      "Square Grid",
+      "Tile Placement",
+      "Track Movement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Arrange traditional Japanese dolls into aesthetically pleasing displays for scoring combinations.",
-    "thumbnail": null,
+    "categories": [
+      "Industry / Manufacturing",
+      "Puzzle"
+    ],
+    "families": [
+      "Country: Japan",
+      "Digital Implementations: Board Game Arena",
+      "Misc: LongPack Games"
+    ],
+    "designers": [
+      "Igor Knop",
+      "André Teruya"
+    ],
+    "description": "Improve your skill tracks to build the best Kokeshi.",
+    "thumbnail": "https://cf.geekdo-images.com/f4hc_XiH4hHuAjOBFwV1iw__small/img/5gxgL6SvNlMC5I2tRc99HieZJro=/fit-in/200x150/filters:strip_icc()/pic8977616.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 14
   },
   {
     "id": 448496,
@@ -6046,18 +7274,24 @@
       "wargames": null
     },
     "mechanics": [
-      "Trick-Taking",
-      "Team Play",
-      "Variable Powers"
+      "Trick-taking"
     ],
-    "categories": [],
+    "categories": [
+      "Card Game",
+      "Horror",
+      "Humor",
+      "Math",
+      "Number"
+    ],
     "families": [],
-    "designers": [],
-    "description": "Players use asymmetric character abilities in a tactical trick-taking contest focused on daring plays.",
-    "thumbnail": null,
+    "designers": [
+      "Friedemann Friese"
+    ],
+    "description": "Try to stay close to the safe path while winning positive and negative tricks.",
+    "thumbnail": "https://cf.geekdo-images.com/mXSybukfBo3bnFy4u_ioFQ__small/img/0ZOcC0Yv0erKX0YTIEAX-2cihzY=/fit-in/200x150/filters:strip_icc()/pic8944454.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 415025,
@@ -6088,18 +7322,32 @@
       "wargames": null
     },
     "mechanics": [
-      "Engine Building",
-      "Resource Management",
-      "Crafting"
+      "Contracts",
+      "Follow",
+      "Hidden Victory Points",
+      "Income",
+      "Market",
+      "Modular Board",
+      "Victory Points as a Resource"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Forge intricate mechanical devices and optimize production chains in a steampunk workshop.",
-    "thumbnail": null,
+    "categories": [
+      "Economic",
+      "Fantasy",
+      "Industry / Manufacturing"
+    ],
+    "families": [
+      "Admin: Better Description Needed!",
+      "Components: Gears",
+      "Crowdfunding: Kickstarter"
+    ],
+    "designers": [
+      "Ananda Guneratne"
+    ],
+    "description": "Build your factory, rotate your gears, and complete your orders.",
+    "thumbnail": "https://cf.geekdo-images.com/783jEwZUnHRnydh56xJHyQ__small/img/pauz3p8fT7oed9fq4AtFZNWMi6o=/fit-in/200x150/filters:strip_icc()/pic8699633.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 378983,
@@ -6135,18 +7383,33 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Drafting",
-      "Set Collection"
+      "Chaining",
+      "Connections",
+      "End Game Bonuses",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players build an Irish county landscape using polyomino tiles while balancing sheep, whiskey, and terrain scoring.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Farming",
+      "Puzzle",
+      "Territory Building"
+    ],
+    "families": [
+      "Animals: Sheep",
+      "Components: Meeples (Animal) / Animeeples",
+      "Components: Polyominoes",
+      "Country: Ireland",
+      "Digital Implementations: Board Game Arena",
+      "Food & Drink: Liquor / Cocktails"
+    ],
+    "designers": [
+      "Günter Burkhardt"
+    ],
+    "description": "Build an Irish county piece by piece.",
+    "thumbnail": "https://cf.geekdo-images.com/tRW-yz-omIwXn0P8ItGC4g__small/img/jsIIngDdp0XiDZIlYJoAalSgL1A=/fit-in/200x150/filters:strip_icc()/pic7318778.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2023,
+    "minAge": 8
   },
   {
     "id": 428058,
@@ -6179,18 +7442,27 @@
       "wargames": null
     },
     "mechanics": [
-      "Guessing",
-      "Party Game",
-      "Risk Management"
+      "Hand Management",
+      "Open Drafting",
+      "Set Collection"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players predict whether values will rise or fall in a fast, chaotic betting-style party game.",
-    "thumbnail": null,
+    "categories": [
+      "Card Game"
+    ],
+    "families": [
+      "Card Games: Draw and Discard",
+      "Digital Implementations: Board Game Arena",
+      "Mechanism: Card Line"
+    ],
+    "designers": [
+      "Michael Kiesling",
+      "Wolfgang Kramer"
+    ],
+    "description": "Build rows of ascending or descending numbers.",
+    "thumbnail": "https://cf.geekdo-images.com/mDFmyVgBDbBISW60o5-u6A__small/img/Izz6ZCTW_qEPqlx6gJ5gNku0PEA=/fit-in/200x150/filters:strip_icc()/pic8794193.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2024,
+    "minAge": 8
   },
   {
     "id": 431493,
@@ -6223,18 +7495,30 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Environmental Management",
-      "Area Majority"
+      "Action Points",
+      "Contracts",
+      "End Game Bonuses",
+      "Hexagon Grid",
+      "Variable Player Powers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Competing forestry agencies cultivate sustainable forests while balancing conservation and profit.",
-    "thumbnail": null,
+    "categories": [
+      "Educational",
+      "Environmental",
+      "Farming",
+      "Industry / Manufacturing"
+    ],
+    "families": [
+      "Theme: Environmental Protection / Degradation / Pollution",
+      "Theme: Trees and Forests"
+    ],
+    "designers": [
+      "Michal Peichl"
+    ],
+    "description": "Become forest stewards who balance resource harvesting with sustainability.",
+    "thumbnail": "https://cf.geekdo-images.com/G8QE3IbgF41q75PY4kC1nA__small/img/69pYEVOCWdrjpWuS18AkVpIdXrE=/fit-in/200x150/filters:strip_icc()/pic9060310.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 13
   },
   {
     "id": 443932,
@@ -6265,18 +7549,29 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Pattern Building",
-      "Drafting"
+      "End Game Bonuses",
+      "Hand Management",
+      "Set Collection",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Build thriving underwater ecosystems by strategically placing marine habitats and sea life tiles.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Card Game",
+      "Puzzle"
+    ],
+    "families": [
+      "Animals: Fish / Fishes",
+      "Mechanism: Tableau Building",
+      "Theme: Zoos, Aquaria, Safari Parks"
+    ],
+    "designers": [
+      "Tomáš Holek"
+    ],
+    "description": "Take care of your lionfish.",
+    "thumbnail": "https://cf.geekdo-images.com/44BwMuvFoPjaHHmLZH8sGQ__small/img/ckCn6SFSeTdK_sE7njUJYQ0rPLw=/fit-in/200x150/filters:strip_icc()/pic8822242.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 12
   },
   {
     "id": 414117,
@@ -6309,18 +7604,35 @@
       "wargames": null
     },
     "mechanics": [
-      "Area Control",
-      "Combat",
-      "Asymmetric Powers"
+      "Action Drafting",
+      "Area Majority / Influence",
+      "Cooperative Game",
+      "Dice Rolling",
+      "Die Icon Resolution",
+      "Moving Multiple Units",
+      "Once-Per-Game Abilities",
+      "Open Drafting",
+      "Solo / Solitaire Game",
+      "Variable Player Powers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Competing factions battle for dominance over a fractured fantasy world using tactical combat and control.",
-    "thumbnail": null,
+    "categories": [
+      "Fantasy",
+      "Territory Building"
+    ],
+    "families": [
+      "Category: DIZED Tutorial",
+      "Components: Dice with Icons",
+      "Crowdfunding: Gamefound",
+      "Players: Games with Solitaire Rules"
+    ],
+    "designers": [
+      "Manny Trembley"
+    ],
+    "description": "Factions vie for control over the island of Wroth.",
+    "thumbnail": "https://cf.geekdo-images.com/pF07bElBCzBj1en-zTwFtQ__small/img/owqJWDObFHxuxCPMvATTe80iPeA=/fit-in/200x150/filters:strip_icc()/pic8978903.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 13
   },
   {
     "id": 429863,
@@ -6353,18 +7665,29 @@
       "wargames": null
     },
     "mechanics": [
-      "Area Control",
-      "Negotiation",
-      "Asymmetric Powers"
+      "Action Points",
+      "Set Collection",
+      "Solo / Solitaire Game",
+      "Worker Placement",
+      "Zone of Control"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Powerful factions forge alliances and wage strategic wars in a dark science-fantasy universe.",
-    "thumbnail": null,
+    "categories": [
+      "Adventure",
+      "Fantasy"
+    ],
+    "families": [
+      "Components: Dice with Icons",
+      "Creatures: Dwarves & Gnomes",
+      "Digital Implementations: Tabletopia"
+    ],
+    "designers": [
+      "Germán P. Millán"
+    ],
+    "description": "Lead your dwarven clan to reclaim the sacred mountain.",
+    "thumbnail": "https://cf.geekdo-images.com/4XkIFGbIAXtA-pDb6nlvsg__small/img/uQ9etIk8_uvoJuVA9ZzTtNYORKg=/fit-in/200x150/filters:strip_icc()/pic8968542.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 443085,
@@ -6398,18 +7721,30 @@
       "wargames": null
     },
     "mechanics": [
-      "Exploration",
-      "Engine Building",
-      "Sci-Fi Strategy"
+      "Action Drafting",
+      "Contracts",
+      "End Game Bonuses",
+      "Hexagon Grid",
+      "Map Addition",
+      "Open Drafting",
+      "Pick-up and Deliver"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Investigate alien worlds and technologies while building scientific understanding through modular exploration systems.",
-    "thumbnail": null,
+    "categories": [
+      "Science Fiction",
+      "Space Exploration"
+    ],
+    "families": [
+      "Admin: Better Description Needed!",
+      "Admin: Upcoming Releases"
+    ],
+    "designers": [
+      "Dan Manfredini"
+    ],
+    "description": "Aliens coordinate planetary missions to collect knowledge and specimens",
+    "thumbnail": "https://cf.geekdo-images.com/zJmzafjA3uklJRvzHZndgQ__small/img/WEVyzTbCecmLwYKyAow_E3g8Pnc=/fit-in/200x150/filters:strip_icc()/pic8805300.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 430813,
@@ -6441,18 +7776,28 @@
       "wargames": null
     },
     "mechanics": [
-      "Dice Combat",
-      "Area Movement",
-      "Team-Based Play"
+      "Area Majority / Influence",
+      "Grid Movement",
+      "Team-Based Game",
+      "Variable Player Powers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A streamlined underwater warfare game adapting the Axis & Allies system to submarine conflict.",
-    "thumbnail": null,
+    "categories": [
+      "Fantasy",
+      "Miniatures",
+      "Wargame"
+    ],
+    "families": [
+      "Game: Axis & Allies (Avalon Hill)",
+      "Theme: Under the Sea"
+    ],
+    "designers": [
+      "Matt Hyra"
+    ],
+    "description": "Partner your underwater army with another to dominate the oceans.",
+    "thumbnail": "https://cf.geekdo-images.com/S6Z4KgUXKfTGkzbXOaL4qA__small/img/Z6OJbkAUXU-9XHNfi_QDmtSICVQ=/fit-in/200x150/filters:strip_icc()/pic8483263.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 423404,
@@ -6485,18 +7830,28 @@
       "wargames": null
     },
     "mechanics": [
-      "Pattern Building",
-      "Dice Drafting",
-      "Set Collection"
+      "Action Timer",
+      "Elapsed Real Time Ending",
+      "Memory"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players attract colorful hummingbirds to gardens by carefully arranging flowers and nectar sources.",
-    "thumbnail": null,
+    "categories": [
+      "Action / Dexterity",
+      "Animals",
+      "Memory",
+      "Real-time"
+    ],
+    "families": [
+      "Animals: Birds",
+      "Components: Sand Timers"
+    ],
+    "designers": [
+      "Jason Tremblay"
+    ],
+    "description": "A simple game where you estimate when hidden sand timers are done!",
+    "thumbnail": "https://cf.geekdo-images.com/MdNCcoko7ykIO6UXuDCaqA__small/img/dpOMFrPB9Y7bBBIqMeFMJ07zPQg=/fit-in/200x150/filters:strip_icc()/pic9068465.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 8
   },
   {
     "id": 419130,
@@ -6528,18 +7883,35 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Ecological Simulation",
-      "Area Majority"
+      "Open Drafting",
+      "Solo / Solitaire Game",
+      "Square Grid",
+      "Tile Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Grow biodiverse rainforest ecosystems while balancing wildlife habitats and environmental pressures.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Environmental",
+      "Puzzle"
+    ],
+    "families": [
+      "Country: Indonesia",
+      "Digital Implementations: Board Game Arena",
+      "Misc: Mensa Select",
+      "Misc: Watch It Played How To Videos",
+      "Players: Games with Solitaire Rules",
+      "Theme: Ecology",
+      "Theme: Nature",
+      "Theme: Trees and Forests"
+    ],
+    "designers": [
+      "Asger Aleksandrov Granerud",
+      "Daniel Skjold Pedersen"
+    ],
+    "description": "Watch your rainforest come alive with majestic trees and iconic animals.",
+    "thumbnail": "https://cf.geekdo-images.com/6FW_5-zuDPb1pGuM3fMFTQ__small/img/NPBTht8YovEJIZ8IEPmKlh3m4Mw=/fit-in/200x150/filters:strip_icc()/pic8280787.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 8
   },
   {
     "id": 429405,
@@ -6573,18 +7945,36 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Engine Building",
-      "Historical Simulation"
+      "Action Retrieval",
+      "End Game Bonuses",
+      "Rondel",
+      "Set Collection",
+      "Tech Trees / Tech Tracks",
+      "Variable Set-up",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players maintain and expand the famous astronomical clock while managing civic and scientific developments in medieval Prague.",
-    "thumbnail": null,
+    "categories": [
+      "Medieval",
+      "Renaissance"
+    ],
+    "families": [
+      "Cities: Prague (Czech Republic)",
+      "Country: Czech Republic",
+      "History: Age of Discovery",
+      "Religious: Christianity",
+      "Theme: Astrology",
+      "Theme: Astronomy",
+      "Theme: Stained Glass"
+    ],
+    "designers": [
+      "Abraham Sanchez Hermida",
+      "Paloma J. Pascual"
+    ],
+    "description": "Become part of Prague’s legacy by assembling the majestic and intricate Orloj.",
+    "thumbnail": "https://cf.geekdo-images.com/PhwbD--vP0xEdMD-WZlZTA__small/img/ju1B0GUZf3KZ8exbXZNBG3jrpDs=/fit-in/200x150/filters:strip_icc()/pic8685899.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 442655,
@@ -6620,18 +8010,35 @@
       "wargames": null
     },
     "mechanics": [
-      "Survival",
-      "Resource Management",
-      "Area Control"
+      "Cooperative Game",
+      "Modular Board",
+      "Multi-Use Cards",
+      "Solo / Solitaire Game"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Wildlife species compete to survive droughts, predators, and shifting savanna ecosystems.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Puzzle"
+    ],
+    "families": [
+      "Admin: Upcoming Releases",
+      "Animals: Elephants",
+      "Continents: Africa",
+      "Digital Implementations: Board Game Arena",
+      "Players: Games with Solitaire Rules",
+      "Theme: Nature",
+      "Theme: Survival"
+    ],
+    "designers": [
+      "Asger Aleksandrov Granerud",
+      "Mads Fløe",
+      "Dan Halstad",
+      "Daniel Skjold Pedersen"
+    ],
+    "description": "Outsmart the savanna’s dangers in a cooperative elephant adventure.",
+    "thumbnail": "https://cf.geekdo-images.com/INl40stk33DiC1CtDKMmqA__small/img/W7VuLVtZT29zez3OpmKE02HmGB0=/fit-in/200x150/filters:strip_icc()/pic9071679.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 10
   },
   {
     "id": 396790,
@@ -6665,18 +8072,41 @@
       "wargames": null
     },
     "mechanics": [
-      "Network Building",
-      "Resource Conversion",
-      "Economic"
+      "Action Retrieval",
+      "Contracts",
+      "End Game Bonuses",
+      "Hand Management",
+      "Income",
+      "Market",
+      "Network and Route Building",
+      "Solo / Solitaire Game",
+      "Tech Trees / Tech Tracks",
+      "Variable Player Powers"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Harness atomic energy to power industrial expansion in an alternate-history energy revolution.",
-    "thumbnail": null,
+    "categories": [
+      "Economic",
+      "Industry / Manufacturing",
+      "Science Fiction"
+    ],
+    "families": [
+      "Components: Map (Regional scale)",
+      "Digital Implementations: Tabletopia",
+      "History: Industrial Revolution",
+      "Misc: GettingGames Tutorial Videos",
+      "Misc: LongPack Games",
+      "Region: Saxony (Germany)",
+      "Theme: Alternate History",
+      "Theme: Electricity Generation"
+    ],
+    "designers": [
+      "Simone Luciani",
+      "Dávid Turczi"
+    ],
+    "description": "Become the leader of the industrial revolution in an alternate timeline.",
+    "thumbnail": "https://cf.geekdo-images.com/fIVUaMvbfy6GCOgfxt7xaw__small/img/jKsO4nKmtNjX5bfH7aCPeK7hsqU=/fit-in/200x150/filters:strip_icc()/pic7647168.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2023,
+    "minAge": 14
   },
   {
     "id": 448159,
@@ -6710,18 +8140,32 @@
       "wargames": null
     },
     "mechanics": [
-      "Economic",
-      "Route Building",
-      "Industrial Expansion"
+      "Auction / Bidding",
+      "End Game Bonuses",
+      "Income",
+      "Network and Route Building",
+      "Turn Order: Auction"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Compete during the railway boom era to build infrastructure and dominate transport logistics.",
-    "thumbnail": null,
+    "categories": [
+      "Economic",
+      "Industry / Manufacturing",
+      "Trains"
+    ],
+    "families": [
+      "Admin: Better Description Needed!",
+      "Country: Japan",
+      "Organizations: Forgenext",
+      "Theme: Trains"
+    ],
+    "designers": [
+      "Hisashi Hayashi",
+      "Simone Luciani"
+    ],
+    "description": "Lay your tracks to revolutionize the Japan railway industry!",
+    "thumbnail": "https://cf.geekdo-images.com/HLf1dKFTM4y7EwdQubbazQ__small/img/yFsR_l7zagtOjSmxVKqZlegRpo8=/fit-in/200x150/filters:strip_icc()/pic8951049.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 14
   },
   {
     "id": 455904,
@@ -6748,18 +8192,28 @@
       "wargames": null
     },
     "mechanics": [
-      "Exploration",
+      "Hand Management",
       "Set Collection",
-      "Card Drafting"
+      "Variable Set-up"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Sail the seas discovering ancient scrolls and combining knowledge for exploration bonuses.",
-    "thumbnail": null,
+    "categories": [
+      "Animals",
+      "Card Game"
+    ],
+    "families": [
+      "Admin: Better Description Needed!",
+      "Admin: Upcoming Releases",
+      "Animals: Fish / Fishes",
+      "Animals: Sharks"
+    ],
+    "designers": [
+      "Alex Houghton"
+    ],
+    "description": "Form the largest school of fish or get eaten by sharks!",
+    "thumbnail": "https://cf.geekdo-images.com/35R4p6SwC4JQWNe9ynwA6w__small/img/i24Wlcx9ZVvdHDpuWZq5fpCV-BU=/fit-in/200x150/filters:strip_icc()/pic9149603.jpg",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2026,
+    "minAge": 10
   },
   {
     "id": 431481,
@@ -6793,17 +8247,32 @@
       "wargames": null
     },
     "mechanics": [
-      "Tile Placement",
-      "Pattern Building"
+      "Pattern Building",
+      "Solo / Solitaire Game",
+      "Worker Placement"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "Players organize overflowing bookshelves by carefully arranging books and decorations to maximize cozy scoring objectives.",
-    "thumbnail": null,
+    "categories": [
+      "Puzzle"
+    ],
+    "families": [
+      "Category: DIZED Tutorial",
+      "Containers: Book-like",
+      "Crowdfunding: Kickstarter",
+      "Organizations: Game Designers of North Carolina",
+      "Players: Games with Solitaire Rules",
+      "Theme: Books / Libraries",
+      "Theme: Rooms: Interiour Design, Home Decoration, Tidying",
+      "Theme: Shelving"
+    ],
+    "designers": [
+      "Alex Cutler",
+      "Michael Mihealsick"
+    ],
+    "description": "Acquire, arrange, and admire your books as you complete rewarding projects!",
+    "thumbnail": "https://cf.geekdo-images.com/aPj94RRrT5oliCph1zaVbw__small/img/3p0Edz0i3N9KsVSy4ALhbJDXe-Y=/fit-in/200x150/filters:strip_icc()/pic8519566.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 10
   },
   {
     "id": 447267,
@@ -6836,18 +8305,24 @@
       "wargames": null
     },
     "mechanics": [
-      "Survival",
-      "Resource Management",
-      "Area Control"
+      "Market",
+      "Rondel"
     ],
-    "categories": [],
-    "families": [],
+    "categories": [
+      "Animals",
+      "City Building"
+    ],
+    "families": [
+      "Animals: Penguins",
+      "Theme: Anthropomorphic Animals",
+      "Theme: City"
+    ],
     "designers": [],
-    "description": "Build and sustain a colony in frozen conditions while managing environmental threats.",
-    "thumbnail": null,
+    "description": "Waddle your way to victory by building up the premier penguin paradise!",
+    "thumbnail": "https://cf.geekdo-images.com/2a4QfHcAQJLCdsa1AfpBWw__small/img/f8waTA8QCdHsj49jB3elaZYg8hc=/fit-in/200x150/filters:strip_icc()/pic8907220.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 6
   },
   {
     "id": 444648,
@@ -6881,17 +8356,22 @@
       "wargames": null
     },
     "mechanics": [
-      "Dexterity",
-      "Party Game",
-      "Push Your Luck"
+      "Hand Management",
+      "Race"
     ],
-    "categories": [],
-    "families": [],
-    "designers": [],
-    "description": "A chaotic water-park racing game where timing and physical dexterity determine survival in obstacle-filled slides.",
-    "thumbnail": null,
+    "categories": [
+      "Racing"
+    ],
+    "families": [
+      "Theme: Anthropomorphic Animals"
+    ],
+    "designers": [
+      "Moyuki Adisawa (アヂサワモユキ)"
+    ],
+    "description": "Play your cards right to make your jet ski soar.",
+    "thumbnail": "https://cf.geekdo-images.com/s9iFJ2eDYT_10TIDBHmTkw__small/img/B8Mfwzht2Pe4mx5PxcbY91AjPLI=/fit-in/200x150/filters:strip_icc()/pic8835448.png",
     "image": null,
-    "yearPublished": null,
-    "minAge": null
+    "yearPublished": 2025,
+    "minAge": 6
   }
 ]

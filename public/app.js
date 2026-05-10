@@ -13,22 +13,22 @@ const SORT_KEYS = {
   tags: r => { const t = TAGS[r.id] || {}; return (t.want ? 2 : 0) + (t.played ? 1 : 0); },
   pmn:  r => r.minPlayers,
   pmx:  r => r.maxPlayers,
-  ob:   r => r.bestPlayers && r.bestPlayers.length ? r.bestPlayers[0] : 99,
-  or:   r => r.recommendedPlayers && r.recommendedPlayers.length ? Math.min(...r.recommendedPlayers) : 99,
+  ob:   r => r.bestPlayers && r.bestPlayers.length ? r.bestPlayers[0] : Infinity,
+  or:   r => r.recommendedPlayers && r.recommendedPlayers.length ? Math.min(...r.recommendedPlayers) : Infinity,
   w:    r => r.weight,
-  tmn:  r => r.minTime ?? 999,
-  tmx:  r => r.maxTime ?? 999,
+  tmn:  r => r.minTime ?? Infinity,
+  tmx:  r => r.maxTime ?? Infinity,
   a:    r => r.avgRating,
   g:    r => r.geekRating,
   v:    r => r.votes,
-  rank: r => r.bggRank ?? 9999,
+  rank: r => r.bggRank ?? Infinity,
 };
 
 function getSortFn(key) {
   if (SORT_KEYS[key]) return SORT_KEYS[key];
   if (key.startsWith('sr_')) {
     const k = key.slice(3);
-    return r => r.subRanks?.[k] ?? 9999;
+    return r => r.subRanks?.[k] ?? Infinity;
   }
   return () => 0;
 }
@@ -112,19 +112,15 @@ const SUB_RANK_LABELS = {
   wargames:  'Wargame',
 };
 
-function imgTooltip(r) {
+function imgTooltipAttrs(r) {
   if (!r.thumbnail) return '';
-  return `<div class="hover-tooltip img-tooltip"><img src="${r.thumbnail}" alt="${escapeHtml(r.name)}" width="200" loading="lazy">${r.yearPublished ? `<span class="tt-year">${r.yearPublished}</span>` : ''}</div>`;
+  return ` data-thumbnail="${escapeHtml(r.thumbnail)}"` + (r.yearPublished ? ` data-year="${r.yearPublished}"` : '');
 }
 
-function rankTooltip(r) {
-  const rows = Object.entries(SUB_RANK_LABELS)
-    .filter(([k]) => r.subRanks?.[k] != null)
-    .map(([k, label]) => `<div class="rt-row"><span class="rt-label">${label}</span><span class="rt-val">#${r.subRanks[k]}</span></div>`)
-    .join('');
-  if (!rows) return '';
-  const overall = `<div class="rt-row rt-overall"><span class="rt-label">Overall</span><span class="rt-val">#${r.bggRank}</span></div>`;
-  return `<div class="hover-tooltip rank-tooltip">${overall}<div class="rt-divider"></div>${rows}</div>`;
+function rankTooltipAttrs(r) {
+  const hasSubranks = Object.keys(r.subRanks || {}).some(k => r.subRanks[k] != null);
+  if (!hasSubranks) return '';
+  return ` data-rank-overall="${r.bggRank}" data-sub-ranks='${JSON.stringify(r.subRanks)}'`;
 }
 
 function formatPollList(arr) {
@@ -362,6 +358,9 @@ function filteredRows() {
   const dir = state.sortDir;
   rows.sort((a, b) => {
     const av = k(a), bv = k(b);
+    if (av === Infinity && bv === Infinity) return 0;
+    if (av === Infinity) return 1;
+    if (bv === Infinity) return -1;
     if (av < bv) return -dir;
     if (av > bv) return dir;
     return 0;
@@ -377,8 +376,10 @@ const SORT_FIELD = {
   w:    r => r.weight > 0 ? ['Weight', r.weight.toFixed(2)] : null,
   tmn:  r => timeRangeText(r) ? ['Time', timeRangeText(r)] : null,
   tmx:  r => timeRangeText(r) ? ['Time', timeRangeText(r)] : null,
+  a:    r => ['Avg', r.avgRating > 0 ? r.avgRating.toFixed(2) : '—'],
+  g:    r => ['Geek', r.geekRating > 0 ? r.geekRating.toFixed(2) : '—'],
   v:    r => ['Votes', r.votes.toLocaleString()],
-  rank: r => r.bggRank != null ? ['BGG Rank', '#' + r.bggRank] : null,
+  rank: r => ['BGG Rank', r.bggRank != null ? '#' + r.bggRank : '—'],
   tags: r => {
     const t = TAGS[r.id] || {};
     const marks = (t.want ? '♥ ' : '') + (t.played ? '✓' : '');
@@ -393,6 +394,80 @@ function sortFieldPart(r, sk) {
   if (!result) return '';
   const [label, value] = result;
   return `<span class="rating-part sort-active"><span class="rating-label">${label}</span> ${escapeHtml(String(value))}</span>`;
+}
+
+function buildCardDetail(r) {
+  const playerRange = playerCountText(r);
+  const bestText    = playerRangeText(r.bestPlayers);
+  const recText     = playerRangeText(r.recommendedPlayers);
+
+  const weight = r.weight > 0 ? fmt(r.weight, 2) : '—';
+  const time   = timeRangeText(r) ?? '—';
+  const rating = r.avgRating > 0 ? fmt(r.avgRating, 2) : '—';
+  const rank   = r.bggRank != null ? '#' + r.bggRank : '—';
+
+  const hasSubranks = r.subRanks && Object.values(r.subRanks).some(v => v != null);
+  const subranksHtml = hasSubranks
+    ? '<div class="cd-section">'
+        + '<span class="cd-label">Category Ranks</span>'
+        + '<div class="cd-chips">'
+        + Object.entries(SUB_RANK_LABELS)
+            .filter(([k]) => r.subRanks?.[k] != null)
+            .map(([k, label]) => `<span class="cd-chip"><span class="cd-chip-cat">${escapeHtml(label)}</span><span class="cd-chip-val">#${r.subRanks[k]}</span></span>`)
+            .join('')
+        + '</div></div>'
+    : '';
+
+  const mechanicsHtml = r.mechanics && r.mechanics.length
+    ? '<div class="cd-section">'
+        + '<span class="cd-label">Mechanics</span>'
+        + '<div class="cd-chips">'
+        + r.mechanics.map(m => `<span class="cd-chip">${escapeHtml(m)}</span>`).join('')
+        + '</div></div>'
+    : '';
+
+  const categoriesHtml = r.categories && r.categories.length
+    ? '<div class="cd-section">'
+        + '<span class="cd-label">Categories</span>'
+        + '<div class="cd-chips">'
+        + r.categories.map(c => `<span class="cd-chip">${escapeHtml(c)}</span>`).join('')
+        + '</div></div>'
+    : '';
+
+  const coverHtml = r.thumbnail
+    ? `<img class="card-cover-img" src="${escapeHtml(r.thumbnail)}" alt="" loading="lazy">`
+    : '';
+
+  // Top: image | rank+rating | players+weight (1:1:1)
+  const topHtml = '<div class="cd-top">'
+    + coverHtml
+    + '<div class="cd-stats-col">'
+    +   `<div class="cd-item"><span class="cd-label">Rank</span><span class="cd-val">${rank}</span></div>`
+    +   `<div class="cd-item"><span class="cd-label">Rating</span><span class="cd-val">${rating}</span></div>`
+    + '</div>'
+    + '<div class="cd-stats-col">'
+    +   `<div class="cd-item"><span class="cd-label">Players</span><span class="cd-val">${escapeHtml(playerRange)}</span></div>`
+    +   `<div class="cd-item"><span class="cd-label">Weight</span><span class="cd-val">${weight}</span></div>`
+    + '</div>'
+    + '</div>';
+
+  // Bottom: full-width details
+  const bottomHtml = '<div class="cd-bottom">'
+    + '<div class="cd-pair">'
+    +   (recText  ? `<div class="cd-item"><span class="cd-label">Rec. Players</span><span class="cd-val">${escapeHtml(recText)}</span></div>` : '')
+    +   (bestText ? `<div class="cd-item"><span class="cd-label">Best At</span><span class="cd-val">${escapeHtml(bestText)}</span></div>` : '')
+    +   `<div class="cd-item"><span class="cd-label">Time</span><span class="cd-val">${escapeHtml(time)}</span></div>`
+    + '</div>'
+    + subranksHtml
+    + mechanicsHtml
+    + categoriesHtml
+    + '</div>';
+
+  return '<div class="cd-inner"><div class="cd-body">'
+    + topHtml
+    + bottomHtml
+    + `<a class="cd-bgg-link" href="https://boardgamegeek.com/boardgame/${r.id}" target="_blank" rel="noopener">View on BoardGameGeek ↗</a>`
+    + '</div></div>';
 }
 
 function render() {
@@ -410,10 +485,8 @@ function render() {
       + '</span>';
     const sk = state.sortKey;
     const cls = key => key === sk ? ' sort-active' : '';
-    const ratingPart = (label, n, key) =>
-      n > 0 ? `<span class="rating-part${cls(key)}"><span class="rating-label">${label}</span> ${n.toFixed(2)}</span>` : '';
     const sortPart = sortFieldPart(r, sk);
-    const summary = `<span class="card-summary">${ratingPart('Avg', r.avgRating, 'a')}${ratingPart('Geek', r.geekRating, 'g')}${sortPart}</span>`;
+    const summary = sortPart ? `<span class="card-summary">${sortPart}</span>` : '';
     const playerRange = playerCountText(r);
 
     const best    = playerRangeText(r.bestPlayers) ?? '<span class="dim">—</span>';
@@ -425,7 +498,7 @@ function render() {
       : '<span class="dim">—</span>';
 
     return '<tr data-id="' + r.id + '"' + (EXPANDED.has(r.id) ? ' class="expanded"' : '') + '>'
-      + '<td class="name" data-label="Game"><span class="card-chevron" aria-hidden="true"></span><span class="card-players">' + playerRange + '</span><a href="https://boardgamegeek.com/boardgame/' + r.id + '" target="_blank" rel="noopener">' + escapeHtml(r.name) + '</a>' + summary + imgTooltip(r) + '</td>'
+      + '<td class="name" data-label="Game"' + imgTooltipAttrs(r) + '><div class="card-name-body"><a href="https://boardgamegeek.com/boardgame/' + r.id + '" target="_blank" rel="noopener">' + escapeHtml(r.name) + '</a>' + summary + '</div><div class="card-controls"><span class="card-tags-mobile">' + tagBtns + '</span><span class="card-chevron" aria-hidden="true"></span></div></td>'
       + '<td class="ctr tags-cell" data-label="My list">' + tagBtns + '</td>'
       + `<td class="ctr${cls('ob')}" data-label="Best">${best}</td>`
       + `<td class="ctr${cls('pmn')}" data-label="Players">${playerRange}</td>`
@@ -435,7 +508,8 @@ function render() {
       + `<td class="ctr rating-group-start${cls('a')}" data-label="Avg">${fmt(r.avgRating, 2)}</td>`
       + `<td class="num rating-detail${cls('g')}" data-label="Geek">${fmt(r.geekRating, 2)}</td>`
       + `<td class="num rating-detail rating-group-end${cls('v')}" data-label="Votes">${r.votes.toLocaleString()}</td>`
-      + `<td class="num rank-col${cls('rank')}" data-label="Rank">${rankCell}${rankTooltip(r)}</td>`
+      + `<td class="num rank-col${cls('rank')}" data-label="Rank"${rankTooltipAttrs(r)}>${rankCell}</td>`
+      + `<td class="card-detail">${buildCardDetail(r)}</td>`
       + state.extraRankCols.map(k => {
           const val = r.subRanks?.[k];
           const sk = 'sr_' + k;
@@ -513,10 +587,12 @@ function syncControls() {
     state.hideUnranked,
   ].filter(Boolean).length;
   const badge = document.getElementById('filterBadge');
+  const resetBtn = document.getElementById('filterResetBtn');
   if (badge) {
     badge.hidden = activeCount === 0;
     badge.textContent = activeCount;
   }
+  if (resetBtn) resetBtn.hidden = activeCount === 0;
 
 }
 
@@ -789,6 +865,8 @@ document.querySelectorAll('.chip-group').forEach(group => {
   });
 });
 
+let _lastTagKey = null, _lastTagTime = 0;
+
 tbody.addEventListener('click', e => {
   const btn = e.target.closest('.tag-btn');
   if (btn) {
@@ -796,9 +874,22 @@ tbody.addEventListener('click', e => {
     e.stopPropagation();
     const id = parseInt(btn.dataset.id, 10);
     const tag = btn.dataset.tag;
+    // Debounce: ignore repeat clicks on the same button within 400ms
+    const key = id + ':' + tag;
+    const now = Date.now();
+    if (key === _lastTagKey && now - _lastTagTime < 400) return;
+    _lastTagKey = key;
+    _lastTagTime = now;
     const on = !(TAGS[id] && TAGS[id][tag]);
     setTag(id, tag, on);
-    render();
+    // Surgical update: patch all tag buttons for this row without re-rendering
+    // (full render causes ghost clicks on mobile from layout reflow)
+    tbody.querySelectorAll(`.tag-btn[data-id="${id}"][data-tag="${tag}"]`).forEach(b => {
+      b.classList.toggle('active', on);
+      if (tag === 'want') b.textContent = on ? '♥' : '♡';
+    });
+    // Only full re-render if tag filtering is active (affects which rows show)
+    if (state.tags.want || state.tags.played) render();
     return;
   }
   if (e.target.closest('a')) return;
@@ -806,10 +897,70 @@ tbody.addEventListener('click', e => {
   const tr = e.target.closest('tr');
   if (!tr || tr.querySelector('td.loading')) return;
   const id = parseInt(tr.dataset.id, 10);
-  if (EXPANDED.has(id)) EXPANDED.delete(id);
-  else EXPANDED.add(id);
-  tr.classList.toggle('expanded');
+  if (EXPANDED.has(id)) {
+    EXPANDED.delete(id);
+    tr.classList.remove('expanded');
+    const rect = tr.getBoundingClientRect();
+    if (rect.top < 0) {
+      window.scrollTo({ top: window.scrollY + rect.top - 8, behavior: 'smooth' });
+    }
+  } else {
+    EXPANDED.add(id);
+    tr.classList.add('expanded');
+  }
 });
+
+// ─── Cover art tooltip (fixed-position to escape table overflow clipping) ────
+
+const imgTt     = document.createElement('div');
+imgTt.id        = 'img-tooltip';
+const imgTtImg  = document.createElement('img');
+imgTtImg.width  = 200;
+imgTtImg.loading = 'lazy';
+const imgTtYear = document.createElement('span');
+imgTtYear.className = 'tt-year';
+imgTt.append(imgTtImg, imgTtYear);
+document.body.appendChild(imgTt);
+
+tbody.addEventListener('mouseover', e => {
+  if (window.matchMedia('(max-width: 700px)').matches) return;
+  const cell = e.target.closest('td.name');
+  if (!cell || !cell.dataset.thumbnail) { imgTt.style.display = 'none'; return; }
+  imgTtImg.src         = cell.dataset.thumbnail;
+  imgTtImg.alt         = cell.textContent.trim();
+  imgTtYear.textContent = cell.dataset.year || '';
+  imgTtYear.hidden      = !cell.dataset.year;
+  imgTt.style.display   = 'flex';
+  const rect = cell.getBoundingClientRect();
+  imgTt.style.left = (rect.right + 8) + 'px';
+  imgTt.style.top  = (rect.top  + rect.height / 2) + 'px';
+});
+
+tbody.addEventListener('mouseleave', () => { imgTt.style.display = 'none'; });
+
+// ─── Rank tooltip (fixed-position) ───────────────────────────────────────────
+
+const rankTt = document.createElement('div');
+rankTt.id = 'rank-tooltip';
+document.body.appendChild(rankTt);
+
+tbody.addEventListener('mouseover', e => {
+  if (window.matchMedia('(max-width: 700px)').matches) return;
+  const cell = e.target.closest('td.rank-col');
+  if (!cell || !cell.dataset.rankOverall) { rankTt.style.display = 'none'; return; }
+  const subRanks = JSON.parse(cell.dataset.subRanks || '{}');
+  const subRows = Object.entries(SUB_RANK_LABELS)
+    .filter(([k]) => subRanks[k] != null)
+    .map(([k, label]) => `<div class="rt-row"><span class="rt-label">${label}</span><span class="rt-val">#${subRanks[k]}</span></div>`)
+    .join('');
+  rankTt.innerHTML = `<div class="rt-row rt-overall"><span class="rt-label">Overall</span><span class="rt-val">#${cell.dataset.rankOverall}</span></div><div class="rt-divider"></div>${subRows}`;
+  rankTt.style.display = 'block';
+  const rect = cell.getBoundingClientRect();
+  rankTt.style.left = (rect.left + 24) + 'px';
+  rankTt.style.top  = (rect.top  + rect.height / 2) + 'px';
+});
+
+tbody.addEventListener('mouseleave', () => { rankTt.style.display = 'none'; });
 
 function pickRandom() {
   const rows = filteredRows();
@@ -821,9 +972,37 @@ function pickRandom() {
   tr.classList.add('picked');
   tr.scrollIntoView({ block: 'center', behavior: 'smooth' });
   setTimeout(() => tr.classList.remove('picked'), 3000);
+  // On mobile, auto-expand the picked card
+  if (window.matchMedia('(max-width: 700px)').matches) {
+    EXPANDED.add(r.id);
+    tr.classList.add('expanded');
+  }
 }
 
 pickBtn.addEventListener('click', pickRandom);
+
+// ─── Filter reset ────────────────────────────────────────────────────────────
+const filterResetBtn = document.getElementById('filterResetBtn');
+if (filterResetBtn) {
+  filterResetBtn.addEventListener('click', e => {
+    e.stopPropagation(); // don't toggle the <details> panel
+    update({
+      q: DEFAULTS.q,
+      hideUnranked: DEFAULTS.hideUnranked,
+      players: DEFAULTS.players,
+      weight: DEFAULTS.weight,
+      timeMax: DEFAULTS.timeMax,
+      minRating: DEFAULTS.minRating,
+      ratingField: DEFAULTS.ratingField,
+      bestOnly: DEFAULTS.bestOnly,
+      tags: { ...DEFAULTS.tags },
+      mechanics: [...DEFAULTS.mechanics],
+      mechanicsMode: DEFAULTS.mechanicsMode,
+      categories: [...DEFAULTS.categories],
+      categoriesMode: DEFAULTS.categoriesMode,
+    });
+  });
+}
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
 
