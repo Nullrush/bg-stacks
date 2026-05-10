@@ -381,6 +381,29 @@ h1 {
 .filter-reset-btn:hover { background: var(--bg-hover); color: var(--text); }
 .filter-reset-btn[hidden] { display: none; }
 
+#scrollTopBtn {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 200;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg-2));
+  color: color-mix(in srgb, var(--accent) 50%, var(--text-3));
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  opacity: 0.75;
+  transition: background 0.15s, opacity 0.15s;
+}
+#scrollTopBtn:hover { background: color-mix(in srgb, var(--accent) 14%, var(--bg-2)); opacity: 1; }
+#scrollTopBtn[hidden] { display: none; }
+
 .filter-panel[open] .filter-panel-summary {
   border-bottom: 1px solid var(--border);
 }
@@ -570,8 +593,8 @@ tbody tr:last-child td { border-bottom: none; }
   color: var(--accent);
 }
 
-.card-summary, .card-chevron, .card-players, .card-controls { display: none; }
-.card-name-body { display: contents; }
+.card-summary, .card-chevron, .card-players, .card-controls, .card-stats, .card-mini { display: none; }
+.card-name-body, .card-header { display: contents; }
 .rating-part { white-space: nowrap; }
 .rating-part + .rating-part { margin-left: 10px; }
 .rating-label { color: var(--text-3); margin-right: 3px; }
@@ -1012,25 +1035,63 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
 
   /* Break out of table layout when expanded so both cells take full width */
   tbody tr.expanded { display: block; }
-  tbody tr.expanded td.name,
-  tbody tr.expanded td.card-detail { display: block; width: 100%; box-sizing: border-box; }
+  tbody tr.expanded td.name { display: block; width: 100%; box-sizing: border-box; }
+  tbody tr.expanded td.card-detail { width: 100%; box-sizing: border-box; }
 
-  tbody tr .card-summary {
-    display: block;
-    margin-top: 3px;
-    font-family: 'Geist Mono', ui-monospace, monospace;
-    font-size: 11px;
-    color: var(--text-2);
-    letter-spacing: 0.02em;
+  tbody tr .card-summary { display: none; }
+  .card-sort-extra {
+    font-size: 12px;
+    margin-top: 6px;
   }
-  tbody tr .card-summary .sort-active { color: var(--text-2); font-weight: normal; }
-  tbody tr .card-summary .sort-active .rating-label { color: var(--text-3); }
-  tbody tr.expanded .card-summary { /* keep visible to prevent layout jump */ }
+
+  .card-mini {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 10px;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .card-cover-img {
+    display: block;
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+  .card-cover-ph {
+    width: 90px;
+    height: 90px;
+    background: var(--bg-3);
+    border-radius: 4px;
+  }
+  .card-mini-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+  }
+  .cms-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .cms-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    color: var(--text-3);
+  }
+  .cms-val {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .cms-item.sort-active .cms-val { color: var(--accent); }
 
   .card-name-body {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
     flex: 1;
     min-width: 0;
   }
@@ -1040,7 +1101,6 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
     align-items: center;
     gap: 6px;
     flex-shrink: 0;
-    align-self: stretch;
     padding-left: 10px;
     margin-left: 8px;
     border-left: 1px solid var(--border);
@@ -1116,13 +1176,17 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
   }
 
   tbody td.name {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    gap: 0;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
     font-size: 16px;
     text-align: left;
     padding: 0;
+  }
+  .card-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
   }
   /* Name is plain text on mobile — link lives in expanded detail panel */
   tbody td.name a {
@@ -1130,14 +1194,11 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
     pointer-events: none;
     cursor: default;
     text-decoration: none;
+    font-size: 16px;
+    font-weight: 800;
   }
+  tbody tr[data-sort-name] td.name a { color: var(--accent); }
 
-  tbody tr.expanded td.name {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 8px;
-    margin-bottom: 6px;
-  }
 
   tbody td:not(.name)::before {
     content: attr(data-label);
@@ -1169,6 +1230,7 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
   .card-detail {
     display: grid;
     grid-template-rows: 0fr;
+    grid-template-columns: 1fr;
     overflow: hidden;
     transition: grid-template-rows 0.25s ease;
     padding: 0;
@@ -1177,7 +1239,7 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
   }
   .card-detail::before { display: none; }
   tbody tr.expanded .card-detail { display: grid; grid-template-rows: 1fr; }
-  .cd-inner { min-height: 0; overflow: hidden; }
+  .cd-inner { min-height: 0; overflow: hidden; width: 100%; box-sizing: border-box; }
 
   .cd-body {
     display: flex;
@@ -1186,36 +1248,17 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
     padding-bottom: 4px;
   }
 
-  /* Top: image | rank+rating | players+weight (1:1:1) */
-  .cd-top {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-    align-items: center;
-    margin-top: 8px;
-  }
-  .card-cover-img {
-    display: block;
-    width: 100%;
-    border-radius: 6px;
-  }
-  .cd-stats-col {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
   /* Bottom: full-width sections */
   .cd-bottom {
-    border-top: 1px solid var(--border);
     padding-top: 10px;
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
-  .cd-pair {
-    display: flex;
-    gap: 12px;
+  .cd-trio {
+    display: grid;
+    grid-template-columns: 90px 1fr 1fr;
+    gap: 8px 10px;
   }
   .cd-section {
     display: flex;

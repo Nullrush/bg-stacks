@@ -8,13 +8,15 @@ if ('serviceWorker' in navigator) {
 
 // ─── Sort keys ───────────────────────────────────────────────────────────────
 
+const PMAX_CAP = 20; // matches parser cap; maxPlayers === PMAX_CAP means "any"
+
 const SORT_KEYS = {
   n:    r => r.name.toLowerCase(),
   tags: r => { const t = TAGS[r.id] || {}; return (t.want ? 2 : 0) + (t.played ? 1 : 0); },
-  pmn:  r => r.minPlayers,
-  pmx:  r => r.maxPlayers,
-  ob:   r => r.bestPlayers && r.bestPlayers.length ? r.bestPlayers[0] : Infinity,
-  or:   r => r.recommendedPlayers && r.recommendedPlayers.length ? Math.min(...r.recommendedPlayers) : Infinity,
+  pmn:  r => r.minPlayers ?? Infinity,
+  pmx:  r => r.maxPlayers != null ? (r.maxPlayers >= PMAX_CAP ? PMAX_CAP + 0.5 : r.maxPlayers) : Infinity,
+  ob:   r => r.bestPlayers        && r.bestPlayers.length        ? (r.bestPlayers.length        > 6 ? PMAX_CAP + 0.5 : r.bestPlayers[0])              : Infinity,
+  or:   r => r.recommendedPlayers && r.recommendedPlayers.length ? (r.recommendedPlayers.length > 6 ? PMAX_CAP + 0.5 : Math.min(...r.recommendedPlayers)) : Infinity,
   w:    r => r.weight,
   tmn:  r => r.minTime ?? Infinity,
   tmx:  r => r.maxTime ?? Infinity,
@@ -397,14 +399,9 @@ function sortFieldPart(r, sk) {
 }
 
 function buildCardDetail(r) {
-  const playerRange = playerCountText(r);
   const bestText    = playerRangeText(r.bestPlayers);
   const recText     = playerRangeText(r.recommendedPlayers);
-
-  const weight = r.weight > 0 ? fmt(r.weight, 2) : '—';
-  const time   = timeRangeText(r) ?? '—';
-  const rating = r.avgRating > 0 ? fmt(r.avgRating, 2) : '—';
-  const rank   = r.bggRank != null ? '#' + r.bggRank : '—';
+  const time        = timeRangeText(r) ?? '—';
 
   const hasSubranks = r.subRanks && Object.values(r.subRanks).some(v => v != null);
   const subranksHtml = hasSubranks
@@ -434,38 +431,17 @@ function buildCardDetail(r) {
         + '</div></div>'
     : '';
 
-  const coverHtml = r.thumbnail
-    ? `<img class="card-cover-img" src="${escapeHtml(r.thumbnail)}" alt="" loading="lazy">`
-    : '';
-
-  // Top: image | rank+rating | players+weight (1:1:1)
-  const topHtml = '<div class="cd-top">'
-    + coverHtml
-    + '<div class="cd-stats-col">'
-    +   `<div class="cd-item"><span class="cd-label">Rank</span><span class="cd-val">${rank}</span></div>`
-    +   `<div class="cd-item"><span class="cd-label">Rating</span><span class="cd-val">${rating}</span></div>`
-    + '</div>'
-    + '<div class="cd-stats-col">'
-    +   `<div class="cd-item"><span class="cd-label">Players</span><span class="cd-val">${escapeHtml(playerRange)}</span></div>`
-    +   `<div class="cd-item"><span class="cd-label">Weight</span><span class="cd-val">${weight}</span></div>`
-    + '</div>'
-    + '</div>';
-
-  // Bottom: full-width details
-  const bottomHtml = '<div class="cd-bottom">'
-    + '<div class="cd-pair">'
-    +   (recText  ? `<div class="cd-item"><span class="cd-label">Rec. Players</span><span class="cd-val">${escapeHtml(recText)}</span></div>` : '')
-    +   (bestText ? `<div class="cd-item"><span class="cd-label">Best At</span><span class="cd-val">${escapeHtml(bestText)}</span></div>` : '')
+  return '<div class="cd-inner"><div class="cd-body">'
+    + '<div class="cd-bottom">'
+    + '<div class="cd-trio">'
+    +   (recText  ? `<div class="cd-item"><span class="cd-label">Rec. Players</span><span class="cd-val">${escapeHtml(recText)}</span></div>` : '<div class="cd-item"></div>')
+    +   (bestText ? `<div class="cd-item"><span class="cd-label">Best At</span><span class="cd-val">${escapeHtml(bestText)}</span></div>` : '<div class="cd-item"></div>')
     +   `<div class="cd-item"><span class="cd-label">Time</span><span class="cd-val">${escapeHtml(time)}</span></div>`
     + '</div>'
     + subranksHtml
     + mechanicsHtml
     + categoriesHtml
-    + '</div>';
-
-  return '<div class="cd-inner"><div class="cd-body">'
-    + topHtml
-    + bottomHtml
+    + '</div>'
     + `<a class="cd-bgg-link" href="https://boardgamegeek.com/boardgame/${r.id}" target="_blank" rel="noopener">View on BoardGameGeek ↗</a>`
     + '</div></div>';
 }
@@ -485,9 +461,30 @@ function render() {
       + '</span>';
     const sk = state.sortKey;
     const cls = key => key === sk ? ' sort-active' : '';
-    const sortPart = sortFieldPart(r, sk);
-    const summary = sortPart ? `<span class="card-summary">${sortPart}</span>` : '';
     const playerRange = playerCountText(r);
+    const miniRank   = r.bggRank != null ? '#' + r.bggRank : '—';
+    const miniRating = r.avgRating > 0 ? fmt(r.avgRating, 2) : '—';
+    const miniWeight = r.weight > 0 ? fmt(r.weight, 2) : '—';
+    const miniCover  = r.thumbnail
+      ? `<img class="card-cover-img" src="${escapeHtml(r.thumbnail)}" alt="" loading="lazy">`
+      : '<div class="card-cover-ph"></div>';
+    const miniItems = [
+      { label: 'Rank',    val: miniRank,               keys: ['rank'] },
+      { label: 'Players', val: escapeHtml(playerRange), keys: ['pmn'] },
+      { label: 'Rating',  val: miniRating,              keys: ['a'] },
+      { label: 'Weight',  val: miniWeight,              keys: ['w'] },
+    ];
+    const sortPart = sortFieldPart(r, sk);
+    const miniHasSortKey = miniItems.some(item => item.keys.includes(sk));
+    const cardMini = '<div class="card-mini">'
+      + miniCover
+      + '<div class="card-mini-stats">'
+      + miniItems.map(item => {
+          const active = item.keys.includes(sk) ? ' sort-active' : '';
+          return `<div class="cms-item${active}"><span class="cms-label">${item.label}</span><span class="cms-val">${item.val}</span></div>`;
+        }).join('')
+      + '</div></div>'
+      + ((!miniHasSortKey && sortPart) ? `<div class="card-sort-extra">${sortPart}</div>` : '');
 
     const best    = playerRangeText(r.bestPlayers) ?? '<span class="dim">—</span>';
     const rec     = playerRangeText(r.recommendedPlayers) ?? '<span class="dim">—</span>';
@@ -497,8 +494,8 @@ function render() {
       ? `<span class="${r.bggRank <= 10 ? 'top-ten' : ''}${hasSubranks ? ' has-subranks' : ''}">#${r.bggRank}</span>`
       : '<span class="dim">—</span>';
 
-    return '<tr data-id="' + r.id + '"' + (EXPANDED.has(r.id) ? ' class="expanded"' : '') + '>'
-      + '<td class="name" data-label="Game"' + imgTooltipAttrs(r) + '><div class="card-name-body"><a href="https://boardgamegeek.com/boardgame/' + r.id + '" target="_blank" rel="noopener">' + escapeHtml(r.name) + '</a>' + summary + '</div><div class="card-controls"><span class="card-tags-mobile">' + tagBtns + '</span><span class="card-chevron" aria-hidden="true"></span></div></td>'
+    return '<tr data-id="' + r.id + '"' + (EXPANDED.has(r.id) ? ' class="expanded"' : '') + (sk === 'n' ? ' data-sort-name' : '') + '>'
+      + '<td class="name" data-label="Game"' + imgTooltipAttrs(r) + '><div class="card-header"><div class="card-name-body"><a href="https://boardgamegeek.com/boardgame/' + r.id + '" target="_blank" rel="noopener">' + escapeHtml(r.name) + '</a></div><div class="card-controls"><span class="card-tags-mobile">' + tagBtns + '</span><span class="card-chevron" aria-hidden="true"></span></div></div>' + cardMini + '</td>'
       + '<td class="ctr tags-cell" data-label="My list">' + tagBtns + '</td>'
       + `<td class="ctr${cls('ob')}" data-label="Best">${best}</td>`
       + `<td class="ctr${cls('pmn')}" data-label="Players">${playerRange}</td>`
@@ -851,7 +848,11 @@ document.querySelectorAll('.chip-group').forEach(group => {
     if (!btn) return;
     if (name === 'tags') {
       const tag = btn.dataset.tag;
-      update({ tags: { ...state.tags, [tag]: !state.tags[tag] } });
+      const next = !state.tags[tag];
+      const newTags = { ...state.tags, [tag]: next };
+      if (next && tag === 'played')   newTags.unplayed = false;
+      if (next && tag === 'unplayed') newTags.played   = false;
+      update({ tags: newTags });
       return;
     }
     const raw = btn.dataset.v;
@@ -1001,6 +1002,18 @@ if (filterResetBtn) {
       categories: [...DEFAULTS.categories],
       categoriesMode: DEFAULTS.categoriesMode,
     });
+  });
+}
+
+// ─── Scroll to top ────────────────────────────────────────────────────────────
+
+const scrollTopBtn = document.getElementById('scrollTopBtn');
+if (scrollTopBtn) {
+  window.addEventListener('scroll', () => {
+    scrollTopBtn.hidden = window.scrollY < 400;
+  }, { passive: true });
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 }
 
