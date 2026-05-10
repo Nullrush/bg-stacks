@@ -79,6 +79,7 @@ const sortDdText   = document.getElementById('sortDdText');
 const sortDirBtn   = document.getElementById('sortDirBtn');
 const pickBtn      = document.getElementById('pickBtn');
 const themeBtn     = document.getElementById('themeBtn');
+const installBtn   = document.getElementById('installBtn');
 const updatedEl    = document.getElementById('updated');
 
 // multi-select elements
@@ -1048,6 +1049,31 @@ themeBtn.addEventListener('click', () => {
 })();
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncThemeIcon);
+
+// ─── PWA install prompt ───────────────────────────────────────────────────────
+
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBtn.hidden = false;
+});
+
+installBtn.addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  const { outcome } = await deferredInstallPrompt.userChoice;
+  if (outcome === 'accepted') {
+    installBtn.hidden = true;
+    deferredInstallPrompt = null;
+  }
+});
+
+window.addEventListener('appinstalled', () => {
+  installBtn.hidden = true;
+  deferredInstallPrompt = null;
+});
 
 // ─── Keyboard shortcuts ───────────────────────────────────────────────────────
 
