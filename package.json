@@ -8,7 +8,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "serve public -p 3000",
+    "dev": "swa start",
+    "dev:thin": "serve public -p 3000",
     "refresh": "node parse-bgg-csv.mjs",
     "deploy": "set -a && . ./.env.local && set +a && swa deploy public --env production --api-language node --api-version 20 --deployment-token \"$SWA_CLI_DEPLOYMENT_TOKEN\""
   },

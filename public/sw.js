@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'pnw-v5';
+const CACHE_VERSION = 'pnw-v6';
 
 // Assets to pre-cache on install (app shell + data)
 const PRECACHE = [

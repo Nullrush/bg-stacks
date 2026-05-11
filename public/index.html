@@ -26,6 +26,24 @@
     <p class="sub">Sortable lineup. Source <a href="https://boardgamegeek.com/geeklist/358871/geekway-2026-prime-pnw-lineup" target="_blank" rel="noopener">geeklist 358871</a>.</p>
     <div class="header-btns">
       <button type="button" class="btn icon-btn install-btn" id="installBtn" aria-label="Install app" title="Install app" hidden>⬇</button>
+
+      <!-- Logged-out: sign-in button + provider dropdown -->
+      <div class="auth-signin" id="authSignIn">
+        <button type="button" class="btn auth-signin-btn" id="signInBtn" aria-haspopup="true" aria-expanded="false">Sign in</button>
+        <ul class="auth-provider-menu" id="authProviderMenu" hidden role="menu">
+          <li><a href="/.auth/login/google?post_login_redirect_uri=/" role="menuitem">Sign in with Google</a></li>
+          <li><a href="/.auth/login/apple?post_login_redirect_uri=/" role="menuitem">Sign in with Apple</a></li>
+        </ul>
+      </div>
+
+      <!-- Logged-in: user pill + sync status + sign-out -->
+      <div class="auth-user" id="authUser" hidden>
+        <span class="auth-avatar" id="authAvatar" aria-hidden="true"></span>
+        <span class="auth-name" id="authName"></span>
+        <span class="auth-sync" id="syncStatus" hidden></span>
+        <a href="/.auth/logout?post_logout_redirect_uri=/" class="auth-signout">Sign out</a>
+      </div>
+
       <button type="button" class="btn icon-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle light/dark">🌙</button>
     </div>
   </header>
@@ -162,6 +180,16 @@
       </tbody>
     </table>
   </div>
+
+  <dialog id="conflictModal" class="conflict-modal">
+    <h2 class="conflict-modal-title">Sync Conflict</h2>
+    <p class="conflict-modal-desc" id="conflictDesc"></p>
+    <div class="conflict-modal-actions">
+      <button type="button" class="btn" id="conflictCloud">Keep cloud</button>
+      <button type="button" class="btn" id="conflictLocal">Use this device</button>
+      <button type="button" class="btn btn-accent" id="conflictMerge">Merge both</button>
+    </div>
+  </dialog>
 
   <footer>
     <p class="footer-text">Data from <a href="https://boardgamegeek.com" target="_blank" rel="noopener">BoardGameGeek</a>. <span id="updated"></span></p>

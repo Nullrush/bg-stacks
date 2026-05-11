@@ -1,0 +1,14 @@
+{
+  "name": "geekway-pnw-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "tags.js",
+  "scripts": {
+    "test": "node --require ./lib/crypto-polyfill.js --test lib/handlers.test.js lib/tagsFormat.test.js"
+  },
+  "dependencies": {
+    "@azure/data-tables": "^13.3.0",
+    "@azure/functions": "^4.7.0"
+  }
+}

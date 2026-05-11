@@ -21,7 +21,8 @@ pnpm-debug.log*
 
 # Local tooling/config
 .claude/
-swa-cli.config.json
+# swa-cli.config.json is committed (no secrets; use .env.local for tokens)
+api/local.settings.json
 
 # Source data — drop CSV exports here for `npm run refresh`,
 # but don't commit them (they may include personal BGG account info).

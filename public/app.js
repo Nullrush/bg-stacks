@@ -243,6 +243,238 @@ function setTag(id, tag, on) {
     if (Object.keys(t).length === 0) delete TAGS[id];
   }
   saveTags();
+  scheduleSyncToCloud();
+}
+
+// ─── Auth + sync state ────────────────────────────────────────────────────────
+
+let AUTH_USER   = null;  // { userId, userDetails, identityProvider } | null
+let CLOUD_ETAG  = null;  // eTag of the last successfully read/written cloud entity
+let SYNC_STATUS = 'idle'; // 'idle' | 'syncing' | 'synced' | 'offline'
+
+// Cloud format: { want: [ids], played: [ids] }
+// Runtime format (TAGS): { [gameId]: { want?: true, played?: true } }
+
+function cloudToRuntime(cloud) {
+  const tags = {};
+  for (const id of cloud.want   || []) tags[id] = Object.assign(tags[id] || {}, { want:   true });
+  for (const id of cloud.played || []) tags[id] = Object.assign(tags[id] || {}, { played: true });
+  return tags;
+}
+
+function runtimeToCloud(tags) {
+  const want = [], played = [];
+  for (const [id, t] of Object.entries(tags)) {
+    const n = Number(id);
+    if (!Number.isFinite(n) || n <= 0) continue;
+    if (t.want)   want.push(n);
+    if (t.played) played.push(n);
+  }
+  return { want, played };
+}
+
+function mergeTags(a, b) {
+  const result = {};
+  for (const [id, t] of Object.entries(a)) result[id] = { ...t };
+  for (const [id, t] of Object.entries(b)) result[id] = Object.assign(result[id] || {}, t);
+  return result;
+}
+
+function tagsAreEqual(a, b) {
+  const aKeys = Object.keys(a).sort();
+  const bKeys = Object.keys(b).sort();
+  if (aKeys.length !== bKeys.length) return false;
+  return aKeys.every((k, i) => {
+    if (k !== bKeys[i]) return false;
+    const ta = a[k], tb = b[k];
+    if (!ta || !tb || typeof ta !== 'object' || typeof tb !== 'object') return false;
+    return !!ta.want === !!tb.want && !!ta.played === !!tb.played;
+  });
+}
+
+async function checkAuth() {
+  try {
+    const res = await fetch('/.auth/me');
+    if (!res.ok) { AUTH_USER = null; return null; }
+    const data = await res.json();
+    AUTH_USER = data.clientPrincipal || null;
+    return AUTH_USER;
+  } catch {
+    AUTH_USER = null;
+    return null;
+  }
+}
+
+function updateAuthUI(user) {
+  const signInEl = document.getElementById('authSignIn');
+  const userEl   = document.getElementById('authUser');
+  const nameEl   = document.getElementById('authName');
+  const avatarEl = document.getElementById('authAvatar');
+  if (!signInEl || !userEl || !nameEl || !avatarEl) return;
+
+  if (!user) {
+    signInEl.hidden = false;
+    userEl.hidden   = true;
+    return;
+  }
+
+  const display = user.userDetails || user.userId || '';
+  nameEl.textContent   = display.length > 24 ? display.slice(0, 22) + '…' : display;
+  avatarEl.textContent = (display[0] || '?').toUpperCase();
+  signInEl.hidden = true;
+  userEl.hidden   = false;
+}
+
+function setSyncStatus(status) {
+  SYNC_STATUS = status;
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  el.dataset.status = status;
+  el.textContent = status === 'syncing' ? '↻ Syncing…'
+                 : status === 'synced'  ? '☁ Synced'
+                 : status === 'offline' ? '⚠ Offline'
+                 : '';
+  el.hidden = (status === 'idle');
+}
+
+let _syncTimer = null;
+
+function scheduleSyncToCloud() {
+  if (!AUTH_USER) return;
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(syncToCloud, 1500);
+}
+
+async function syncToCloud() {
+  if (!AUTH_USER) return;
+  setSyncStatus('syncing');
+  try {
+    const res = await fetch('/api/tags', {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ tags: runtimeToCloud(TAGS), etag: CLOUD_ETAG }),
+    });
+    if (res.status === 409) {
+      // Stale eTag — re-fetch, merge, retry once
+      const getRes = await fetch('/api/tags');
+      if (!getRes.ok || getRes.status === 204) { setSyncStatus('offline'); return; }
+      const { tags: freshCloud, etag: freshEtag } = await getRes.json();
+      CLOUD_ETAG = freshEtag;
+      TAGS = mergeTags(TAGS, cloudToRuntime(freshCloud));
+      saveTags();
+      render();
+      const retryRes = await fetch('/api/tags', {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ tags: runtimeToCloud(TAGS), etag: CLOUD_ETAG }),
+      });
+      if (retryRes.ok) {
+        const { etag } = await retryRes.json();
+        CLOUD_ETAG = etag;
+        setSyncStatus('synced');
+      } else {
+        setSyncStatus('offline');
+      }
+      return;
+    }
+    if (!res.ok) { setSyncStatus('offline'); return; }
+    const { etag } = await res.json();
+    CLOUD_ETAG = etag;
+    setSyncStatus('synced');
+  } catch { setSyncStatus('offline'); }
+}
+
+function showConflictModal(localTags, cloudTags) {
+  return new Promise(resolve => {
+    const modal    = document.getElementById('conflictModal');
+    const desc     = document.getElementById('conflictDesc');
+    const btnCloud = document.getElementById('conflictCloud');
+    const btnLocal = document.getElementById('conflictLocal');
+    const btnMerge = document.getElementById('conflictMerge');
+
+    const localCount = Object.keys(localTags).length;
+    const cloudCount = Object.keys(cloudTags).length;
+    desc.textContent =
+      `This device has tags for ${localCount} game${localCount !== 1 ? 's' : ''}. ` +
+      `Your account has tags for ${cloudCount} game${cloudCount !== 1 ? 's' : ''}. ` +
+      `What should we do?`;
+
+    let settled = false;
+
+    function finish(result) {
+      if (settled) return;
+      settled = true;
+      modal.close();
+      cleanup();
+      resolve(result);
+    }
+
+    function cleanup() {
+      btnCloud.removeEventListener('click', onCloud);
+      btnLocal.removeEventListener('click', onLocal);
+      btnMerge.removeEventListener('click', onMerge);
+      modal.removeEventListener('cancel', onCancel);
+    }
+
+    const onCloud  = () => finish(cloudTags);
+    const onLocal  = () => finish(localTags);
+    const onMerge  = () => finish(mergeTags(localTags, cloudTags));
+    // Escape key / backdrop: treat as "merge" (safe default, matches previous stub behavior)
+    const onCancel = e => { e.preventDefault(); finish(mergeTags(localTags, cloudTags)); };
+
+    btnCloud.addEventListener('click', onCloud);
+    btnLocal.addEventListener('click', onLocal);
+    btnMerge.addEventListener('click', onMerge);
+    modal.addEventListener('cancel', onCancel);
+
+    modal.showModal();
+  });
+}
+
+// Resolves after syncing from cloud (or gracefully failing).
+// Returns true if a conflict modal was shown and resolved.
+async function syncFromCloud() {
+  if (!AUTH_USER) return false;
+  setSyncStatus('syncing');
+  try {
+    const res = await fetch('/api/tags');
+    if (!res.ok) { setSyncStatus('offline'); return false; }
+
+    if (res.status === 204) {
+      // Nothing in cloud — push local if any
+      if (Object.keys(TAGS).length > 0) await syncToCloud();
+      else setSyncStatus('synced');
+      return false;
+    }
+
+    const { tags: cloudCompact, etag } = await res.json();
+    CLOUD_ETAG = etag;
+    const cloudRuntime = cloudToRuntime(cloudCompact);
+    const localEmpty   = Object.keys(TAGS).length === 0;
+    const cloudEmpty   = Object.keys(cloudRuntime).length === 0;
+
+    if (localEmpty) {
+      const prevTags = TAGS;
+      TAGS = cloudRuntime;
+      try { saveTags(); } catch { TAGS = prevTags; setSyncStatus('offline'); return false; }
+      setSyncStatus('synced');
+      return false;
+    }
+    if (cloudEmpty) {
+      await syncToCloud(); return false;
+    }
+    if (tagsAreEqual(TAGS, cloudRuntime)) {
+      setSyncStatus('synced'); return false;
+    }
+
+    // Both sides non-empty and diverged — show conflict modal (wired in Task 8)
+    const resolved = await showConflictModal(TAGS, cloudRuntime);
+    const prevTags2 = TAGS;
+    TAGS = resolved;
+    try { saveTags(); } catch { TAGS = prevTags2; setSyncStatus('offline'); return false; }
+    await syncToCloud();
+    return true;
+  } catch { setSyncStatus('offline'); return false; }
 }
 
 // ─── URL / localStorage state ─────────────────────────────────────────────────
@@ -1090,6 +1322,29 @@ window.addEventListener('appinstalled', () => {
   deferredInstallPrompt = null;
 });
 
+// Sign-in dropdown toggle
+const signInBtn        = document.getElementById('signInBtn');
+const authProviderMenu = document.getElementById('authProviderMenu');
+
+if (signInBtn && authProviderMenu) {
+  signInBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = authProviderMenu.hidden;
+    authProviderMenu.hidden = !open;
+    signInBtn.setAttribute('aria-expanded', String(open));
+  });
+
+  document.addEventListener('click', e => {
+    const menu = document.getElementById('authProviderMenu');
+    const btn  = document.getElementById('signInBtn');
+    if (!menu || !btn) return;
+    if (!menu.hidden && !e.target.closest('.auth-signin')) {
+      menu.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
 // ─── Keyboard shortcuts ───────────────────────────────────────────────────────
 
 document.addEventListener('keydown', e => {
@@ -1120,7 +1375,8 @@ Promise.all([
   fetch('games.json').then(r => r.json()),
   fetch('mechanics.json').then(r => r.json()).catch(() => []),
   fetch('categories.json').then(r => r.json()).catch(() => []),
-]).then(([games, mechanics, categories]) => {
+  checkAuth(),
+]).then(async ([games, mechanics, categories]) => {
   MECHANICS  = mechanics;
   CATEGORIES = categories;
 
@@ -1161,6 +1417,14 @@ Promise.all([
     modeKey:   'categoriesMode',
     allItemsFn: () => CATEGORIES,
   });
+
+  // Update header to reflect login state
+  updateAuthUI(AUTH_USER);
+
+  // Sync from cloud before first render (silently continues on error)
+  if (AUTH_USER) {
+    try { await syncFromCloud(); } catch { setSyncStatus('offline'); }
+  }
 
   render();
 }).catch(err => {
