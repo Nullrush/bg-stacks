@@ -246,6 +246,65 @@ function setTag(id, tag, on) {
   scheduleSyncToCloud();
 }
 
+// ─── MD5 (for Gravatar URLs) ──────────────────────────────────────────────────
+// RFC 1321 implementation based on blueimp/JavaScript-MD5 (MIT)
+
+function md5(str) {
+  str = unescape(encodeURIComponent(str)); // normalise to UTF-8 bytes
+  function add(x, y) { const l = (x & 0xFFFF) + (y & 0xFFFF); return (((x >> 16) + (y >> 16) + (l >> 16)) << 16) | (l & 0xFFFF); }
+  function rol(n, s) { return (n << s) | (n >>> (32 - s)); }
+  function cmn(q, a, b, x, s, t) { return add(rol(add(add(a, q), add(x, t)), s), b); }
+  function ff(a,b,c,d,x,s,t) { return cmn((b & c) | (~b & d), a, b, x, s, t); }
+  function gg(a,b,c,d,x,s,t) { return cmn((b & d) | (c & ~d), a, b, x, s, t); }
+  function hh(a,b,c,d,x,s,t) { return cmn(b ^ c ^ d,      a, b, x, s, t); }
+  function ii(a,b,c,d,x,s,t) { return cmn(c ^ (b | ~d),   a, b, x, s, t); }
+  const n = str.length;
+  const blks = new Array((((n + 8) >> 6) + 1) * 16).fill(0);
+  for (let i = 0; i < n; i++) blks[i >> 2] |= str.charCodeAt(i) << ((i % 4) * 8);
+  blks[n >> 2] |= 0x80 << ((n % 4) * 8);
+  blks[blks.length - 2] = n * 8;
+  let a = 1732584193, b = -271733879, c = -1732584194, d = 271733878;
+  for (let i = 0; i < blks.length; i += 16) {
+    const [oa, ob, oc, od] = [a, b, c, d], m = blks.slice(i, i + 16);
+    a=ff(a,b,c,d,m[0], 7,-680876936);   d=ff(d,a,b,c,m[1],12,-389564586);
+    c=ff(c,d,a,b,m[2],17, 606105819);   b=ff(b,c,d,a,m[3],22,-1044525330);
+    a=ff(a,b,c,d,m[4], 7,-176418897);   d=ff(d,a,b,c,m[5],12, 1200080426);
+    c=ff(c,d,a,b,m[6],17,-1473231341);  b=ff(b,c,d,a,m[7],22,-45705983);
+    a=ff(a,b,c,d,m[8], 7, 1770035416);  d=ff(d,a,b,c,m[9],12,-1958414417);
+    c=ff(c,d,a,b,m[10],17,-42063);      b=ff(b,c,d,a,m[11],22,-1990404162);
+    a=ff(a,b,c,d,m[12], 7, 1804603682); d=ff(d,a,b,c,m[13],12,-40341101);
+    c=ff(c,d,a,b,m[14],17,-1502002290); b=ff(b,c,d,a,m[15],22, 1236535329);
+    a=gg(a,b,c,d,m[1], 5,-165796510);   d=gg(d,a,b,c,m[6], 9,-1069501632);
+    c=gg(c,d,a,b,m[11],14, 643717713);  b=gg(b,c,d,a,m[0],20,-373897302);
+    a=gg(a,b,c,d,m[5], 5,-701558691);   d=gg(d,a,b,c,m[10], 9, 38016083);
+    c=gg(c,d,a,b,m[15],14,-660478335);  b=gg(b,c,d,a,m[4],20,-405537848);
+    a=gg(a,b,c,d,m[9], 5, 568446438);   d=gg(d,a,b,c,m[14], 9,-1019803690);
+    c=gg(c,d,a,b,m[3],14,-187363961);   b=gg(b,c,d,a,m[8],20, 1163531501);
+    a=gg(a,b,c,d,m[13], 5,-1444681467); d=gg(d,a,b,c,m[2], 9,-51403784);
+    c=gg(c,d,a,b,m[7],14, 1735328473);  b=gg(b,c,d,a,m[12],20,-1926607734);
+    a=hh(a,b,c,d,m[5], 4,-378558);      d=hh(d,a,b,c,m[8],11,-2022574463);
+    c=hh(c,d,a,b,m[11],16, 1839030562); b=hh(b,c,d,a,m[14],23,-35309556);
+    a=hh(a,b,c,d,m[1], 4,-1530992060);  d=hh(d,a,b,c,m[4],11, 1272893353);
+    c=hh(c,d,a,b,m[7],16,-155497632);   b=hh(b,c,d,a,m[10],23,-1094730640);
+    a=hh(a,b,c,d,m[13], 4, 681279174);  d=hh(d,a,b,c,m[0],11,-358537222);
+    c=hh(c,d,a,b,m[3],16,-722521979);   b=hh(b,c,d,a,m[6],23, 76029189);
+    a=hh(a,b,c,d,m[9], 4,-640364487);   d=hh(d,a,b,c,m[12],11,-421815835);
+    c=hh(c,d,a,b,m[15],16, 530742520);  b=hh(b,c,d,a,m[2],23,-995338651);
+    a=ii(a,b,c,d,m[0], 6,-198630844);   d=ii(d,a,b,c,m[7],10, 1126891415);
+    c=ii(c,d,a,b,m[14],15,-1416354905); b=ii(b,c,d,a,m[5],21,-57434055);
+    a=ii(a,b,c,d,m[12], 6, 1700485571); d=ii(d,a,b,c,m[3],10,-1894986606);
+    c=ii(c,d,a,b,m[10],15,-1051523);    b=ii(b,c,d,a,m[1],21,-2054922799);
+    a=ii(a,b,c,d,m[8], 6, 1873313359);  d=ii(d,a,b,c,m[15],10,-30611744);
+    c=ii(c,d,a,b,m[6],15,-1560198380);  b=ii(b,c,d,a,m[13],21, 1309151649);
+    a=ii(a,b,c,d,m[4], 6,-145523070);   d=ii(d,a,b,c,m[11],10,-1120210379);
+    c=ii(c,d,a,b,m[2],15, 718787259);   b=ii(b,c,d,a,m[9],21,-343485551);
+    a=add(a,oa); b=add(b,ob); c=add(c,oc); d=add(d,od);
+  }
+  return [a, b, c, d]
+    .map(n => [0,1,2,3].map(j => ((n >> (j*8)) & 0xff).toString(16).padStart(2,'0')).join(''))
+    .join('');
+}
+
 // ─── Auth + sync state ────────────────────────────────────────────────────────
 
 let AUTH_USER   = null;  // { userId, userDetails, identityProvider } | null
@@ -306,21 +365,42 @@ async function checkAuth() {
 }
 
 function updateAuthUI(user) {
-  const signInEl = document.getElementById('authSignIn');
-  const userEl   = document.getElementById('authUser');
-  const nameEl   = document.getElementById('authName');
-  const avatarEl = document.getElementById('authAvatar');
-  if (!signInEl || !userEl || !nameEl || !avatarEl) return;
+  const signInEl   = document.getElementById('authSignIn');
+  const userEl     = document.getElementById('authUser');
+  const avatarEl   = document.getElementById('authAvatar');
+  const menuAvatar = document.getElementById('authMenuAvatar');
+  const menuName   = document.getElementById('authMenuName');
+  if (!signInEl || !userEl || !avatarEl) return;
 
   if (!user) {
     signInEl.hidden = false;
     userEl.hidden   = true;
+    themeBtn.hidden = false;
     return;
   }
+  themeBtn.hidden = true;
 
   const display = user.userDetails || user.userId || '';
-  nameEl.textContent   = display.length > 24 ? display.slice(0, 22) + '…' : display;
-  avatarEl.textContent = (display[0] || '?').toUpperCase();
+  const picture = user.claims?.find(c => c.typ === 'picture')?.val;
+  const gravatarSrc = display
+    ? `https://www.gravatar.com/avatar/${md5(display.toLowerCase().trim())}?d=identicon&s=48`
+    : null;
+  const src = picture || gravatarSrc;
+
+  for (const el of [avatarEl, menuAvatar].filter(Boolean)) {
+    el.textContent = '';
+    if (src) {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
+      img.className = 'auth-avatar-img';
+      el.appendChild(img);
+    } else {
+      el.textContent = display ? display[0].toUpperCase() : '?';
+    }
+  }
+  if (menuName) menuName.textContent = display;
+
   signInEl.hidden = true;
   userEl.hidden   = false;
 }
@@ -334,7 +414,7 @@ function setSyncStatus(status) {
                  : status === 'synced'  ? '☁ Synced'
                  : status === 'offline' ? '⚠ Offline'
                  : '';
-  el.hidden = (status === 'idle');
+  el.hidden = (status === 'idle' || status === 'synced');
 }
 
 let _syncTimer = null;
@@ -1273,6 +1353,8 @@ function syncThemeIcon() {
   const cur = document.documentElement.getAttribute('data-theme');
   const isDark = cur === 'dark' || (!cur && window.matchMedia('(prefers-color-scheme: dark)').matches);
   themeBtn.textContent = isDark ? '☀' : '🌙';
+  const menuItem = document.getElementById('themeMenuItem');
+  if (menuItem) menuItem.textContent = isDark ? '☀ Light mode' : '🌙 Dark mode';
 }
 
 function applyTheme(theme) {
@@ -1281,13 +1363,15 @@ function applyTheme(theme) {
   syncThemeIcon();
 }
 
-themeBtn.addEventListener('click', () => {
+function toggleTheme() {
   const cur = document.documentElement.getAttribute('data-theme');
   const isDark = cur === 'dark' || (!cur && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const next = isDark ? 'light' : 'dark';
   applyTheme(next);
   try { localStorage.setItem(THEME_KEY, next); } catch {}
-});
+}
+
+themeBtn.addEventListener('click', toggleTheme);
 
 (function initTheme() {
   let saved = null;
@@ -1322,25 +1406,50 @@ window.addEventListener('appinstalled', () => {
   deferredInstallPrompt = null;
 });
 
-// Sign-in dropdown toggle
-const signInBtn        = document.getElementById('signInBtn');
-const authProviderMenu = document.getElementById('authProviderMenu');
+// Sign-in modal
+const signInBtn    = document.getElementById('signInBtn');
+const signInModal  = document.getElementById('signInModal');
+const signInCancel = document.getElementById('signInCancel');
 
-if (signInBtn && authProviderMenu) {
-  signInBtn.addEventListener('click', e => {
+if (signInBtn && signInModal) {
+  signInBtn.addEventListener('click', () => signInModal.showModal());
+  signInCancel?.addEventListener('click', () => signInModal.close());
+}
+
+// Avatar flyout menu
+const authAvatarBtn = document.getElementById('authAvatarBtn');
+const authMenu      = document.getElementById('authMenu');
+
+function closeAuthMenu() {
+  authMenu?.classList.remove('is-open');
+  authAvatarBtn?.setAttribute('aria-expanded', 'false');
+}
+
+document.getElementById('themeMenuItem')?.addEventListener('click', () => {
+  toggleTheme();
+  closeAuthMenu();
+});
+
+if (authAvatarBtn && authMenu) {
+  authAvatarBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    const open = authProviderMenu.hidden;
-    authProviderMenu.hidden = !open;
-    signInBtn.setAttribute('aria-expanded', String(open));
+    const open = authMenu.classList.contains('is-open');
+    if (open) {
+      closeAuthMenu();
+    } else {
+      authMenu.classList.add('is-open');
+      authAvatarBtn.setAttribute('aria-expanded', 'true');
+    }
   });
 
-  document.addEventListener('click', e => {
-    const menu = document.getElementById('authProviderMenu');
-    const btn  = document.getElementById('signInBtn');
-    if (!menu || !btn) return;
-    if (!menu.hidden && !e.target.closest('.auth-signin')) {
-      menu.hidden = true;
-      btn.setAttribute('aria-expanded', 'false');
+  document.addEventListener('click', () => {
+    if (authMenu.classList.contains('is-open')) closeAuthMenu();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && authMenu.classList.contains('is-open')) {
+      closeAuthMenu();
+      authAvatarBtn.focus();
     }
   });
 }

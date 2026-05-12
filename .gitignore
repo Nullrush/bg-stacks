@@ -3,6 +3,7 @@ node_modules/
 
 # Build & cache
 .swa/
+.azurite/
 .cache/
 dist/
 build/

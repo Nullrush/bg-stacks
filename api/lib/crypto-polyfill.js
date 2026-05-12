@@ -11,5 +11,7 @@ if (!crypto.randomUUID) {
     });
   };
 }
-// Set crypto as global for bundled Azure SDK code
-global.crypto = crypto;
+// Set crypto as global for bundled Azure SDK code (skip if already a native getter, e.g. Node 22+)
+if (!global.crypto) {
+  global.crypto = crypto;
+}

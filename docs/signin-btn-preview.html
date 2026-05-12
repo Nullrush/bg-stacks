@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign-in button options</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-2: #fafafa;
+    --text: #09090b;
+    --text-2: #52525b;
+    --border: #e4e4e7;
+    --accent: #0d9488;
+    --accent-bg: #ccfbf1;
+    --radius: 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #09090b;
+      --bg-2: #18181b;
+      --text: #fafafa;
+      --text-2: #a1a1aa;
+      --border: #27272a;
+      --accent: #2dd4bf;
+      --accent-bg: #134e4a;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Geist', -apple-system, sans-serif;
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    padding: 40px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  h2 {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    margin-bottom: 20px;
+  }
+
+  .note {
+    font-size: 12px;
+    color: var(--text-2);
+    margin-top: 10px;
+  }
+
+  /* ── Simulated header strip ── */
+  .header-strip {
+    position: relative;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 20px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .header-strip .btns {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .kicker {
+    font-size: 11px;
+    color: var(--text-2);
+    letter-spacing: 0.04em;
+  }
+
+  .title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.032em;
+    line-height: 1.1;
+  }
+
+  .sub { font-size: 13px; color: var(--text-2); }
+
+  /* ── Base btn ── */
+  .btn {
+    font: inherit;
+    font-weight: 500;
+    font-size: 12px;
+    height: 30px;
+    padding: 0 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Option A — Accent outline */
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+  }
+  .btn-outline:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+
+  /* Option B — Accent filled */
+  .btn-filled {
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    color: #fff;
+  }
+  .btn-filled:hover { opacity: 0.9; }
+
+  /* Option C — Accent ghost */
+  .btn-ghost {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    color: var(--accent);
+  }
+  .btn-ghost:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+</style>
+</head>
+<body>
+
+<div>
+  <h2>A — Accent outline</h2>
+  <div class="header-strip">
+    <span class="kicker">● Geekway 2026 / Prime</span>
+    <span class="title">Play &amp; Win Index</span>
+    <span class="sub">Sortable lineup. Source geeklist 358871.</span>
+    <div class="btns">
+      <button class="btn btn-outline">Sign in</button>
+    </div>
+  </div>
+  <p class="note">Teal border + teal text. Premium, quiet. Fits the minimal aesthetic.</p>
+</div>
+
+<div>
+  <h2>B — Accent filled</h2>
+  <div class="header-strip">
+    <span class="kicker">● Geekway 2026 / Prime</span>
+    <span class="title">Play &amp; Win Index</span>
+    <span class="sub">Sortable lineup. Source geeklist 358871.</span>
+    <div class="btns">
+      <button class="btn btn-filled">Sign in</button>
+    </div>
+  </div>
+  <p class="note">Solid teal fill + white text. Highest contrast. Clearly a primary action.</p>
+</div>
+
+<div>
+  <h2>C — Accent ghost</h2>
+  <div class="header-strip">
+    <span class="kicker">● Geekway 2026 / Prime</span>
+    <span class="title">Play &amp; Win Index</span>
+    <span class="sub">Sortable lineup. Source geeklist 358871.</span>
+    <div class="btns">
+      <button class="btn btn-ghost">Sign in</button>
+    </div>
+  </div>
+  <p class="note">Soft teal wash background + teal text + muted teal border. Between A and B.</p>
+</div>
+
+</body>
+</html>

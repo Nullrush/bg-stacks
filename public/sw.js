@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'pnw-v6';
+const CACHE_VERSION = 'pnw-v7';
 
 // Assets to pre-cache on install (app shell + data)
 const PRECACHE = [
@@ -47,6 +47,9 @@ self.addEventListener('fetch', event => {
 
   // Let cross-origin requests (Google Fonts, BGG links) go straight to network
   if (!request.url.startsWith(self.location.origin)) return;
+
+  // Never intercept auth endpoints — they must always hit the network
+  if (new URL(request.url).pathname.startsWith('/.auth')) return;
 
   event.respondWith(
     caches.match(request).then(cached => {

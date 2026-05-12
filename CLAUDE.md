@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Geekway 2026 Prime PnW — sortable game list
 
 Static site that displays the BoardGameGeek geeklist for Geekway 2026 Prime's Play & Win shelves as a sortable, filterable table. Deploys to Azure Static Web Apps.
@@ -7,30 +11,34 @@ Static site that displays the BoardGameGeek geeklist for Geekway 2026 Prime's Pl
 No build step. `public/` is the deploy artifact.
 `public/index.html` is markup only; `public/app.js` does the fetch / render / sort / filter / state-persistence work; `public/styles.css` carries every visual rule. Everything is vanilla HTML/CSS/JS — no frameworks, no bundler.
 
-## Files
-
-- `public/index.html` — page markup
-- `public/app.js` — all behavior (state, filtering, sorting, render, URL/localStorage persistence, theme & view toggles, mobile card expansion, keyboard shortcuts)
-- `public/styles.css` — all styles, light/dark via `prefers-color-scheme` plus a manual override
-- `public/games.json` — game data (regenerated via `npm run refresh`)
-- `public/staticwebapp.config.json` — Azure SWA routing/headers (lives at the SWA app root, which is `public/`)
-- `parse-bgg-csv.mjs` — converts a BGG geeklist CSV export into `public/games.json`
-- `.github/workflows/azure-static-web-apps.yml` — auto-deploy on push to `main` (CI path)
-- `.env.local.example` — template for the SWA CLI deployment token (manual deploy path)
+The `api/` directory is an Azure Functions app (Node.js, CommonJS) that provides a `/api/tags` endpoint for cloud sync of wishlist/played tags. It talks to Azure Table Storage (`usertags` table). Auth is handled by Azure Static Web Apps' built-in identity providers (Google, Apple) via `/.auth/*` routes — the function reads the `x-ms-client-principal` header to identify the user.
 
 ## Commands
 
 ```bash
 npm install                     # one time, installs serve + swa-cli
-npm run dev                     # serve public/ on http://localhost:3000
-npm run refresh -- <csv-path>   # rebuild games.json from a BGG CSV export
+npm run dev                     # SWA CLI: serves public/ + api/ on http://localhost:4280
+npm run dev:thin                # serve public/ only on http://localhost:3000 (no API/auth)
+npm run refresh -- <csv-path>   # step 1: rebuild games.json from a BGG CSV export
+node scripts/enrich-from-bgg.js # step 2: add mechanics/categories/thumbnails/ranks to games.json
 npm run deploy                  # one-shot SWA CLI deploy (sources .env.local)
+
+# API tests (run from repo root, not api/)
+cd api && npm test
 ```
+
+## Data pipeline
+
+`games.json` is produced in two steps:
+
+1. **`npm run refresh -- <csv-path>`** (`parse-bgg-csv.mjs`) — converts a BGG geeklist CSV export into `public/games.json` with player counts, play times, ratings, and poll data. Required CSV columns: `id`, `name`, `minplayers`, `maxplayers`, `playingtime`, `minplaytime`, `maxplaytime`, `average`, `bayesaverage`, `averageweight`, `usersrated`, and `1player` through `20player` (poll values: `B`/`R`/`N`). The CSV comes from a BGG geeklist export (e.g. via BGG1Tool).
+
+2. **`node scripts/enrich-from-bgg.js`** — fetches enriched data (mechanics, categories, thumbnails, descriptions, BGG rank, sub-category ranks) from the BGG API for each game and merges it into `games.json`. Results are cached in `scripts/.bgg-cache/` so the script is safe to interrupt and resume. Requests are throttled with a random 30–120 second delay to avoid taxing BGG. Pass `--merge-only` to skip fetching and just merge cached data.
 
 ## State the UI persists
 
 - Filters + sort state → URL query params and `localStorage['gpw.state']`. URL wins on load; localStorage is the fallback. Anything matching `DEFAULTS` is omitted from the URL.
-- Per-game `wishlist` / `played` tags → `localStorage['gpw.tags']` keyed by game id.
+- Per-game `wishlist` / `played` tags → `localStorage['gpw.tags']` keyed by game id. When signed in, tags also sync to Azure Table Storage via `/api/tags` (optimistic concurrency via eTag; conflict modal on divergence).
 - Theme override (light / dark / system) → `localStorage['gpw.theme']`.
 - Desktop-mode override on phones → `localStorage['gpw.view']` (swaps the viewport `<meta>` to `width=1280`).
 
@@ -53,7 +61,12 @@ Each entry in `games.json` uses verbose field names so the file is self-describi
   "maxTime": 160,
   "avgRating": 8.42,
   "geekRating": 8.03,
-  "votes": 19245
+  "votes": 19245,
+  "bggRank": 12,
+  "subRanks": { "strategy": 5, "thematic": null, ... },
+  "mechanics": ["Worker Placement"],
+  "categories": ["Science Fiction"],
+  "thumbnail": "https://..."
 }
 ```
 
@@ -61,9 +74,15 @@ Each entry in `games.json` uses verbose field names so the file is self-describi
 
 The runtime adds a derived `hybridRating = (avgRating + geekRating) / 2` after fetch (when `geekRating > 0`).
 
-## Source CSV columns
+## API backend (`api/`)
 
-The refresh script expects a CSV from a BGG geeklist export (e.g. produced by [BGG1Tool](https://boardgamegeek.com/wiki/page/BGG1Tool)). Required columns: `id`, `name`, `minplayers`, `maxplayers`, `playingtime`, `minplaytime`, `maxplaytime`, `average`, `bayesaverage`, `averageweight`, `usersrated`, and `1player` through `20player` (poll values: `B`/`R`/`N`).
+- `api/tags.js` — Azure Functions entry point; routes GET/PUT `/api/tags`
+- `api/lib/handlers.js` — storage logic using `@azure/data-tables` (Azure Table Storage, table `usertags`, partition key = userId, row key = `'tags'`). Uses optimistic concurrency (eTag); returns `409` on conflict.
+- `api/lib/tagsFormat.js` — pure functions for converting between cloud format `{ want: [ids], played: [ids] }` and runtime format `{ [gameId]: { want?: true, played?: true } }`; also `mergeTags` and `tagsAreEqual`.
+- `api/lib/crypto-polyfill.js` — required before anything that needs `crypto` in the Azure Functions runtime.
+- `api/local.settings.json` — local dev config (gitignored); needs `AZURE_STORAGE_CONNECTION_STRING`.
+
+Cloud format stores game IDs as numbers. Runtime format uses string keys (object property names) but the IDs are numeric values. This asymmetry exists because `localStorage` JSON keys are always strings.
 
 ## Conventions
 

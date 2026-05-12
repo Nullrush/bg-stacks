@@ -2,6 +2,8 @@
 
 Sortable, filterable web table of the games on the Play & Win shelves at [Geekway Prime 2026](https://geekway.com/), pulled from [BGG geeklist 358871](https://boardgamegeek.com/geeklist/358871/geekway-2026-prime-pnw-lineup).
 
+**Live site:** [bgstacks.com](https://bgstacks.com)
+
 Single-page static site — no framework, no bundler, no build step. Deploys to Azure Static Web Apps.
 
 ## Features
@@ -9,6 +11,7 @@ Single-page static site — no framework, no bundler, no build step. Deploys to 
 - Sort and filter by player count, weight, playtime, rating, BGG rank, sub-category ranks (Strategy, Family, etc.), "best at N" optimal counts, mechanics, categories, and personal wishlist / played tags.
 - Mechanics and categories use searchable multi-select dropdowns with OR / AND mode toggle.
 - Filter state survives reload (localStorage) and is shareable via URL. Active filters shown as a badge; one-click reset.
+- Sign in with Google or Apple to sync your ♥ wishlist and ✓ played tags across devices. ETag-based conflict detection with a resolution modal.
 - Mobile card layout: cover image + mini stats grid when collapsed; tap to expand full details (rec. players, mechanics, categories, rank breakdown).
 - Cover-image tooltip on hover; sub-rank breakdown tooltip on BGG rank cell.
 - Installable as a PWA — service worker (cache-first + background refresh), web app manifest, home-screen icons.
@@ -18,8 +21,12 @@ Single-page static site — no framework, no bundler, no build step. Deploys to 
 ## Quick start
 
 ```bash
-npm install            # installs the `serve` dev server and the SWA CLI
-npm run dev            # http://localhost:3000
+npm install            # installs the SWA CLI + serve dev server
+cd api && npm install  # installs Azure Functions SDK
+npm run dev            # SWA CLI: public/ + api/ at http://localhost:4280
+                       # Sign-in shows a local identity picker — no real credentials needed
+npm run dev:thin       # static files only at http://localhost:3000 (no API / auth)
+cd api && npm test     # unit tests for handlers and tag format helpers
 ```
 
 ## Refreshing the data
@@ -69,15 +76,22 @@ Useful if you don't want to use CI/CD or want a quick push without committing.
 ```
 public/                                  what gets deployed
   index.html                             page markup
-  app.js                                 fetch, sort, filter, render, state
+  app.js                                 fetch, sort, filter, render, state, auth, sync
   styles.css                             all styling
   games.json                             game data (base + enriched)
-  mechanics.json                         mechanic id→name map
-  categories.json                        category id→name map
+  mechanics.json                         mechanic list
+  categories.json                        category list
   sw.js                                  service worker (cache-first + refresh)
   manifest.json                          PWA web app manifest
   icon.svg / icon-192.png / icon-512.png app icons
-  staticwebapp.config.json               Azure SWA routing/headers
+  staticwebapp.config.json               Azure SWA routing/headers + auth providers
+api/
+  tags.js                                Azure Functions HTTP endpoint (GET/PUT /api/tags)
+  lib/handlers.js                        Azure Table Storage logic + getUserId
+  lib/tagsFormat.js                      cloudToRuntime / runtimeToCloud / mergeTags
+  lib/handlers.test.js                   unit tests
+  lib/tagsFormat.test.js                 unit tests
+  local.settings.json                    local dev config (gitignored)
 scripts/
   enrich-from-bgg.js                     BGG API enrichment (ranks, mechanics, etc.)
   .bgg-cache/                            per-game API response cache (gitignored)

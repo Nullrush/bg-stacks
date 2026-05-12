@@ -29,7 +29,7 @@ const fs = require('fs');
 const path = require('path');
 const xml2js = require('xml2js');
 
-const DEPLOYED_GAMES_URL = 'https://p2w.bleemus.dev/games.json';
+const DEPLOYED_GAMES_URL = 'https://bgstacks.com/games.json';
 const LOCAL_GAMES_PATH   = path.join(__dirname, '../src/assets/data/games.json');
 const RANKS_CSV_PATH     = path.join(__dirname, '../src/assets/data/boardgames_ranks.csv');
 const OUT_PATH           = path.join(__dirname, '../src/assets/data/games-enriched.json');
