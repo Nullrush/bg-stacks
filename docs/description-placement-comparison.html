@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Description Placement Comparison</title>
+<style>
+  :root {
+    --bg: #0f0f11;
+    --bg-2: #18181b;
+    --bg-3: #232329;
+    --border: #2e2e36;
+    --text: #e8e8f0;
+    --text-2: #a0a0b4;
+    --text-3: #6b6b82;
+    --accent: #7c6cf7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    padding: 32px 24px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .subtitle {
+    color: var(--text-3);
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 1100px;
+  }
+  .option-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .option-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .option-desc {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+
+  /* ── card detail replica ── */
+  .card-shell {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .card-name-bar {
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .card-detail-area {
+    padding: 12px 14px 10px;
+  }
+  .cd-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cd-trio {
+    display: grid;
+    grid-template-columns: 90px 1fr 1fr;
+    gap: 8px 10px;
+  }
+  .cd-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .cd-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: ui-monospace, monospace;
+    color: var(--text-3);
+  }
+  .cd-val {
+    font-size: 14px;
+    color: var(--text);
+  }
+  .cd-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cd-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .cd-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 11px;
+    color: var(--text-2);
+  }
+  .cd-desc-text {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+  .cd-bgg-link {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-3);
+    text-align: center;
+    text-decoration: none;
+  }
+
+  /* highlight pulse for the new section */
+  .highlight {
+    position: relative;
+  }
+  .highlight::before {
+    content: 'NEW';
+    position: absolute;
+    top: 0; right: 0;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    opacity: 0.9;
+  }
+  .new-border {
+    border-left: 2px solid var(--accent);
+    padding-left: 8px;
+    margin-left: -10px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Description placement comparison</h1>
+<p class="subtitle">Game: SETI: Search for Extraterrestrial Intelligence — "A strategic game of worker placement and tableau building set in the search for alien life."</p>
+
+<div class="grid">
+
+  <!-- Option A -->
+  <div class="option-wrap">
+    <div class="option-label">Option A</div>
+    <div class="option-title">After trio, before sub-ranks</div>
+    <div class="option-desc">Description appears as context right after the key stats, before any tag chips.</div>
+    <div class="card-shell">
+      <div class="card-name-bar">SETI: Search for Extraterrestrial Intelligence</div>
+      <div class="card-detail-area">
+        <div class="cd-bottom">
+          <div class="cd-trio">
+            <div class="cd-item">
+              <span class="cd-label">Rec. Players</span>
+              <span class="cd-val">3–4</span>
+            </div>
+            <div class="cd-item">
+              <span class="cd-label">Best At</span>
+              <span class="cd-val">3–4</span>
+            </div>
+            <div class="cd-item">
+              <span class="cd-label">Time</span>
+              <span class="cd-val">40–160 min</span>
+            </div>
+          </div>
+
+          <div class="cd-section highlight new-border">
+            <span class="cd-label">Description</span>
+            <span class="cd-desc-text">A strategic game of worker placement and tableau building set in the search for alien life.</span>
+          </div>
+
+          <div class="cd-section">
+            <span class="cd-label">Category Ranks</span>
+            <div class="cd-chips">
+              <span class="cd-chip">Strategy #5</span>
+              <span class="cd-chip">Thematic #18</span>
+            </div>
+          </div>
+          <div class="cd-section">
+            <span class="cd-label">Mechanics</span>
+            <div class="cd-chips">
+              <span class="cd-chip">Worker Placement</span>
+              <span class="cd-chip">Tableau Building</span>
+              <span class="cd-chip">Hand Management</span>
+            </div>
+          </div>
+          <div class="cd-section">
+            <span class="cd-label">Categories</span>
+            <div class="cd-chips">
+              <span class="cd-chip">Science Fiction</span>
+              <span class="cd-chip">Science</span>
+            </div>
+          </div>
+        </div>
+        <a class="cd-bgg-link" href="#">View on BoardGameGeek ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div class="option-wrap">
+    <div class="option-label">Option B</div>
+    <div class="option-title">After categories, before BGG link</div>
+    <div class="option-desc">Description appears at the bottom as a closing note, after all chips.</div>
+    <div class="card-shell">
+      <div class="card-name-bar">SETI: Search for Extraterrestrial Intelligence</div>
+      <div class="card-detail-area">
+        <div class="cd-bottom">
+          <div class="cd-trio">
+            <div class="cd-item">
+              <span class="cd-label">Rec. Players</span>
+              <span class="cd-val">3–4</span>
+            </div>
+            <div class="cd-item">
+              <span class="cd-label">Best At</span>
+              <span class="cd-val">3–4</span>
+            </div>
+            <div class="cd-item">
+              <span class="cd-label">Time</span>
+              <span class="cd-val">40–160 min</span>
+            </div>
+          </div>
+          <div class="cd-section">
+            <span class="cd-label">Category Ranks</span>
+            <div class="cd-chips">
+              <span class="cd-chip">Strategy #5</span>
+              <span class="cd-chip">Thematic #18</span>
+            </div>
+          </div>
+          <div class="cd-section">
+            <span class="cd-label">Mechanics</span>
+            <div class="cd-chips">
+              <span class="cd-chip">Worker Placement</span>
+              <span class="cd-chip">Tableau Building</span>
+              <span class="cd-chip">Hand Management</span>
+            </div>
+          </div>
+          <div class="cd-section">
+            <span class="cd-label">Categories</span>
+            <div class="cd-chips">
+              <span class="cd-chip">Science Fiction</span>
+              <span class="cd-chip">Science</span>
+            </div>
+          </div>
+
+          <div class="cd-section highlight new-border">
+            <span class="cd-label">Description</span>
+            <span class="cd-desc-text">A strategic game of worker placement and tableau building set in the search for alien life.</span>
+          </div>
+        </div>
+        <a class="cd-bgg-link" href="#">View on BoardGameGeek ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div class="option-wrap">
+    <div class="option-label">Option C</div>
+    <div class="option-title">First item in cd-bottom</div>
+    <div class="option-desc">Description leads the detail view — first thing you read before any numbers.</div>
+    <div class="card-shell">
+      <div class="card-name-bar">SETI: Search for Extraterrestrial Intelligence</div>
+      <div class="card-detail-area">
+        <div class="cd-bottom">
+          <div class="cd-section highlight new-border">
+            <span class="cd-label">Description</span>
+            <span class="cd-desc-text">A strategic game of worker placement and tableau building set in the search for alien life.</span>
+          </div>
+
+          <div class="cd-trio">
+            <div class="cd-item">
+              <span class="cd-label">Rec. Players</span>
+              <span class="cd-val">3–4</span>
+            </div>
+            <div class="cd-item">
+              <span class="cd-label">Best At</span>
+              <span class="cd-val">3–4</span>
+            </div>
+            <div class="cd-item">
+              <span class="cd-label">Time</span>
+              <span class="cd-val">40–160 min</span>
+            </div>
+          </div>
+          <div class="cd-section">
+            <span class="cd-label">Category Ranks</span>
+            <div class="cd-chips">
+              <span class="cd-chip">Strategy #5</span>
+              <span class="cd-chip">Thematic #18</span>
+            </div>
+          </div>
+          <div class="cd-section">
+            <span class="cd-label">Mechanics</span>
+            <div class="cd-chips">
+              <span class="cd-chip">Worker Placement</span>
+              <span class="cd-chip">Tableau Building</span>
+              <span class="cd-chip">Hand Management</span>
+            </div>
+          </div>
+          <div class="cd-section">
+            <span class="cd-label">Categories</span>
+            <div class="cd-chips">
+              <span class="cd-chip">Science Fiction</span>
+              <span class="cd-chip">Science</span>
+            </div>
+          </div>
+        </div>
+        <a class="cd-bgg-link" href="#">View on BoardGameGeek ↗</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

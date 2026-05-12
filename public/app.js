@@ -716,6 +716,16 @@ function buildCardDetail(r) {
   const recText     = playerRangeText(r.recommendedPlayers);
   const time        = timeRangeText(r) ?? '—';
 
+  const desc = (r.description || '').trim();
+  const descHtml = desc
+    ? '<div class="cd-section">'
+        + '<span class="cd-label">Description</span>'
+        + (desc.length > 200
+            ? `<span class="cd-desc-text">${escapeHtml(desc.slice(0, 200))}&hellip; <a class="cd-desc-more" href="https://boardgamegeek.com/boardgame/${r.id}" target="_blank" rel="noopener">read more ↗</a></span>`
+            : `<span class="cd-desc-text">${escapeHtml(desc)}</span>`)
+        + '</div>'
+    : '';
+
   const hasSubranks = r.subRanks && Object.values(r.subRanks).some(v => v != null);
   const subranksHtml = hasSubranks
     ? '<div class="cd-section">'
@@ -751,6 +761,7 @@ function buildCardDetail(r) {
     +   (bestText ? `<div class="cd-item"><span class="cd-label">Best At</span><span class="cd-val">${escapeHtml(bestText)}</span></div>` : '<div class="cd-item"></div>')
     +   `<div class="cd-item"><span class="cd-label">Time</span><span class="cd-val">${escapeHtml(time)}</span></div>`
     + '</div>'
+    + descHtml
     + subranksHtml
     + mechanicsHtml
     + categoriesHtml

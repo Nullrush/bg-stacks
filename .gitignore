@@ -48,3 +48,7 @@ ehthumbs.db
 *.bak
 *.tmp
 .history/
+
+scripts/.bgg-cache/
+
+scripts/.bgg-session
