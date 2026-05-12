@@ -1466,30 +1466,30 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
 
 .signin-provider-btn svg { flex-shrink: 0; }
 
-.signin-google {
+.signin-entra {
   background: #fff;
-  color: #1f1f1f;
-  border-color: #747775;
+  color: #5e5e5e;
+  border-color: #8c8c8c;
 }
-.signin-google:hover { background: #f8f9fa; }
+.signin-entra:hover { background: #f3f3f3; }
 
-.signin-apple {
-  background: #000;
+.signin-github {
+  background: #24292e;
   color: #fff;
-  border-color: #000;
+  border-color: #24292e;
 }
-.signin-apple:hover { background: #1a1a1a; }
+.signin-github:hover { background: #2f363d; }
 
 @media (prefers-color-scheme: dark) {
-  .signin-google { background: #131314; color: #e3e3e3; border-color: #8e918f; }
-  .signin-google:hover { background: #1e1e1e; }
-  .signin-apple { background: #fff; color: #000; border-color: #fff; }
-  .signin-apple:hover { background: #e8e8e8; }
+  .signin-entra { background: #2f2f2f; color: #fff; border-color: #6e6e6e; }
+  .signin-entra:hover { background: #3a3a3a; }
+  .signin-github { background: #f0f6fc; color: #24292e; border-color: #f0f6fc; }
+  .signin-github:hover { background: #dde6ee; }
 }
-[data-theme="dark"] .signin-google { background: #131314; color: #e3e3e3; border-color: #8e918f; }
-[data-theme="dark"] .signin-google:hover { background: #1e1e1e; }
-[data-theme="dark"] .signin-apple { background: #fff; color: #000; border-color: #fff; }
-[data-theme="dark"] .signin-apple:hover { background: #e8e8e8; }
+[data-theme="dark"] .signin-entra { background: #2f2f2f; color: #fff; border-color: #6e6e6e; }
+[data-theme="dark"] .signin-entra:hover { background: #3a3a3a; }
+[data-theme="dark"] .signin-github { background: #f0f6fc; color: #24292e; border-color: #f0f6fc; }
+[data-theme="dark"] .signin-github:hover { background: #dde6ee; }
 
 .signin-modal-cancel {
   display: block;

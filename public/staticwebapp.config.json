@@ -1,1 +1,23 @@
-{"navigationFallback":{"rewrite":"/index.html"},"globalHeaders":{"Cache-Control":"public, max-age=3600"},"mimeTypes":{".json":"application/json"},"routes":[{"route":"/api/*","allowedRoles":["authenticated"]}],"responseOverrides":{"401":{"statusCode":401}}}
+{
+  "navigationFallback": {
+    "rewrite": "/index.html"
+  },
+  "globalHeaders": {
+    "Cache-Control": "public, max-age=3600"
+  },
+  "mimeTypes": {
+    ".json": "application/json"
+  },
+  "routes": [
+    {
+      "route": "/api/*",
+      "allowedRoles": ["authenticated"]
+    }
+  ],
+  "responseOverrides": {
+    "401": {
+      "statusCode": 401
+    }
+  }
+}
+
