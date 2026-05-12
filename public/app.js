@@ -381,8 +381,10 @@ function updateAuthUI(user) {
   themeBtn.hidden = true;
 
   const display = user.userDetails || user.userId || '';
-  const picture = user.claims?.find(c => c.typ === 'picture')?.val;
-  const gravatarSrc = display
+  const picture = user.claims?.find(c => c.typ === 'picture')?.val
+    || (user.identityProvider === 'github' ? `https://github.com/${user.userDetails}.png` : null);
+  const isEmail = display.includes('@');
+  const gravatarSrc = isEmail
     ? `https://www.gravatar.com/avatar/${md5(display.toLowerCase().trim())}?d=identicon&s=48`
     : null;
   const src = picture || gravatarSrc;
