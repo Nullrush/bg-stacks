@@ -1,0 +1,39 @@
+using BgStacks.Web.Application.Events;
+using BgStacks.Web.Domain.Events;
+using BgStacks.Web.Domain.Tags;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
+namespace BgStacks.Web.Tests.Presentation.Helpers;
+
+public class CustomWebApplicationFactory : WebApplicationFactory<Program>
+{
+    public InMemoryTagsRepository TagsRepository { get; } = new();
+    public InMemoryEventRepository EventRepository { get; } = new();
+    public InMemoryEventDataRepository EventDataRepository { get; } = new();
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseEnvironment("Testing");
+
+        builder.ConfigureServices(services =>
+        {
+            services.RemoveAll<ITagsRepository>();
+            services.RemoveAll<IEventRepository>();
+            services.RemoveAll<IEventDataRepository>();
+            services.RemoveAll<EventDataService>();
+
+            services.AddScoped<ITagsRepository>(_ => TagsRepository);
+            services.AddScoped<IEventRepository>(_ => EventRepository);
+            services.AddSingleton<IEventDataRepository>(_ => EventDataRepository);
+            services.AddSingleton<EventDataService>();
+
+            services.AddAuthentication(TestAuthHandler.SchemeName)
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                    TestAuthHandler.SchemeName, _ => { });
+        });
+    }
+}
