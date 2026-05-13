@@ -38,10 +38,11 @@ Azure Container Apps (consumption plan, 0–3 replicas)
   └─ Secrets: OAuth client IDs + secrets (Google, Facebook, Discord)
 
 Azure Cosmos DB (NoSQL, free tier)
-  └─ Database: bgstacks / Container: usertags
-       PartitionKey: /userId
-       id: "tags"
-       _etag: optimistic concurrency
+  ├─ Database: bgstacks / Container: usertags
+  │    PartitionKey: /userId, id: "tags", _etag: optimistic concurrency
+  └─ Database: bgstacks / Container: events
+       PartitionKey: /slug, id: slug
+       Fields: name, eventDate, isPublic
 
 Azure Storage Account (Blob)
   └─ Container: events
@@ -67,17 +68,21 @@ bg-stacks/
           ITagsRepository.cs        — GetAsync(UserId) / SaveAsync(UserTags, string? etag)
         Events/
           EventSlug.cs              — value object: validated lowercase slug (letters, digits, hyphens)
+          Event.cs                  — aggregate root: slug, name, eventDate, isPublic
           EventData.cs              — entity: games, mechanics, categories for one event
+          IEventRepository.cs       — GetAsync(EventSlug) / ListPublicAsync() / SaveAsync(Event)
           IEventDataRepository.cs   — GetAsync(EventSlug)
       Application/
         Tags/
           TagsService.cs            — GetTags, SaveTags (eTag/conflict logic)
         Events/
-          EventDataService.cs       — ResolveEvent, GetGameData (caching policy)
+          EventService.cs           — ListPublicEvents, GetEvent (registry queries)
+          EventDataService.cs       — GetGameData (blob fetch + caching policy)
       Infrastructure/
         Tags/
           CosmosTagsRepository.cs   — ITagsRepository via Microsoft.Azure.Cosmos SDK
         Events/
+          CosmosEventRepository.cs  — IEventRepository via Microsoft.Azure.Cosmos SDK
           BlobEventDataRepository.cs — IEventDataRepository via Azure.Storage.Blobs SDK
         Auth/
           OAuthUserIdFactory.cs     — derives UserId + userDetails + picture from ClaimsPrincipal
@@ -86,10 +91,15 @@ bg-stacks/
           AuthEndpoints.cs          — MapGroup("/.auth"): login/{provider}, logout, me
         Api/
           TagsEndpoints.cs          — MapGroup("/api"): GET /tags, PUT /tags
+          EventsEndpoints.cs        — GET /api/events (public event list for home page)
         Events/
-          EventMiddleware.cs        — resolves EventSlug from Host header → HttpContext.Items
+          EventMiddleware.cs        — resolves EventSlug from Host header → HttpContext.Items; root domain → null slug (home page context)
           GamesJsonEndpoint.cs      — GET /games.json, /mechanics.json, /categories.json
-      wwwroot/                      — index.html, app.js, styles.css, icons, sw.js, manifest.json
+      wwwroot/
+        home.html                   — root domain home page: lists public events, upcoming vs. archive
+        home.js                     — fetches GET /api/events, renders event cards
+        index.html                  — event subdomain page (existing, unchanged)
+        app.js, styles.css, icons, sw.js, manifest.json
       Program.cs
       Dockerfile
       appsettings.json
@@ -193,14 +203,15 @@ The `claims` array is extensible — a future `/api/me` PUT endpoint can store a
 
 ### Host → event slug resolution (`EventMiddleware`)
 
-Runs early in the pipeline. Reads the `Host` header, strips the configured base domain (`bgstacks.com`), treats the leftmost label as the event slug.
+Runs early in the pipeline. Reads the `Host` header, strips the configured base domain (`bgstacks.com`), treats the leftmost label as the event slug. If the hostname matches the bare base domain (no subdomain), the slug is null — signalling home page context.
 
 ```
-gw-2026-pnw.bgstacks.com  →  EventSlug("gw-2026-pnw")
-localhost:5000           →  EventSlug("dev")   (configurable fallback)
+gw-2026-pnw.bgstacks.com  →  EventSlug("gw-2026-pnw")   (event page)
+bgstacks.com               →  null                         (home page)
+localhost:5000             →  EventSlug("dev")             (configurable dev fallback)
 ```
 
-`EventSlug` is stored in `HttpContext.Items` and read by all downstream handlers.
+The resolved `EventSlug` (or null) is stored in `HttpContext.Items`. Endpoints that require an event slug (game data, tags API) return 404 when null. The home page and `/api/events` are reachable from both contexts.
 
 ### Blob Storage layout
 
@@ -217,12 +228,42 @@ container: events
 
 `/games.json`, `/mechanics.json`, `/categories.json` are Minimal API routes — not static files. They resolve the slug from `HttpContext.Items`, call `EventDataService`, and return the cached blob as `application/json`. The frontend's `fetch('/games.json')` is unchanged.
 
+### Event registry (Cosmos DB)
+
+Event metadata is stored in a second Cosmos DB container, separate from tags:
+
+```
+Database:      bgstacks
+Container:     events
+PartitionKey:  /slug
+id:            same as slug
+
+Fields:
+  slug        string   "gw-2026-pnw"
+  name        string   "Geekway 2026 Prime Play & Win"
+  eventDate   string   ISO 8601 date "2026-06-12" (start date of convention)
+  isPublic    bool     controls home page visibility
+```
+
+`GET /api/events` returns all documents where `isPublic = true`, ordered by `eventDate` descending. The home page (`home.js`) consumes this to render two sections: upcoming/active events (eventDate ≥ today) and past/archive events (eventDate < today). Private events (isPublic = false) are never returned by this endpoint — they are accessible only via direct subdomain URL.
+
+### Home page (`home.html` + `home.js`)
+
+Served at the root domain (`bgstacks.com`). Calls `GET /api/events` on load and renders:
+- **Upcoming / Active** — events where `eventDate ≥ today`, sorted soonest first
+- **Past / Archive** — events where `eventDate < today`, sorted most recent first
+
+Each event card links to its subdomain URL. Auth state (sign-in button) is present on the home page using the same `/.auth/me` check as the event page. The home page shares `styles.css` and `sw.js` with the event page for consistent platform identity.
+
+`manifest.json` uses generic platform-level identity ("BG Stacks") so it works for both the root domain and event subdomains as a PWA.
+
 ### Adding a new event
 
 1. Run pipeline scripts locally → produces `games.json`, `mechanics.json`, `categories.json`
 2. Upload to `events/{slug}/` in Blob Storage
-3. Add a CNAME DNS record for the new subdomain pointing at the ACA environment IP
-4. Done — no redeploy, no Bicep changes
+3. Register the event in the Cosmos DB `events` container (name, slug, eventDate, isPublic)
+4. Add a CNAME DNS record for the new subdomain pointing at the ACA environment IP
+5. Done — no redeploy, no Bicep changes
 
 ---
 
@@ -277,7 +318,7 @@ Task<string> SaveAsync(UserTags userTags, string? clientEtag); // throws Conflic
 |---|---|---|
 | `environment.bicep` | `Microsoft.App/managedEnvironments` | Wildcard DNS suffix `*.bgstacks.com`, wildcard TLS cert |
 | `containerapp.bicep` | `Microsoft.App/containerApps` | External ingress port 8080, min 0 / max 3 replicas, system-assigned identity |
-| `cosmos.bicep` | `Microsoft.DocumentDB/databaseAccounts` | Free tier, NoSQL API, database `bgstacks`, container `usertags` |
+| `cosmos.bicep` | `Microsoft.DocumentDB/databaseAccounts` | Free tier, NoSQL API, database `bgstacks`, containers `usertags` + `events` |
 | `storage.bicep` | `Microsoft.Storage/storageAccounts` | Blob Storage only, container `events` |
 | `keyvault.bicep` | `Microsoft.KeyVault/vaults` | Stores wildcard TLS certificate for ACA environment DNS suffix |
 
@@ -338,6 +379,8 @@ Uses existing OIDC login pattern (`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_S
 ---
 
 ## Out of Scope (this migration)
+
+- Event admin UI (events registered directly in Cosmos DB for now)
 
 - Apple Sign In (v2 — requires JWT client secret with private key rotation)
 - Per-event tag scoping (issue #11)
