@@ -3,7 +3,7 @@
 
 ## Problem
 
-Azure Static Web Apps requires the Standard plan ($9/month) for custom OAuth providers (Google, Apple). The Free plan silently falls back to Entra ID. Additionally, the platform vision requires wildcard subdomain support (e.g. `gwpnw2026.bgstacks.com`) to host arbitrary numbers of simultaneous events, which SWA's 5-domain cap does not accommodate.
+Azure Static Web Apps requires the Standard plan ($9/month) for custom OAuth providers (Google, Apple). The Free plan silently falls back to Entra ID. Additionally, the platform vision requires wildcard subdomain support (e.g. `gw-2026-pnw.bgstacks.com`) to host arbitrary numbers of simultaneous events, which SWA's 5-domain cap does not accommodate.
 
 ## Solution
 
@@ -45,9 +45,9 @@ Azure Cosmos DB (NoSQL, free tier)
 
 Azure Storage Account (Blob)
   └─ Container: events
-       gwpnw2026/games.json
-       gwpnw2026/mechanics.json
-       gwpnw2026/categories.json
+       gw-2026-pnw/games.json
+       gw-2026-pnw/mechanics.json
+       gw-2026-pnw/categories.json
        geekwaywest2026/...
 ```
 
@@ -66,7 +66,7 @@ bg-stacks/
           Tags.cs                   — value object: { want: int[], played: int[] }
           ITagsRepository.cs        — GetAsync(UserId) / SaveAsync(UserTags, string? etag)
         Events/
-          EventSlug.cs              — value object: validated lowercase slug
+          EventSlug.cs              — value object: validated lowercase slug (letters, digits, hyphens)
           EventData.cs              — entity: games, mechanics, categories for one event
           IEventDataRepository.cs   — GetAsync(EventSlug)
       Application/
@@ -196,7 +196,7 @@ The `claims` array is extensible — a future `/api/me` PUT endpoint can store a
 Runs early in the pipeline. Reads the `Host` header, strips the configured base domain (`bgstacks.com`), treats the leftmost label as the event slug.
 
 ```
-gwpnw2026.bgstacks.com  →  EventSlug("gwpnw2026")
+gw-2026-pnw.bgstacks.com  →  EventSlug("gw-2026-pnw")
 localhost:5000           →  EventSlug("dev")   (configurable fallback)
 ```
 
