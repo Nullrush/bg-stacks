@@ -1,7 +1,7 @@
-# BgStacks.Web — First Deployment Guide
+# BgStacks.Web — First Deployment Checklist
 
 Everything needed to go from a fresh Azure subscription to a running Container App.
-Wildcard domain setup is a follow-up step after the initial deployment is healthy.
+Wildcard domain setup is a follow-up after the initial deployment is healthy.
 
 ---
 
@@ -22,14 +22,15 @@ These are computed by Bicep with `env = 'prod'`:
 
 ## Step 1 — Prerequisites
 
-- Azure subscription with Container Apps, Cosmos DB, and Storage available
-- Azure CLI installed and up to date (`az upgrade`)
-- GitHub repo with Actions enabled (`nullrush/bg-stacks`)
-- Docker installed locally (only needed if you want to test the image before pushing)
+- [ ] Azure subscription with Container Apps, Cosmos DB, and Storage available
+- [ ] Azure CLI installed and up to date (`az upgrade`)
+- [ ] GitHub repo with Actions enabled (`nullrush/bg-stacks`)
 
 ---
 
 ## Step 2 — Create the resource group
+
+- [ ] Log in and create the resource group:
 
 ```powershell
 az login
@@ -40,97 +41,140 @@ az group create --name bgstacks-rg --location eastus
 
 ## Step 3 — OIDC federated identity (GitHub → Azure)
 
-Both workflows authenticate to Azure via OIDC — no stored credentials.
+Both workflows authenticate via OIDC — no stored credentials.
+
+- [ ] Create the Entra app registration and service principal:
 
 ```powershell
-# Create the Entra app registration
 $app = az ad app create --display-name "bgstacks-github-actions" | ConvertFrom-Json
 $appId = $app.appId
-
-# Create a service principal for it
 az ad sp create --id $appId
-
-# Get the SP object ID (needed for role assignments)
 $spObjectId = (az ad sp show --id $appId | ConvertFrom-Json).id
+```
 
-# Grant Contributor on the resource group (needed for Bicep deployments)
+- [ ] Grant Contributor on the resource group:
+
+```powershell
 $subId = (az account show | ConvertFrom-Json).id
 az role assignment create `
   --assignee $spObjectId `
   --role Contributor `
   --scope "/subscriptions/$subId/resourceGroups/bgstacks-rg"
+```
 
-# Add a federated credential for push to main
+- [ ] Add the federated credential for push to `main`:
+
+```powershell
 az ad app federated-credential create --id $appId --parameters '{
   "name": "github-main",
   "issuer": "https://token.actions.githubusercontent.com",
   "subject": "repo:nullrush/bg-stacks:ref:refs/heads/main",
   "audiences": ["api://AzureADMyOrg"]
 }'
+```
 
-# Print the values you need for GitHub vars
+- [ ] Note down the values you'll need for GitHub vars:
+
+```powershell
 Write-Host "AZURE_CLIENT_ID:       $appId"
 Write-Host "AZURE_TENANT_ID:       $((az account show | ConvertFrom-Json).tenantId)"
 Write-Host "AZURE_SUBSCRIPTION_ID: $subId"
+Write-Host "SP object ID (for Key Vault later): $spObjectId"
 ```
 
 ---
 
-## Step 4 — GitHub repository configuration
+## Step 4 — Register OAuth apps
+
+You need a client ID and secret from each provider before running the Bicep deployment.
+
+You won't know the real redirect URI until after Step 6. Use
+`https://placeholder.example.com/callback` for now — you'll update it in Step 10.
+
+The final URI pattern is: `https://<containerAppFqdn>/.auth/login/<provider>/callback`
+
+### Google
+
+- [ ] Go to [console.cloud.google.com](https://console.cloud.google.com/)
+- [ ] Create a project (top-left picker → **New Project**) or select an existing one
+- [ ] **APIs & Services → OAuth consent screen**
+  - User type: **External**
+  - Fill in App name (`BgStacks`), support email, developer contact email
+  - Scopes: confirm `openid`, `email`, `profile` are listed (they're defaults)
+  - Test users: add your own email while in testing mode
+  - Save and continue through all screens
+- [ ] **APIs & Services → Credentials → + Create Credentials → OAuth 2.0 Client ID**
+  - Application type: **Web application**
+  - Name: `BgStacks Web`
+  - Authorized redirect URIs: `https://placeholder.example.com/callback`
+  - Click **Create**
+- [ ] Copy the **Client ID** and **Client secret** from the confirmation dialog
+- [ ] Save: `GOOGLE_CLIENT_ID` = Client ID, `GOOGLE_CLIENT_SECRET` = Client secret
+
+> The app starts in Testing mode — only listed test users can sign in. To allow any
+> Google account, go to **OAuth consent screen → Publish App** when ready.
+
+---
+
+### Facebook
+
+- [ ] Go to [developers.facebook.com](https://developers.facebook.com/) and log in
+- [ ] **My Apps → Create App**
+  - Use case: **Authenticate and request data from users** (or **Other → Consumer**)
+  - App name: `BgStacks`, contact email: your email
+- [ ] **App settings → Basic** — copy the **App ID** and **App secret** (click Show)
+- [ ] Add Facebook Login: left sidebar → **Add product → Facebook Login → Set up (Web)**
+  - Site URL: `https://bgstacks.com`
+- [ ] **Facebook Login → Settings**
+  - Valid OAuth Redirect URIs: `https://placeholder.example.com/callback`
+  - Save changes
+- [ ] Save: `FACEBOOK_CLIENT_ID` = App ID, `FACEBOOK_CLIENT_SECRET` = App secret
+
+> Facebook restricts sign-in to app admins and testers until the app passes App Review.
+> For a private event tool, development mode is likely fine — add attendees as testers
+> at **Roles → Testers**.
+
+---
+
+### Discord
+
+- [ ] Go to [discord.com/developers/applications](https://discord.com/developers/applications) and log in
+- [ ] **New Application** → name it `BgStacks` → Create
+- [ ] Left sidebar → **OAuth2**
+  - Copy the **Client ID**
+  - Click **Reset Secret** → confirm → copy the **Client Secret** (shown once — save it now)
+- [ ] Under **Redirects**, add `https://placeholder.example.com/callback` → Save changes
+- [ ] Save: `DISCORD_CLIENT_ID` = Client ID, `DISCORD_CLIENT_SECRET` = Client secret
+
+---
+
+## Step 5 — GitHub repository configuration
 
 Go to **Settings → Secrets and variables → Actions** in the GitHub repo.
 
 ### Variables (not secret)
 
-| Name | Value |
-|---|---|
-| `AZURE_CLIENT_ID` | App registration client ID (from Step 3) |
-| `AZURE_TENANT_ID` | Your Entra tenant ID (from Step 3) |
-| `AZURE_SUBSCRIPTION_ID` | Your subscription ID (from Step 3) |
-| `AZURE_RESOURCE_GROUP` | `bgstacks-rg` |
+- [ ] Add variable `AZURE_CLIENT_ID` — app registration client ID from Step 3
+- [ ] Add variable `AZURE_TENANT_ID` — Entra tenant ID from Step 3
+- [ ] Add variable `AZURE_SUBSCRIPTION_ID` — subscription ID from Step 3
+- [ ] Add variable `AZURE_RESOURCE_GROUP` — `bgstacks-rg`
 
 ### Secrets
 
-| Name | Where to get it |
-|---|---|
-| `GOOGLE_CLIENT_ID` | Google Cloud Console → APIs & Services → Credentials |
-| `GOOGLE_CLIENT_SECRET` | Same |
-| `FACEBOOK_CLIENT_ID` | Facebook Developers → App → App Settings → Basic |
-| `FACEBOOK_CLIENT_SECRET` | Same |
-| `DISCORD_CLIENT_ID` | Discord Developer Portal → Application → OAuth2 |
-| `DISCORD_CLIENT_SECRET` | Same |
-
----
-
-## Step 5 — Register OAuth apps
-
-You need redirect URIs pointing at the Container App. You won't know the exact FQDN
-until after the first Bicep deployment. Use a placeholder now and update after Step 7.
-
-The FQDN pattern is: `bgstacks-prod.<aca-env-default-domain>`
-(visible in the Bicep output `containerAppFqdn` after deployment)
-
-### Google
-- Console: [console.cloud.google.com](https://console.cloud.google.com/) → APIs & Services → Credentials → Create OAuth 2.0 Client ID (Web application)
-- Authorized redirect URI: `https://<containerAppFqdn>/.auth/login/google/callback`
-
-### Facebook
-- Console: [developers.facebook.com](https://developers.facebook.com/) → Your App → Facebook Login → Settings
-- Valid OAuth Redirect URI: `https://<containerAppFqdn>/.auth/login/facebook/callback`
-
-### Discord
-- Console: [discord.com/developers/applications](https://discord.com/developers/applications) → OAuth2 → Redirects
-- Redirect: `https://<containerAppFqdn>/.auth/login/discord/callback`
-
-> Once the wildcard domain is live, update these to `https://bgstacks.com/.auth/login/<provider>/callback`
-> (the root domain — the SPA and auth live on the root, events live on subdomains).
+- [ ] Add secret `GOOGLE_CLIENT_ID`
+- [ ] Add secret `GOOGLE_CLIENT_SECRET`
+- [ ] Add secret `FACEBOOK_CLIENT_ID`
+- [ ] Add secret `FACEBOOK_CLIENT_SECRET`
+- [ ] Add secret `DISCORD_CLIENT_ID`
+- [ ] Add secret `DISCORD_CLIENT_SECRET`
 
 ---
 
 ## Step 6 — Initial Bicep deployment (no wildcard cert yet)
 
-The first deployment skips the wildcard cert — the app will be reachable at the default
-ACA FQDN. Add the wildcard cert as a follow-up (Step 12).
+The app will be reachable at the default ACA FQDN. Wildcard cert is Step 12.
+
+- [ ] Run the deployment:
 
 ```powershell
 az deployment group create `
@@ -147,18 +191,17 @@ az deployment group create `
     image="ghcr.io/nullrush/bg-stacks:latest"
 ```
 
-Note the outputs — you'll need them:
+- [ ] Note the outputs:
 
 ```powershell
-# Grab outputs after deployment
 $outputs = az deployment group show `
   --resource-group bgstacks-rg `
   --name main `
   --query properties.outputs `
   | ConvertFrom-Json
 
-Write-Host "App URL:        https://$($outputs.containerAppFqdn.value)"
-Write-Host "ACA static IP:  $($outputs.environmentStaticIp.value)"   # for DNS later
+Write-Host "App URL:         https://$($outputs.containerAppFqdn.value)"
+Write-Host "ACA static IP:   $($outputs.environmentStaticIp.value)"   # needed for DNS in Step 12
 Write-Host "Cosmos endpoint: $($outputs.cosmosEndpoint.value)"
 Write-Host "Blob endpoint:   $($outputs.blobEndpoint.value)"
 ```
@@ -167,64 +210,62 @@ Write-Host "Blob endpoint:   $($outputs.blobEndpoint.value)"
 
 ## Step 7 — Push the first Docker image
 
-Trigger `app.yml` by pushing a commit that touches `src/**`:
+- [ ] Trigger `app.yml` with an empty commit:
 
 ```powershell
-# Trivial change to trigger the workflow
 git commit --allow-empty -m "chore: trigger first app.yml deploy"
 git push
 ```
 
-Watch the Actions tab. The workflow:
-1. Runs `dotnet test`
-2. Builds and pushes the image to `ghcr.io/nullrush/bg-stacks:<sha>`
-3. Calls `az containerapp update` to deploy the new image
+- [ ] Watch the **Actions** tab — the workflow runs `dotnet test`, builds and pushes
+  `ghcr.io/nullrush/bg-stacks:<sha>` to GHCR, then calls `az containerapp update`
+- [ ] Confirm the workflow completes green
 
-After it completes, the Container App will have pulled the image. It scales to zero when
-idle, so the first request after idle may take a few seconds to cold-start.
+The Container App scales to zero when idle — the first request after a cold start may
+take a few seconds.
 
 ---
 
 ## Step 8 — Seed Blob Storage (event game data)
 
-Upload `games.json`, `mechanics.json`, and `categories.json` for each event.
-The blob path pattern is `events/{slug}/{file}`.
+The blob path pattern is `events/{slug}/games.json` (and `mechanics.json`, `categories.json`).
+
+- [ ] Upload game data for the first event (swap `gw-2026-pnw` for your slug):
 
 ```powershell
 $storageAccount = "bgstacksprodblob"
+$slug = "gw-2026-pnw"
 
-# Upload game data for the first event (replace gw-2026-pnw with your slug)
 az storage blob upload `
   --account-name $storageAccount `
   --container-name events `
-  --name "gw-2026-pnw/games.json" `
+  --name "$slug/games.json" `
   --file public/games.json `
   --auth-mode login
 
 az storage blob upload `
   --account-name $storageAccount `
   --container-name events `
-  --name "gw-2026-pnw/mechanics.json" `
+  --name "$slug/mechanics.json" `
   --file public/mechanics.json `
   --auth-mode login
 
 az storage blob upload `
   --account-name $storageAccount `
   --container-name events `
-  --name "gw-2026-pnw/categories.json" `
+  --name "$slug/categories.json" `
   --file public/categories.json `
   --auth-mode login
 ```
 
-> `--auth-mode login` uses your `az login` credentials. The storage account has no
-> public access — only the Container App's managed identity (Blob Data Reader role)
-> and your CLI session can read blobs.
+> `--auth-mode login` uses your `az login` session. The storage account has no public
+> access — only the Container App's managed identity (Blob Data Reader) and your CLI can read blobs.
 
 ---
 
 ## Step 9 — Seed Cosmos DB (event record)
 
-The `events` container holds one document per event, keyed on `slug`.
+- [ ] Create the event document (the `id` and `slug` fields must match):
 
 ```powershell
 az cosmosdb sql document create `
@@ -240,62 +281,83 @@ az cosmosdb sql document create `
   }'
 ```
 
-Repeat for any additional events. Set `"isPublic": false` to hide an event from
-`/api/events` until it's ready.
+- [ ] Repeat for any additional events. Use `"isPublic": false` to hide an event from
+  `/api/events` until it's ready.
 
 ---
 
 ## Step 10 — Update OAuth redirect URIs
 
-Now that you know the FQDN from Step 6, go back to each OAuth provider and fill in
-the real redirect URIs.
+Now that you know the real FQDN from Step 6, replace the placeholder URIs you set in Step 4.
+
+- [ ] **Google** — APIs & Services → Credentials → BgStacks Web → Authorized redirect URIs:
+  replace placeholder with `https://<containerAppFqdn>/.auth/login/google/callback`
+- [ ] **Facebook** — Facebook Login → Settings → Valid OAuth Redirect URIs:
+  replace placeholder with `https://<containerAppFqdn>/.auth/login/facebook/callback`
+- [ ] **Discord** — OAuth2 → Redirects:
+  replace placeholder with `https://<containerAppFqdn>/.auth/login/discord/callback`
+
+> Once the wildcard domain is live (Step 12), update these again to use
+> `https://bgstacks.com/.auth/login/<provider>/callback`.
 
 ---
 
 ## Step 11 — Smoke test
 
+- [ ] Verify the live endpoints:
+
 ```powershell
 $fqdn = "<containerAppFqdn from Step 6>"
 
-# Auth endpoint — should return { clientPrincipal: null }
+# Should return { clientPrincipal: null }
 Invoke-RestMethod "https://$fqdn/.auth/me"
 
-# Events API — should return the gw-2026-pnw event
+# Should return the gw-2026-pnw event
 Invoke-RestMethod "https://$fqdn/api/events"
 
-# games.json on default FQDN — should return 404 (no event slug on root domain)
+# Should return 404 — no event slug on the default FQDN
 try { Invoke-RestMethod "https://$fqdn/games.json" } catch { $_.Exception.Response.StatusCode }
 
-# Home page — should return HTML
+# Should return HTML
 Invoke-RestMethod "https://$fqdn/"
 ```
+
+- [ ] Sign in via each OAuth provider and confirm `/.auth/me` returns a `clientPrincipal`
+  with a 64-char `userId`
 
 ---
 
 ## Step 12 — Wildcard domain (follow-up)
 
-Do this once you have a wildcard TLS certificate for `*.bgstacks.com`.
+Do this once you have a wildcard TLS certificate (PFX) for `*.bgstacks.com`.
 
-### 12a — Import the cert to Key Vault
+- [ ] Re-run Bicep with `kvCertReaderObjectId` to provision Key Vault:
 
 ```powershell
-# Key Vault is only deployed when kvCertReaderObjectId is set (Step 3 SP object ID)
-# Re-run Bicep with kvCertReaderObjectId to provision the vault first
 az deployment group create `
   --resource-group bgstacks-rg `
   --template-file infra/main.bicep `
   --parameters infra/parameters/main.bicepparam `
-  --parameters kvCertReaderObjectId="<spObjectId from Step 3>" `
-  --parameters googleClientId="..." # ... same as Step 6
+  --parameters `
+    kvCertReaderObjectId="<spObjectId from Step 3>" `
+    googleClientId="<...>" `
+    googleClientSecret="<...>" `
+    facebookClientId="<...>" `
+    facebookClientSecret="<...>" `
+    discordClientId="<...>" `
+    discordClientSecret="<...>"
+```
 
-# Then import the cert
+- [ ] Import the wildcard cert to Key Vault:
+
+```powershell
 az keyvault certificate import `
   --vault-name bgstacks-prod-kv `
   --name wildcard-bgstacks-com `
   --file wildcard.pfx
 ```
 
-### 12b — Get the cert resource ID
+- [ ] Get the cert resource ID:
 
 ```powershell
 $certId = (az keyvault certificate show `
@@ -305,31 +367,25 @@ $certId = (az keyvault certificate show `
 Write-Host "wildcardCertKeyVaultId: $certId"
 ```
 
-### 12c — Update `main.bicepparam`
+- [ ] Update `infra/parameters/main.bicepparam`:
 
 ```
 param wildcardCertKeyVaultId = '<certId from above>'
 param kvCertReaderObjectId   = '<spObjectId from Step 3>'
 ```
 
-### 12d — DNS records
-
-Add these to your `bgstacks.com` zone:
+- [ ] Add DNS records to your `bgstacks.com` zone:
 
 | Type | Name | Value |
 |---|---|---|
-| `A` | `*` | `environmentStaticIp` (from Bicep output in Step 6) |
-| `TXT` | `asuid` | Verification token (from ACA environment → Custom domain → Add) |
+| `A` | `*` | `environmentStaticIp` from Bicep outputs (Step 6) |
+| `TXT` | `asuid` | Verification token from ACA environment → Custom domain → Add |
 
-### 12e — Re-run Bicep
-
-Commit the updated `main.bicepparam` and push to `main` — `infra.yml` will pick it up.
-Or run the deployment manually as in Step 6.
-
-### 12f — Verify a subdomain
+- [ ] Commit the updated `main.bicepparam` and push — `infra.yml` will redeploy
+- [ ] Update OAuth redirect URIs at all three providers to use `bgstacks.com`
+- [ ] Verify a subdomain:
 
 ```powershell
-# Replace with a real event slug
 Invoke-RestMethod "https://gw-2026-pnw.bgstacks.com/games.json"
 ```
 
