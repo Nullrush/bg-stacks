@@ -1,0 +1,11 @@
+**/.git
+**/node_modules
+**/bin
+**/obj
+tests/
+docs/
+scripts/
+api/
+public/
+*.md
+.github/
