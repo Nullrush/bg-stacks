@@ -1,0 +1,38 @@
+name: Deploy Infrastructure
+
+on:
+  push:
+    branches: [main]
+    paths: ['infra/**']
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Bicep
+        run: |
+          az deployment group create \
+            --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
+            --template-file infra/main.bicep \
+            --parameters infra/parameters/main.bicepparam \
+            --parameters \
+              googleClientId="${{ secrets.GOOGLE_CLIENT_ID }}" \
+              googleClientSecret="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+              facebookClientId="${{ secrets.FACEBOOK_CLIENT_ID }}" \
+              facebookClientSecret="${{ secrets.FACEBOOK_CLIENT_SECRET }}" \
+              discordClientId="${{ secrets.DISCORD_CLIENT_ID }}" \
+              discordClientSecret="${{ secrets.DISCORD_CLIENT_SECRET }}"

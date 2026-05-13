@@ -97,3 +97,23 @@ Two paths, both work:
 
 - **GitHub Actions (CI)** — workflow lives at `.github/workflows/azure-static-web-apps.yml`. Set `AZURE_STATIC_WEB_APPS_API_TOKEN` as a repo secret in GitHub. Pushing to `main` triggers a deploy.
 - **Manual SWA CLI** — put the deployment token in `.env.local` (copy `.env.local.example` first), then `npm run deploy`. Useful for ad-hoc pushes without going through CI.
+
+## C# Application (`src/BgStacks.Web/`)
+
+ASP.NET Core Minimal API. DDD structure: Domain → Application → Infrastructure → Presentation.
+
+```bash
+dotnet run --project src/BgStacks.Web          # requires Cosmos emulator + Azurite running locally
+dotnet test tests/BgStacks.Web.Tests
+docker build -f src/BgStacks.Web/Dockerfile -t bgstacks:local .
+```
+
+### Local dev prerequisites
+- [Cosmos DB emulator](https://aka.ms/cosmosdb-emulator) running on https://localhost:8081/
+- [Azurite](https://github.com/Azure/Azurite) running: `npx azurite --silent`
+- OAuth client IDs/secrets are not needed for local dev (auth flows won't work without them, but the rest of the app does)
+
+### Key config (appsettings.Development.json)
+- `Cosmos:ConnectionString` — emulator connection string (overrides DefaultAzureCredential for local dev)
+- `Blob:ConnectionString` — Azurite connection string (overrides DefaultAzureCredential for local dev)
+- `Events:DevFallbackSlug` — slug used when running on localhost (default: `"dev"`)
