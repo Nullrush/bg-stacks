@@ -10,8 +10,7 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
 {
     public const string SchemeName = "TestScheme";
 
-    [ThreadStatic]
-    public static ClaimsPrincipal? CurrentUser;
+    public static ClaimsPrincipal? CurrentUser { get; set; }
 
     public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger, UrlEncoder encoder) : base(options, logger, encoder) { }

@@ -6,6 +6,7 @@ using FluentAssertions;
 
 namespace BgStacks.Web.Tests.Presentation.Auth;
 
+[Collection("integration")]
 public class AuthEndpointsTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;

@@ -7,6 +7,7 @@ using FluentAssertions;
 
 namespace BgStacks.Web.Tests.Presentation.Api;
 
+[Collection("integration")]
 public class TagsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;

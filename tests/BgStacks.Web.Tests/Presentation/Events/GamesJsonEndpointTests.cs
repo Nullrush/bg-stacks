@@ -5,6 +5,7 @@ using FluentAssertions;
 
 namespace BgStacks.Web.Tests.Presentation.Events;
 
+[Collection("integration")]
 public class GamesJsonEndpointTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
