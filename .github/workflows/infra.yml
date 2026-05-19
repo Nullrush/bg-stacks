@@ -28,11 +28,4 @@ jobs:
           az deployment group create \
             --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
             --template-file infra/main.bicep \
-            --parameters infra/parameters/main.bicepparam \
-            --parameters \
-              googleClientId="${{ secrets.GOOGLE_CLIENT_ID }}" \
-              googleClientSecret="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
-              facebookClientId="${{ secrets.FACEBOOK_CLIENT_ID }}" \
-              facebookClientSecret="${{ secrets.FACEBOOK_CLIENT_SECRET }}" \
-              discordClientId="${{ secrets.DISCORD_CLIENT_ID }}" \
-              discordClientSecret="${{ secrets.DISCORD_CLIENT_SECRET }}"
+            --parameters infra/parameters/main.bicepparam

@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Knowledge vault
+
+`vault/` is a gitignored Obsidian vault for local notes, plans, and deployment docs.
+Write all superpowers plan files, specs, and scratchpad documents to `vault/superpowers/` (plans → `vault/superpowers/plans/`, specs → `vault/superpowers/specs/`).
+Do not write planning or documentation files anywhere else in the repo.
+
 # Geekway 2026 Prime PnW — sortable game list
 
 Static site that displays the BoardGameGeek geeklist for Geekway 2026 Prime's Play & Win shelves as a sortable, filterable table. Deploys to Azure Static Web Apps.

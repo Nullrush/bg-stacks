@@ -4,6 +4,14 @@ const { TableClient, RestError } = require('@azure/data-tables');
 const TABLE_NAME = 'usertags';
 const ROW_KEY    = 'tags';
 
+let _tableReady = false;
+
+async function ensureTable(client) {
+  if (_tableReady) return;
+  try { await client.createTable(); } catch (e) { if (e?.statusCode !== 409) throw e; }
+  _tableReady = true;
+}
+
 function getDefaultClient() {
   const conn = process.env.AZURE_STORAGE_CONNECTION_STRING;
   if (!conn) throw new Error('AZURE_STORAGE_CONNECTION_STRING is not set');
@@ -21,6 +29,7 @@ function getUserId(request) {
 
 async function handleGet(userId, makeClient = getDefaultClient) {
   const client = makeClient();
+  await ensureTable(client);
   try {
     const entity = await client.getEntity(userId, ROW_KEY);
     return {
@@ -38,6 +47,7 @@ async function handleGet(userId, makeClient = getDefaultClient) {
 
 async function handlePut(userId, tags, clientEtag, makeClient = getDefaultClient) {
   const client = makeClient();
+  await ensureTable(client);
   const entity = {
     partitionKey: userId,
     rowKey:       ROW_KEY,

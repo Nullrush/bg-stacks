@@ -60,3 +60,6 @@ ehthumbs.db
 scripts/.bgg-cache/
 
 scripts/.bgg-session
+
+# Local knowledge vault (Obsidian) — not for publishing
+vault/

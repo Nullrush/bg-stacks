@@ -9,30 +9,6 @@ param location string = resourceGroup().location
 @description('Full container image reference')
 param image string
 
-@secure()
-param googleClientId string
-
-@secure()
-param googleClientSecret string
-
-@secure()
-param facebookClientId string
-
-@secure()
-param facebookClientSecret string
-
-@secure()
-param discordClientId string
-
-@secure()
-param discordClientSecret string
-
-@description('Object ID used to grant Key Vault certificate access')
-param kvCertReaderObjectId string = ''
-
-@description('Resource ID of the wildcard TLS cert in Key Vault (leave blank to skip DNS suffix)')
-param wildcardCertKeyVaultId string = ''
-
 module cosmos 'modules/cosmos.bicep' = {
   name: 'cosmos'
   params: {
@@ -49,12 +25,25 @@ module storage 'modules/storage.bicep' = {
   }
 }
 
-module keyvault 'modules/keyvault.bicep' = if (!empty(kvCertReaderObjectId)) {
+module keyvault 'modules/keyvault.bicep' = {
   name: 'keyvault'
   params: {
     keyVaultName: 'bgstacks-${env}-kv'
     location: location
-    certificateReaderObjectId: kvCertReaderObjectId
+  }
+}
+
+module wildcardCert 'modules/wildcard-cert.bicep' = {
+  name: 'wildcardCert'
+  params: {
+    keyVaultName: keyvault.outputs.keyVaultName
+  }
+}
+
+module kvSecrets 'modules/keyvault-secrets.bicep' = {
+  name: 'kvSecrets'
+  params: {
+    keyVaultName: keyvault.outputs.keyVaultName
   }
 }
 
@@ -64,7 +53,7 @@ module environment 'modules/environment.bicep' = {
     environmentName: 'bgstacks-${env}-env'
     location: location
     dnsSuffix: 'bgstacks.com'
-    certificateKeyVaultId: wildcardCertKeyVaultId
+    certificateKeyVaultId: wildcardCert.outputs.secretUri
   }
 }
 
@@ -77,12 +66,7 @@ module containerApp 'modules/containerapp.bicep' = {
     image: image
     cosmosEndpoint: cosmos.outputs.cosmosEndpoint
     blobServiceUri: storage.outputs.blobEndpoint
-    googleClientId: googleClientId
-    googleClientSecret: googleClientSecret
-    facebookClientId: facebookClientId
-    facebookClientSecret: facebookClientSecret
-    discordClientId: discordClientId
-    discordClientSecret: discordClientSecret
+    oauthSecrets: kvSecrets.outputs.secretRefs
   }
 }
 
@@ -112,6 +96,30 @@ resource blobReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1')
     principalId: containerApp.outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource keyVaultResource 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyvault.outputs.keyVaultName
+}
+
+resource kvSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyvault.outputs.keyVaultId, containerApp.outputs.principalId, 'KeyVaultSecretsUser')
+  scope: keyVaultResource
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
+    principalId: containerApp.outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource kvCertReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyvault.outputs.keyVaultId, environment.outputs.principalId, 'KeyVaultCertificateUser')
+  scope: keyVaultResource
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'db79e9a7-68ee-4b58-9aeb-b90e7c24fcba')
+    principalId: environment.outputs.principalId
     principalType: 'ServicePrincipal'
   }
 }

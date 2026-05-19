@@ -7,8 +7,8 @@ param location string = resourceGroup().location
 @description('Custom DNS suffix for wildcard domain (e.g. bgstacks.com)')
 param dnsSuffix string
 
-@description('Resource ID of the wildcard TLS certificate in Key Vault')
-param certificateKeyVaultId string
+@description('Secret URI of the wildcard TLS certificate in Key Vault (leave blank to skip custom domain)')
+param certificateKeyVaultId string = ''
 
 @description('Password for the PFX certificate')
 @secure()
@@ -26,6 +26,9 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
 resource environment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: environmentName
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     appLogsConfiguration: {
       destination: 'log-analytics'
@@ -34,7 +37,7 @@ resource environment 'Microsoft.App/managedEnvironments@2024-03-01' = {
         sharedKey: logAnalytics.listKeys().primarySharedKey
       }
     }
-    customDomainConfiguration: {
+    customDomainConfiguration: empty(certificateKeyVaultId) ? null : {
       dnsSuffix: dnsSuffix
       certificateKeyVaultProperties: {
         keyVaultUrl: certificateKeyVaultId
@@ -49,3 +52,4 @@ output environmentId string = environment.id
 output environmentName string = environment.name
 output staticIp string = environment.properties.staticIp
 output defaultDomain string = environment.properties.defaultDomain
+output principalId string = environment.identity.principalId

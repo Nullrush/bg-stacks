@@ -22,29 +22,8 @@ param baseDomain string = 'bgstacks.com'
 @description('Cosmos DB database name')
 param cosmosDatabaseId string = 'bgstacks'
 
-@description('Google OAuth client ID')
-@secure()
-param googleClientId string
-
-@description('Google OAuth client secret')
-@secure()
-param googleClientSecret string
-
-@description('Facebook OAuth client ID')
-@secure()
-param facebookClientId string
-
-@description('Facebook OAuth client secret')
-@secure()
-param facebookClientSecret string
-
-@description('Discord OAuth client ID')
-@secure()
-param discordClientId string
-
-@description('Discord OAuth client secret')
-@secure()
-param discordClientSecret string
+@description('Array of Container App secret definitions ({ name, keyVaultUrl, identity }) for OAuth credentials')
+param oauthSecrets array
 
 resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
@@ -61,14 +40,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
         transport: 'auto'
         allowInsecure: false
       }
-      secrets: [
-        { name: 'google-client-id',        value: googleClientId }
-        { name: 'google-client-secret',    value: googleClientSecret }
-        { name: 'facebook-client-id',      value: facebookClientId }
-        { name: 'facebook-client-secret',  value: facebookClientSecret }
-        { name: 'discord-client-id',       value: discordClientId }
-        { name: 'discord-client-secret',   value: discordClientSecret }
-      ]
+      secrets: oauthSecrets
     }
     template: {
       containers: [
