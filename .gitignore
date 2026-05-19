@@ -63,3 +63,5 @@ scripts/.bgg-session
 
 # Local knowledge vault (Obsidian) — not for publishing
 vault/
+
+infra/main.json

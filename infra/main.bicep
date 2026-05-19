@@ -83,8 +83,6 @@ module workspace 'br/public:avm/res/operational-insights/workspace:0.15.1' = {
   }
 }
 
-// System-assigned identity required here: the managed environment uses 'system' to pull the
-// wildcard TLS cert from Key Vault via certificateKeyVaultProperties
 module environment 'br/public:avm/res/app/managed-environment:0.13.3' = {
   name: 'environment'
   params: {
@@ -92,7 +90,7 @@ module environment 'br/public:avm/res/app/managed-environment:0.13.3' = {
     location: location
     tags: tags
     managedIdentities: {
-      systemAssigned: true
+      userAssignedResourceIds: [containerAppIdentity.id]
     }
     zoneRedundant: false
     appLogsConfiguration: {
@@ -103,7 +101,7 @@ module environment 'br/public:avm/res/app/managed-environment:0.13.3' = {
     certificate: {
       certificateKeyVaultProperties: {
         keyVaultUrl: wildcardCert.outputs.secretUri
-        identityResourceId: 'system'
+        identityResourceId: containerAppIdentity.id
       }
     }
   }
@@ -227,23 +225,6 @@ module containerApp 'br/public:avm/res/app/container-app:0.22.1' = {
         }
       ]
     }
-  }
-}
-
-// Standalone: environment cert reader cannot be inlined into the keyvault module because
-// environment depends on keyvault (for the wildcard cert URI), so keyvault cannot simultaneously
-// depend on environment's principalId without creating a cycle.
-resource kvForCertRole 'Microsoft.KeyVault/vaults@2025-05-01' existing = {
-  name: names.kv
-}
-
-resource kvCertReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceId('Microsoft.KeyVault/vaults', names.kv), names.env, '4633458b-17de-408a-b874-0445c86b69e0')
-  scope: kvForCertRole
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e0')
-    principalId: environment.outputs.systemAssignedMIPrincipalId!
-    principalType: 'ServicePrincipal'
   }
 }
 
