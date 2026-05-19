@@ -13,13 +13,33 @@
   const upcoming = events.filter(e => e.isUpcoming);
   const archive  = events.filter(e => !e.isUpcoming);
 
+  function getSafeEventUrl(rawUrl) {
+    if (typeof rawUrl !== 'string') return '/';
+    try {
+      const url = new URL(rawUrl, window.location.origin);
+      return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : '/';
+    } catch {
+      return '/';
+    }
+  }
+
   function renderEvent(e) {
     const li = document.createElement('li');
     li.className = 'event-card';
-    li.innerHTML = `<a href="${e.url}" class="event-link">
-      <span class="event-name">${e.name}</span>
-      <span class="event-date dim">${e.eventDate}</span>
-    </a>`;
+    const link = document.createElement('a');
+    link.className = 'event-link';
+    link.href = getSafeEventUrl(e.url);
+
+    const name = document.createElement('span');
+    name.className = 'event-name';
+    name.textContent = e.name ?? '';
+
+    const date = document.createElement('span');
+    date.className = 'event-date dim';
+    date.textContent = e.eventDate ?? '';
+
+    link.append(name, date);
+    li.appendChild(link);
     return li;
   }
 

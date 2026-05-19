@@ -7,13 +7,15 @@ namespace BgStacks.Web.Presentation.Auth;
 
 public static class AuthEndpoints
 {
+    private const string DefaultRedirectPath = "/";
+
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/.auth");
 
         group.MapGet("/login/{provider}", (string provider, string? post_login_redirect_uri, HttpContext ctx) =>
         {
-            var redirectUrl = post_login_redirect_uri ?? "/";
+            var redirectUrl = GetSafeRedirectPath(post_login_redirect_uri);
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
             return Results.Challenge(properties, [provider]);
         });
@@ -21,7 +23,7 @@ public static class AuthEndpoints
         group.MapGet("/logout", async (string? post_logout_redirect_uri, HttpContext ctx) =>
         {
             await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Results.Redirect(post_logout_redirect_uri ?? "/");
+            return Results.Redirect(GetSafeRedirectPath(post_logout_redirect_uri));
         });
 
         group.MapGet("/me", (HttpContext ctx) =>
@@ -51,5 +53,20 @@ public static class AuthEndpoints
         });
 
         return app;
+    }
+
+    private static string GetSafeRedirectPath(string? redirectUri)
+    {
+        if (string.IsNullOrWhiteSpace(redirectUri))
+            return DefaultRedirectPath;
+
+        if (!Uri.TryCreate(redirectUri, UriKind.Relative, out _))
+            return DefaultRedirectPath;
+
+        return redirectUri.StartsWith('/', StringComparison.Ordinal)
+               && !redirectUri.StartsWith("//", StringComparison.Ordinal)
+               && !redirectUri.Contains('\\')
+            ? redirectUri
+            : DefaultRedirectPath;
     }
 }
