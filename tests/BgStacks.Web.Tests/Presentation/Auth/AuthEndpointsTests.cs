@@ -10,9 +10,13 @@ namespace BgStacks.Web.Tests.Presentation.Auth;
 public class AuthEndpointsTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;
+    private readonly CustomWebApplicationFactory _factory;
 
     public AuthEndpointsTests(CustomWebApplicationFactory factory)
-        => _client = factory.CreateClient();
+    {
+        _factory = factory;
+        _client = factory.CreateClient();
+    }
 
     [Fact]
     public async Task GetMe_Unauthenticated_ReturnsNullPrincipal()
@@ -41,6 +45,23 @@ public class AuthEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         principal.GetProperty("identityProvider").GetString().Should().Be("google");
         principal.GetProperty("userDetails").GetString().Should().Be("user@example.com");
         principal.GetProperty("userId").GetString().Should().HaveLength(64);
+    }
+
+    [Theory]
+    [InlineData("/games", "/games")]
+    [InlineData("/games?sort=name#top", "/games?sort=name#top")]
+    [InlineData("https://evil.example/", "/")]
+    [InlineData("//evil.example/", "/")]
+    [InlineData("\\evil", "/")]
+    public async Task Logout_OnlyRedirectsToSafeLocalPaths(string redirectUri, string expectedLocation)
+    {
+        using var client = _factory.CreateClient(new() { AllowAutoRedirect = false });
+
+        var response = await client.GetAsync($"/.auth/logout?post_logout_redirect_uri={Uri.EscapeDataString(redirectUri)}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        response.Headers.Location.Should().NotBeNull();
+        response.Headers.Location!.OriginalString.Should().Be(expectedLocation);
     }
 
     private static ClaimsPrincipal MakeGoogleUser(string sub, string email) =>
