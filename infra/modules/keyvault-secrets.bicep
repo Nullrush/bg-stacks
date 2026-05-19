@@ -1,36 +1,36 @@
 @description('Name of the Key Vault containing OAuth credentials')
 param keyVaultName string
 
-resource kv 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+resource kv 'Microsoft.KeyVault/vaults@2025-05-01' existing = {
   name: keyVaultName
 }
 
-resource googleClientId 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = {
+resource googleClientId 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = {
   parent: kv
   name: 'google-client-id'
 }
 
-resource googleClientSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = {
+resource googleClientSecret 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = {
   parent: kv
   name: 'google-client-secret'
 }
 
-resource facebookClientId 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = {
+resource facebookClientId 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = {
   parent: kv
   name: 'facebook-client-id'
 }
 
-resource facebookClientSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = {
+resource facebookClientSecret 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = {
   parent: kv
   name: 'facebook-client-secret'
 }
 
-resource discordClientId 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = {
+resource discordClientId 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = {
   parent: kv
   name: 'discord-client-id'
 }
 
-resource discordClientSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = {
+resource discordClientSecret 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = {
   parent: kv
   name: 'discord-client-secret'
 }

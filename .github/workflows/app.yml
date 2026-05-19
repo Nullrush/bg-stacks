@@ -76,6 +76,6 @@ jobs:
         run: |
           SHA_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$(git rev-parse --short HEAD)"
           az containerapp update \
-            --name bgstacks-prod \
+            --name ca-bgstacks-prod \
             --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
             --image "$SHA_TAG"

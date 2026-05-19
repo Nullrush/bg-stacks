@@ -1,6 +1,9 @@
 name: Deploy Infrastructure
 
 on:
+  pull_request:
+    branches: [main]
+    paths: ['infra/**']
   push:
     branches: [main]
     paths: ['infra/**']
@@ -11,21 +14,58 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Lint Bicep
+        run: az bicep lint --file infra/main.bicep
 
-      - name: Azure login (OIDC)
-        uses: azure/login@v2
+  # Runs on PRs only: shows exactly what will change before anything merges
+  preview:
+    needs: lint
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: azure/login@v2
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Deploy Bicep
+      - name: What-if preview
         run: |
-          az deployment group create \
+          az deployment group what-if \
             --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
             --template-file infra/main.bicep \
             --parameters infra/parameters/main.bicepparam
+
+  # Runs on push to main only: gated by the 'prod' GitHub Environment (requires manual approval)
+  # Uses a deployment stack so resources removed from main.bicep are tracked and deny-assignments
+  # protect managed resources from out-of-band changes.
+  # Note: what-if is not yet supported for deployment stacks; use the preview job on PRs instead.
+  deploy:
+    needs: lint
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v5
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy stack
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deploymentStack
+          operation: create
+          name: bgstacks-infra
+          scope: resourceGroup
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: ${{ vars.AZURE_RESOURCE_GROUP }}
+          template-file: ./infra/main.bicep
+          parameters-file: ./infra/parameters/main.bicepparam
+          action-on-unmanage-resources: detach
+          deny-settings-mode: denyDelete

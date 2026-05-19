@@ -1,0 +1,16 @@
+{
+  "analyzers": {
+    "core": {
+      "enabled": true,
+      "rules": {
+        "outputs-should-not-contain-secrets": { "level": "error" },
+        "secure-parameter-default": { "level": "error" },
+        "no-unused-params": { "level": "warning" },
+        "no-unused-vars": { "level": "warning" },
+        "no-hardcoded-env-urls": { "level": "warning" },
+        "prefer-interpolation": { "level": "warning" },
+        "simplify-interpolation": { "level": "warning" }
+      }
+    }
+  }
+}
