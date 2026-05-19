@@ -94,6 +94,7 @@ module environment 'br/public:avm/res/app/managed-environment:0.13.3' = {
     managedIdentities: {
       systemAssigned: true
     }
+    zoneRedundant: false
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsWorkspaceResourceId: workspace.outputs.resourceId
