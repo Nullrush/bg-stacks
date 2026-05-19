@@ -1,5 +1,6 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.DataProtection;
 using BgStacks.Web.Application.Events;
 using BgStacks.Web.Application.Tags;
 using BgStacks.Web.Domain.Events;
@@ -114,6 +115,17 @@ if (!string.IsNullOrEmpty(discordClientId))
             return Task.CompletedTask;
         };
     });
+
+// ── Data Protection ────────────────────────────────────────────────────────
+var dpBlobUri = builder.Configuration["DataProtection:BlobUri"];
+var dpKeyUri = builder.Configuration["DataProtection:KeyVaultKeyUri"];
+if (dpBlobUri is not null && dpKeyUri is not null)
+{
+    var dpBlob = new Azure.Storage.Blobs.BlobClient(new Uri(dpBlobUri), new DefaultAzureCredential());
+    builder.Services.AddDataProtection()
+        .PersistKeysToAzureBlobStorage(dpBlob)
+        .ProtectKeysWithAzureKeyVault(new Uri(dpKeyUri), new DefaultAzureCredential());
+}
 
 builder.Services.AddAuthorization();
 

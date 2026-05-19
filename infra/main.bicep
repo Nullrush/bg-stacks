@@ -47,9 +47,21 @@ module keyvault 'br/public:avm/res/key-vault/vault:0.13.3' = {
     enableVaultForDeployment: false
     enableVaultForTemplateDeployment: false
     enableVaultForDiskEncryption: false
+    keys: [
+      {
+        name: 'data-protection'
+        kty: 'RSA'
+        keySize: 2048
+      }
+    ]
     roleAssignments: [
       {
         roleDefinitionIdOrName: 'Key Vault Secrets User'
+        principalId: containerAppIdentity.properties.principalId
+        principalType: 'ServicePrincipal'
+      }
+      {
+        roleDefinitionIdOrName: 'Key Vault Crypto Service Encryption User'
         principalId: containerAppIdentity.properties.principalId
         principalType: 'ServicePrincipal'
       }
@@ -168,11 +180,15 @@ module storage 'br/public:avm/res/storage/storage-account:0.32.0' = {
           name: 'events'
           publicAccess: 'None'
         }
+        {
+          name: 'dataprotection'
+          publicAccess: 'None'
+        }
       ]
     }
     roleAssignments: [
       {
-        roleDefinitionIdOrName: 'Storage Blob Data Reader'
+        roleDefinitionIdOrName: 'Storage Blob Data Contributor'
         principalId: containerAppIdentity.properties.principalId
         principalType: 'ServicePrincipal'
       }
@@ -211,6 +227,8 @@ module containerApp 'br/public:avm/res/app/container-app:0.22.1' = {
           { name: 'Cosmos__DatabaseId',            value: 'bgstacks' }
           { name: 'Blob__ServiceUri',              value: storage.outputs.primaryBlobEndpoint }
           { name: 'Events__BaseDomain',            value: 'bgstacks.com' }
+          { name: 'DataProtection__BlobUri',       value: '${storage.outputs.primaryBlobEndpoint}dataprotection/keys.xml' }
+          { name: 'DataProtection__KeyVaultKeyUri', value: 'https://${names.kv}${az.environment().suffixes.keyvaultDns}/keys/data-protection' }
           { name: 'Auth__Google__ClientId',        secretRef: 'google-client-id' }
           { name: 'Auth__Google__ClientSecret',    secretRef: 'google-client-secret' }
           { name: 'Auth__Facebook__ClientId',      secretRef: 'facebook-client-id' }
