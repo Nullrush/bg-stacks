@@ -238,10 +238,10 @@ resource kvForCertRole 'Microsoft.KeyVault/vaults@2025-05-01' existing = {
 }
 
 resource kvCertReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceId('Microsoft.KeyVault/vaults', names.kv), names.env, 'db79e9a7-68ee-4b58-9aeb-b90e7c24fcba')
+  name: guid(resourceId('Microsoft.KeyVault/vaults', names.kv), names.env, '4633458b-17de-408a-b874-0445c86b69e0')
   scope: kvForCertRole
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'db79e9a7-68ee-4b58-9aeb-b90e7c24fcba')
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e0')
     principalId: environment.outputs.systemAssignedMIPrincipalId!
     principalType: 'ServicePrincipal'
   }
