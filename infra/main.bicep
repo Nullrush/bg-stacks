@@ -154,6 +154,10 @@ module storage 'br/public:avm/res/storage/storage-account:0.32.0' = {
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
     allowSharedKeyAccess: false
+    networkAcls: {
+      defaultAction: 'Allow'
+      bypass: 'AzureServices'
+    }
     blobServices: {
       containers: [
         {
