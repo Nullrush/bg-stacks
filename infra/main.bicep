@@ -93,6 +93,7 @@ module environment 'br/public:avm/res/app/managed-environment:0.13.3' = {
       userAssignedResourceIds: [containerAppIdentity.id]
     }
     zoneRedundant: false
+    publicNetworkAccess: 'Enabled'
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsWorkspaceResourceId: workspace.outputs.resourceId
