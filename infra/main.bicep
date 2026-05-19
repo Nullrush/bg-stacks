@@ -132,6 +132,9 @@ module cosmos 'br/public:avm/res/document-db/database-account:0.19.0' = {
         ]
       }
     ]
+    networkRestrictions: {
+      publicNetworkAccess: 'Enabled'
+    }
     sqlRoleAssignments: [
       {
         principalId: containerAppIdentity.properties.principalId
