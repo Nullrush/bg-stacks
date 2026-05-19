@@ -20,7 +20,8 @@ public sealed class EventMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var host = context.Request.Host.Host;
+        var host = context.Request.Headers["X-Event-Host"].FirstOrDefault()
+                   ?? context.Request.Host.Host;
         EventSlug? slug = null;
 
         if (host.EndsWith(_baseDomain, StringComparison.OrdinalIgnoreCase))

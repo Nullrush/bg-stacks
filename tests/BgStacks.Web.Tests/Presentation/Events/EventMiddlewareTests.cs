@@ -21,10 +21,12 @@ public class EventMiddlewareTests
         return new EventMiddleware(_ => Task.CompletedTask, config);
     }
 
-    private static HttpContext MakeContext(string host)
+    private static HttpContext MakeContext(string host, string? eventHostHeader = null)
     {
         var ctx = new DefaultHttpContext();
         ctx.Request.Host = new HostString(host);
+        if (eventHostHeader is not null)
+            ctx.Request.Headers["X-Event-Host"] = eventHostHeader;
         return ctx;
     }
 
@@ -70,5 +72,16 @@ public class EventMiddlewareTests
         await middleware.InvokeAsync(ctx);
 
         ctx.Items[EventMiddleware.SlugKey].Should().BeNull();
+    }
+
+    [Fact]
+    public async Task XEventHostHeader_TakesPrecedenceOverHost()
+    {
+        var middleware = MakeMiddleware();
+        var ctx = MakeContext("ca-bgstacks-prod.bgstacks.com", eventHostHeader: "gw-2026-pnw.bgstacks.com");
+
+        await middleware.InvokeAsync(ctx);
+
+        ctx.Items[EventMiddleware.SlugKey].Should().BeEquivalentTo(EventSlug.From("gw-2026-pnw"));
     }
 }

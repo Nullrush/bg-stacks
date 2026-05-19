@@ -123,3 +123,13 @@ docker build -f src/BgStacks.Web/Dockerfile -t bgstacks:local .
 - `Cosmos:ConnectionString` — emulator connection string (overrides DefaultAzureCredential for local dev)
 - `Blob:ConnectionString` — Azurite connection string (overrides DefaultAzureCredential for local dev)
 - `Events:DevFallbackSlug` — slug used when running on localhost (default: `"dev"`)
+
+## CI/CD
+
+| Trigger | Workflow | What it does |
+|---|---|---|
+| Push to `main` touching `infra/**` | `infra.yml` | Deploy Bicep (idempotent) via deployment stack |
+| Push to `main` touching `src/**` | `app.yml` | Test → build image → push GHCR → update Container App |
+| Manual `workflow_dispatch` | Either | Run on demand |
+
+**Never commit `infra/**` and `src/**` changes together.** Both workflows trigger simultaneously and race to update the Container App. `infra.yml` always deploys with `image = 'ghcr.io/nullrush/bg-stacks:latest'`, which can stomp the SHA-tagged image `app.yml` just pushed — or land before the infrastructure the new app code depends on exists. Always use two commits: infra first, wait for green, then app.

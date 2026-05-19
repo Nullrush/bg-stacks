@@ -22,6 +22,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Warn if infra also changed
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -qE '^infra/'; then
+            echo "::warning::Both infra/ and src/ changed in this push — infra.yml and app.yml will race. Use separate commits: infra first, app second."
+          fi
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.x'

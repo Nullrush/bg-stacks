@@ -18,6 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Warn if src also changed
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -qE '^src/'; then
+            echo "::warning::Both infra/ and src/ changed in this push — infra.yml and app.yml will race. Use separate commits: infra first, app second."
+          fi
       - name: Lint Bicep
         run: az bicep lint --file infra/main.bicep
 
