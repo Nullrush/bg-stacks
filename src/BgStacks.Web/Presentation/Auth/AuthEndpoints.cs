@@ -63,7 +63,7 @@ public static class AuthEndpoints
         if (!Uri.TryCreate(redirectUri, UriKind.Relative, out _))
             return DefaultRedirectPath;
 
-        return redirectUri.StartsWith('/', StringComparison.Ordinal)
+        return redirectUri.StartsWith("/", StringComparison.Ordinal)
                && !redirectUri.StartsWith("//", StringComparison.Ordinal)
                && !redirectUri.Contains('\\')
             ? redirectUri

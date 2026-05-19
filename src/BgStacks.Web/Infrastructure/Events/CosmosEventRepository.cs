@@ -49,6 +49,7 @@ public sealed class CosmosEventRepository : IEventRepository
             Name = @event.Name,
             EventDate = @event.EventDate.ToString("yyyy-MM-dd"),
             IsPublic = @event.IsPublic,
+            GeeklistId = @event.GeeklistId,
         };
         await _container.UpsertItemAsync(doc, new PartitionKey(@event.Slug.Value), cancellationToken: ct);
     }
@@ -57,14 +58,16 @@ public sealed class CosmosEventRepository : IEventRepository
         EventSlug.From(doc.Slug),
         doc.Name,
         DateOnly.Parse(doc.EventDate),
-        doc.IsPublic);
+        doc.IsPublic,
+        doc.GeeklistId);
 
     private sealed class EventDocument
     {
-        [JsonPropertyName("id")]        public string Id { get; set; } = "";
-        [JsonPropertyName("slug")]      public string Slug { get; set; } = "";
-        [JsonPropertyName("name")]      public string Name { get; set; } = "";
-        [JsonPropertyName("eventDate")] public string EventDate { get; set; } = "";
-        [JsonPropertyName("isPublic")]  public bool IsPublic { get; set; }
+        [JsonPropertyName("id")]          public string Id { get; set; } = "";
+        [JsonPropertyName("slug")]        public string Slug { get; set; } = "";
+        [JsonPropertyName("name")]        public string Name { get; set; } = "";
+        [JsonPropertyName("eventDate")]   public string EventDate { get; set; } = "";
+        [JsonPropertyName("isPublic")]    public bool IsPublic { get; set; }
+        [JsonPropertyName("geeklistId")] public int? GeeklistId { get; set; }
     }
 }

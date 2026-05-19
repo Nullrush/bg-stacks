@@ -18,6 +18,7 @@ public static class EventsEndpoints
                 eventDate = e.EventDate.ToString("yyyy-MM-dd"),
                 isUpcoming = e.IsUpcoming(today),
                 url = $"https://{e.Slug.Value}.{baseDomain}/",
+                geeklistId = e.GeeklistId,
             });
             return Results.Ok(result);
         });
