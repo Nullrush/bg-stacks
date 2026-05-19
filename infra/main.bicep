@@ -206,6 +206,7 @@ module containerApp 'br/public:avm/res/app/container-app:0.22.1' = {
         image: image
         env: [
           { name: 'ASPNETCORE_ENVIRONMENT',       value: 'Production' }
+          { name: 'AZURE_CLIENT_ID',             value: containerAppIdentity.properties.clientId }
           { name: 'Cosmos__Endpoint',              value: cosmos.outputs.endpoint }
           { name: 'Cosmos__DatabaseId',            value: 'bgstacks' }
           { name: 'Blob__ServiceUri',              value: storage.outputs.primaryBlobEndpoint }
