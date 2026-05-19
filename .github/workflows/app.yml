@@ -26,7 +26,18 @@ jobs:
         with:
           dotnet-version: '10.x'
       - name: Run tests
-        run: dotnet test tests/BgStacks.Web.Tests --no-restore --logger "trx;LogFileName=results.trx"
+        run: |
+          dotnet test tests/BgStacks.Web.Tests --no-restore \
+            --logger "trx;LogFileName=results.trx" \
+            --logger "console;verbosity=normal" 2>&1 | tee test-output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          {
+            echo "### Test Results"
+            echo '```'
+            grep -E "Failed|Passed|Skipped|Total|Error" test-output.txt | tail -3
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+          exit $EXIT_CODE
       - name: Publish test results
         uses: actions/upload-artifact@v4
         if: always()
@@ -79,3 +90,15 @@ jobs:
             --name ca-bgstacks-prod \
             --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
             --image "$SHA_TAG"
+      - name: Post deployment summary
+        if: success()
+        run: |
+          SHA_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$(git rev-parse --short HEAD)"
+          PORTAL_URL="https://portal.azure.com/#resource/subscriptions/${{ vars.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.AZURE_RESOURCE_GROUP }}/providers/Microsoft.App/containerApps/ca-bgstacks-prod"
+          {
+            echo "### Deployed"
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Image | \`$SHA_TAG\` |"
+            echo "| Container App | [View in Azure Portal]($PORTAL_URL) |"
+          } >> $GITHUB_STEP_SUMMARY

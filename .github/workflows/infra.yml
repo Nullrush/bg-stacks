@@ -38,7 +38,16 @@ jobs:
           az deployment group what-if \
             --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
             --template-file infra/main.bicep \
-            --parameters infra/parameters/main.bicepparam
+            --parameters infra/parameters/main.bicepparam \
+            2>&1 | sed 's/\x1b\[[0-9;]*m//g' | tee what-if.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          {
+            echo "### Infrastructure What-if Preview"
+            echo '```diff'
+            cat what-if.txt
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+          exit $EXIT_CODE
 
   # Runs on push to main only: gated by the 'prod' GitHub Environment (requires manual approval)
   # Uses a deployment stack so resources removed from main.bicep are tracked and deny-assignments
@@ -56,6 +65,13 @@ jobs:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Post portal link
+        run: |
+          URL="https://portal.azure.com/#resource/subscriptions/${{ vars.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.AZURE_RESOURCE_GROUP }}/providers/Microsoft.Resources/deploymentStacks/bgstacks-infra"
+          {
+            echo "### Deployment in progress"
+            echo "[View stack in Azure Portal]($URL)"
+          } >> $GITHUB_STEP_SUMMARY
       - name: Deploy stack
         uses: azure/bicep-deploy@v2
         with:
@@ -69,3 +85,24 @@ jobs:
           parameters-file: ./infra/parameters/main.bicepparam
           action-on-unmanage-resources: detach
           deny-settings-mode: denyDelete
+      - name: Post stack outputs
+        if: success()
+        run: |
+          OUTPUTS=$(az stack group show \
+            --name bgstacks-infra \
+            --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
+            --query outputs \
+            --output json)
+          FQDN=$(echo "$OUTPUTS"     | jq -r '.containerAppFqdn.value   // "—"')
+          STATIC_IP=$(echo "$OUTPUTS" | jq -r '.environmentStaticIp.value // "—"')
+          COSMOS=$(echo "$OUTPUTS"   | jq -r '.cosmosEndpoint.value      // "—"')
+          BLOB=$(echo "$OUTPUTS"     | jq -r '.blobEndpoint.value        // "—"')
+          {
+            echo "### Deployment Outputs"
+            echo "| Output | Value |"
+            echo "|--------|-------|"
+            echo "| Container App FQDN | \`$FQDN\` |"
+            echo "| Environment Static IP | \`$STATIC_IP\` |"
+            echo "| Cosmos Endpoint | \`$COSMOS\` |"
+            echo "| Blob Endpoint | \`$BLOB\` |"
+          } >> $GITHUB_STEP_SUMMARY
