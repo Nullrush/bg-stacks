@@ -5,9 +5,9 @@ resource kv 'Microsoft.KeyVault/vaults@2025-05-01' existing = {
   name: keyVaultName
 }
 
-resource wildcardCert 'Microsoft.KeyVault/vaults/certificates@2025-05-01' existing = {
+resource wildcardCert 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = {
   parent: kv
   name: 'wildcard-cert'
 }
 
-output secretUri string = wildcardCert.properties.secretId
+output secretUri string = wildcardCert.properties.secretUri
