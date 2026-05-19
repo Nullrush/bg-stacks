@@ -3,5 +3,6 @@ main = "worker.js"
 compatibility_date = "2025-01-01"
 
 routes = [
-  { pattern = "*.bgstacks.com/*", zone_name = "bgstacks.com" }
+  { pattern = "bgstacks.com/*", zone_name = "bgstacks.com" },
+  { pattern = "*.bgstacks.com/*", zone_name = "bgstacks.com" },
 ]
