@@ -12,9 +12,10 @@ public static class ServiceCollectionExtensions
     /// additional configuration (e.g. Polly retry policies).
     /// </summary>
     /// <remarks>
-    /// Call this method only once per application. Calling it multiple times appends
-    /// additional <see cref="BggAuthHandler"/> instances to the pipeline; the last
-    /// handler's token overwrites earlier ones, producing ambiguous behavior.
+    /// Calling this method more than once appends additional <see cref="BggAuthHandler"/>
+    /// instances to the pipeline. Each handler sets the <c>Authorization</c> header, so the
+    /// last-registered token wins and earlier tokens are silently discarded. Register once
+    /// unless you intentionally want to replace the token.
     /// </remarks>
     public static IHttpClientBuilder AddBggClient(
         this IServiceCollection services,

@@ -1,4 +1,5 @@
 // src/BggSdk/BggClient.cs
+using System.Net;
 using BggSdk.Exceptions;
 using BggSdk.Models;
 using BggSdk.Parsing;
@@ -71,13 +72,13 @@ public sealed class BggClient
         {
             var response = await _http.GetAsync(path, ct);
 
-            if ((int)response.StatusCode == 429)
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
             {
                 response.Dispose();
                 throw new BggRateLimitException();
             }
 
-            if ((int)response.StatusCode != 202)
+            if (response.StatusCode != HttpStatusCode.Accepted)
             {
                 try
                 {
