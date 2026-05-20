@@ -13,8 +13,8 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <remarks>
     /// Call this method only once per application. Calling it multiple times appends
-    /// additional <see cref="BggAuthHandler"/> instances to the pipeline, which produces
-    /// duplicate <c>Authorization</c> headers and unexpected behavior.
+    /// additional <see cref="BggAuthHandler"/> instances to the pipeline; the last
+    /// handler's token overwrites earlier ones, producing ambiguous behavior.
     /// </remarks>
     public static IHttpClientBuilder AddBggClient(
         this IServiceCollection services,

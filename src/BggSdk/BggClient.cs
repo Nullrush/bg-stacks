@@ -17,6 +17,10 @@ public sealed class BggClient
     /// </summary>
     public BggClient(HttpClient httpClient, TimeSpan? retryDelay = null)
     {
+        if (httpClient.BaseAddress is null)
+            throw new ArgumentException(
+                "HttpClient.BaseAddress must be set before passing to BggClient.",
+                nameof(httpClient));
         _http        = httpClient;
         _retryDelay  = retryDelay ?? TimeSpan.FromSeconds(5);
     }
