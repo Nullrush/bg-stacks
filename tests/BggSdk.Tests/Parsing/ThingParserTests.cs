@@ -224,6 +224,38 @@ public class ThingParserTests
     }
 
     [Fact]
+    public void Parse_PlayerPoll_AllZeroVotes_AbsentFromBothLists()
+    {
+        const string xml = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <items termsofuse="...">
+                <item type="boardgame" id="1">
+                    <name type="primary" sortindex="1" value="Game" />
+                    <minplayers value="1" /><maxplayers value="2" />
+                    <playingtime value="30" /><minplaytime value="30" /><maxplaytime value="30" />
+                    <poll name="suggested_numplayers" title="User Suggested Number of Players" totalvotes="0">
+                        <results numplayers="1">
+                            <result value="Best" numvotes="0" />
+                            <result value="Recommended" numvotes="0" />
+                            <result value="Not Recommended" numvotes="0" />
+                        </results>
+                        <results numplayers="2">
+                            <result value="Best" numvotes="0" />
+                            <result value="Recommended" numvotes="0" />
+                            <result value="Not Recommended" numvotes="0" />
+                        </results>
+                    </poll>
+                </item>
+            </items>
+            """;
+
+        var result = ThingParser.Parse(xml);
+
+        result[0].BestPlayerCounts.Should().BeEmpty();
+        result[0].RecommendedPlayerCounts.Should().BeEmpty();
+    }
+
+    [Fact]
     public void Parse_ReturnsMultipleThings()
     {
         const string multiXml = """

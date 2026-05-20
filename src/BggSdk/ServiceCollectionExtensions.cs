@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         string bearerToken)
     {
+        ArgumentNullException.ThrowIfNull(bearerToken);
         return services
             .AddHttpClient<BggClient>(client =>
                 client.BaseAddress = new Uri("https://boardgamegeek.com/xmlapi2/"))

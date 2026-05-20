@@ -1,6 +1,7 @@
 // src/BggSdk/Parsing/ThingParser.cs
 using System.Globalization;
 using System.Xml.Linq;
+using BggSdk.Exceptions;
 using BggSdk.Models;
 
 namespace BggSdk.Parsing;
@@ -8,10 +9,19 @@ namespace BggSdk.Parsing;
 internal static class ThingParser
 {
     public static IReadOnlyList<Thing> Parse(string xml)
-        => XDocument.Parse(xml).Root!
-            .Elements("item")
-            .Select(ParseItem)
-            .ToList();
+    {
+        try
+        {
+            return XDocument.Parse(xml).Root!
+                .Elements("item")
+                .Select(ParseItem)
+                .ToList();
+        }
+        catch (Exception ex) when (ex is not BggApiException)
+        {
+            throw new BggApiException($"Failed to parse thing XML: {ex.Message}", ex);
+        }
+    }
 
     private static Thing ParseItem(XElement e)
     {

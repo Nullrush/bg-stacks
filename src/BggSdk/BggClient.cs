@@ -28,6 +28,12 @@ public sealed class BggClient
         return GeeklistParser.Parse(xml);
     }
 
+    /// <summary>
+    /// Fetches enriched data for the specified game IDs. Automatically batches requests
+    /// into chunks of at most 20 IDs (BGG API limit).
+    /// Results are returned in the order BGG provides them within each batch,
+    /// which is not guaranteed to match the input ordering.
+    /// </summary>
     public async Task<IReadOnlyList<Thing>> GetThingsAsync(
         IEnumerable<int> ids, CancellationToken ct = default)
     {
@@ -55,17 +61,15 @@ public sealed class BggClient
                 throw new BggRateLimitException();
             }
 
-            if ((int)response.StatusCode == 202)
+            if ((int)response.StatusCode != 202)
             {
-                response.Dispose();
-                if (attempt == maxAttempts - 1)
-                    throw new BggRetryException(maxAttempts);
-                await Task.Delay(_retryDelay, ct);
-                continue;
+                response.EnsureSuccessStatusCode();
+                return response;
             }
 
-            response.EnsureSuccessStatusCode();
-            return response;
+            response.Dispose();
+            if (attempt < maxAttempts - 1)
+                await Task.Delay(_retryDelay, ct);
         }
 
         throw new BggRetryException(maxAttempts);
