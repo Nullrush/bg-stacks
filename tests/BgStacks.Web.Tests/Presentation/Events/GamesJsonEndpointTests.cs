@@ -16,9 +16,15 @@ public class GamesJsonEndpointTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task GetGamesJson_KnownEventSlug_ReturnsJson()
     {
-        var slug = EventSlug.From("gw-2026-pnw");
-        _factory.EventDataRepository.Seed(
-            new EventData(slug, "[{\"id\":1}]", "[]", "[]"));
+        _factory.EventDataRepository.Seed(new EventData
+        {
+            SlugValue = "gw-2026-pnw",
+            Title = "Test",
+            EditTimestamp = 0,
+            GamesJson = "[{\"id\":1}]",
+            MechanicsJson = "[]",
+            CategoriesJson = "[]",
+        });
 
         var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Host = "gw-2026-pnw.bgstacks.com";

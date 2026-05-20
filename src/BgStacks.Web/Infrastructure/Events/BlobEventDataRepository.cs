@@ -19,7 +19,13 @@ public sealed class BlobEventDataRepository : IEventDataRepository
             var games = await DownloadTextAsync(container, $"{slug.Value}/games.json", ct);
             var mechanics = await DownloadTextAsync(container, $"{slug.Value}/mechanics.json", ct);
             var categories = await DownloadTextAsync(container, $"{slug.Value}/categories.json", ct);
-            return new EventData(slug, games, mechanics, categories);
+            return new EventData
+            {
+                SlugValue = slug.Value,
+                GamesJson = games,
+                MechanicsJson = mechanics,
+                CategoriesJson = categories,
+            };
         }
         catch (RequestFailedException ex) when (ex.Status == 404)
         {

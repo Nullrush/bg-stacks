@@ -1,17 +1,27 @@
+using System.Text.Json.Serialization;
+
 namespace BgStacks.Web.Domain.Events;
 
 public sealed class EventData
 {
-    public EventSlug Slug { get; }
-    public string GamesJson { get; }
-    public string MechanicsJson { get; }
-    public string CategoriesJson { get; }
+    [JsonPropertyName("slug")]
+    public string SlugValue { get; init; } = "";
 
-    public EventData(EventSlug slug, string gamesJson, string mechanicsJson, string categoriesJson)
-    {
-        Slug = slug;
-        GamesJson = gamesJson;
-        MechanicsJson = mechanicsJson;
-        CategoriesJson = categoriesJson;
-    }
+    [JsonPropertyName("title")]
+    public string Title { get; init; } = "";
+
+    [JsonPropertyName("editTimestamp")]
+    public long EditTimestamp { get; init; }
+
+    [JsonPropertyName("gamesJson")]
+    public string GamesJson { get; init; } = "";
+
+    [JsonPropertyName("mechanicsJson")]
+    public string MechanicsJson { get; init; } = "";
+
+    [JsonPropertyName("categoriesJson")]
+    public string CategoriesJson { get; init; } = "";
+
+    [JsonIgnore]
+    public EventSlug Slug => EventSlug.From(SlugValue);
 }
