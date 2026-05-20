@@ -28,6 +28,18 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void AddBggClient_CustomBaseAddress_UsesProvidedAddress()
+    {
+        var services = new ServiceCollection();
+
+        services.AddBggClient("token", "https://staging.example.com/api/");
+
+        var provider = services.BuildServiceProvider();
+        var client = provider.GetRequiredService<BggClient>();
+        client.Should().NotBeNull();
+    }
+
+    [Fact]
     public void AddBggClient_CalledTwiceWithDifferentTokens_DoesNotThrow()
     {
         // Callers should be able to register once without error; this guards against

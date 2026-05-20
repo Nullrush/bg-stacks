@@ -30,15 +30,27 @@ public sealed class BggClient
 
     /// <summary>
     /// Fetches enriched data for the specified game IDs. Automatically batches requests
+    /// into chunks of at most 20 IDs (BGG API limit). Duplicate IDs are removed before
+    /// batching; results are returned in BGG's response order per batch, not input order.
+    /// To disable deduplication, use the overload with <paramref name="deduplicateIds"/>.
+    /// </summary>
+    public Task<IReadOnlyList<Thing>> GetThingsAsync(
+        IEnumerable<int> ids, CancellationToken ct = default)
+        => GetThingsAsync(ids, deduplicateIds: true, ct);
+
+    /// <summary>
+    /// Fetches enriched data for the specified game IDs. Automatically batches requests
     /// into chunks of at most 20 IDs (BGG API limit).
-    /// Results are returned in the order BGG provides them within each batch,
-    /// which is not guaranteed to match the input ordering.
+    /// When <paramref name="deduplicateIds"/> is <see langword="true"/> (the default via
+    /// the single-parameter overload), duplicate IDs are removed before batching.
+    /// Results are returned in BGG's response order per batch, not input order.
     /// </summary>
     public async Task<IReadOnlyList<Thing>> GetThingsAsync(
-        IEnumerable<int> ids, CancellationToken ct = default)
+        IEnumerable<int> ids, bool deduplicateIds, CancellationToken ct = default)
     {
+        var idList = deduplicateIds ? ids.Distinct().ToList() : ids.ToList();
         var results = new List<Thing>();
-        foreach (var chunk in ids.Chunk(20))
+        foreach (var chunk in idList.Chunk(20))
         {
             var response = await SendWithRetryAsync(
                 $"thing?id={string.Join(",", chunk)}&stats=1", ct);
@@ -63,7 +75,15 @@ public sealed class BggClient
 
             if ((int)response.StatusCode != 202)
             {
-                response.EnsureSuccessStatusCode();
+                try
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+                catch (HttpRequestException ex)
+                {
+                    response.Dispose();
+                    throw new BggApiException($"BGG API returned an error: {ex.Message}", ex);
+                }
                 return response;
             }
 

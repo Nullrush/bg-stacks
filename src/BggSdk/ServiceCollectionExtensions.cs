@@ -13,12 +13,13 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IHttpClientBuilder AddBggClient(
         this IServiceCollection services,
-        string bearerToken)
+        string bearerToken,
+        string? baseAddress = null)
     {
         ArgumentNullException.ThrowIfNull(bearerToken);
+        var uri = new Uri(baseAddress ?? "https://boardgamegeek.com/xmlapi2/");
         return services
-            .AddHttpClient<BggClient>(client =>
-                client.BaseAddress = new Uri("https://boardgamegeek.com/xmlapi2/"))
+            .AddHttpClient<BggClient>(client => client.BaseAddress = uri)
             .AddHttpMessageHandler(() => new BggAuthHandler(bearerToken));
     }
 }

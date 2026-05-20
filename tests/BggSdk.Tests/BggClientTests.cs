@@ -113,6 +113,17 @@ public class BggClientTests
         handler.RequestCount.Should().Be(5);
     }
 
+    [Fact]
+    public async Task GetGeeklistAsync_ServerError_ThrowsBggApiException()
+    {
+        var handler = new TestHttpMessageHandler(
+            new HttpResponseMessage(HttpStatusCode.InternalServerError));
+
+        await FluentActions
+            .Awaiting(() => MakeClient(handler).GetGeeklistAsync(1))
+            .Should().ThrowAsync<BggApiException>();
+    }
+
     // ── Thing ─────────────────────────────────────────────────────────────────
 
     [Fact]
@@ -181,5 +192,28 @@ public class BggClientTests
         handler.RequestedPaths[0].Count(c => c == ',').Should().Be(19);
         // Second path should have 1 id (0 commas in the id list)
         handler.RequestedPaths[1].Should().Contain("id=21");
+    }
+
+    [Fact]
+    public async Task GetThingsAsync_DuplicateIds_DeduplicatedByDefault()
+    {
+        var handler = new TestHttpMessageHandler(Ok(MinimalThingXml));
+
+        await MakeClient(handler).GetThingsAsync([1, 1, 2, 2]);
+
+        // 4 ids but 2 unique → single request with 2 ids (1 comma)
+        handler.RequestCount.Should().Be(1);
+        handler.RequestedPaths[0].Count(c => c == ',').Should().Be(1);
+    }
+
+    [Fact]
+    public async Task GetThingsAsync_DuplicateIds_NotDeduplicatedWhenOptedOut()
+    {
+        var handler = new TestHttpMessageHandler(Ok(MinimalThingXml));
+
+        await MakeClient(handler).GetThingsAsync([1, 1], deduplicateIds: false);
+
+        // deduplication off → both ids sent
+        handler.RequestedPaths[0].Should().Contain("1,1");
     }
 }
