@@ -24,7 +24,12 @@ public static class ServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(bearerToken);
         var rawBase = baseAddress ?? "https://boardgamegeek.com/xmlapi2/";
-        var uri = new Uri(rawBase.EndsWith('/') ? rawBase : rawBase + '/');
+        if (!Uri.TryCreate(rawBase, UriKind.Absolute, out var uri))
+            throw new ArgumentException(
+                $"baseAddress must be an absolute URI; got: \"{rawBase}\"",
+                nameof(baseAddress));
+        if (!uri.AbsoluteUri.EndsWith('/'))
+            uri = new Uri(uri.AbsoluteUri + '/');
         return services
             .AddHttpClient<BggClient>(client => client.BaseAddress = uri)
             .AddHttpMessageHandler(() => new BggAuthHandler(bearerToken));

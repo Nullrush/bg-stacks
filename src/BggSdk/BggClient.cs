@@ -43,7 +43,7 @@ public sealed class BggClient
     /// </summary>
     public Task<IReadOnlyList<Thing>> GetThingsAsync(
         IEnumerable<int> ids, CancellationToken ct = default)
-        => GetThingsAsync(ids, deduplicateIds: true, ct);
+        => GetThingsAsync(ids, deduplicateIds: true, ct: ct);
 
     /// <summary>
     /// Fetches enriched data for the specified game IDs. Automatically batches requests
@@ -55,6 +55,7 @@ public sealed class BggClient
     public async Task<IReadOnlyList<Thing>> GetThingsAsync(
         IEnumerable<int> ids, bool deduplicateIds, CancellationToken ct = default)
     {
+        ArgumentNullException.ThrowIfNull(ids);
         var idList = deduplicateIds ? ids.Distinct().ToList() : ids.ToList();
         var results = new List<Thing>();
         foreach (var chunk in idList.Chunk(20))
