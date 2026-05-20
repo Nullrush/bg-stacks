@@ -56,8 +56,8 @@ public class ServiceCollectionExtensionsTests
     [Fact]
     public void AddBggClient_CalledTwiceWithDifferentTokens_DoesNotThrow()
     {
-        // Callers should be able to register once without error; this guards against
-        // internal state that would blow up on double-registration.
+        // Guards against double-registration blowing up on internal state;
+        // calling AddBggClient twice with different tokens must not throw.
         var services = new ServiceCollection();
 
         var act = () =>

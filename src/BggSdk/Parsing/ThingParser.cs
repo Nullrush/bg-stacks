@@ -32,12 +32,12 @@ internal static class ThingParser
         var mechanics = e.Elements("link")
             .Where(l => l.Attribute("type")!.Value == "boardgamemechanic")
             .Select(l => l.Attribute("value")!.Value)
-            .ToList();
+            .ToList().AsReadOnly();
 
         var categories = e.Elements("link")
             .Where(l => l.Attribute("type")!.Value == "boardgamecategory")
             .Select(l => l.Attribute("value")!.Value)
-            .ToList();
+            .ToList().AsReadOnly();
 
         var (avgRating, bayesRating, userRatings, avgWeight, bggRank, subRanks)
             = ParseStats(e.Element("statistics")?.Element("ratings"));
@@ -71,7 +71,7 @@ internal static class ThingParser
         ParseStats(XElement? ratings)
     {
         if (ratings is null)
-            return (0, 0, 0, 0, null, new Dictionary<string, int?>());
+            return (0, 0, 0, 0, null, new Dictionary<string, int?>().AsReadOnly());
 
         int? bggRank = null;
         var subRanks = new Dictionary<string, int?>();
@@ -94,7 +94,7 @@ internal static class ThingParser
             IntAttr   (ratings.Element("usersrated"),    "value"),
             DoubleAttr(ratings.Element("averageweight"), "value"),
             bggRank,
-            subRanks
+            subRanks.AsReadOnly()
         );
     }
 
@@ -137,7 +137,7 @@ internal static class ThingParser
             }
         }
 
-        return (best, recommended);
+        return (best.AsReadOnly(), recommended.AsReadOnly());
     }
 
     private static int IntAttr(XElement? el, string attr)

@@ -90,7 +90,7 @@ foreach (var thing in things)
 | `Title` | `string` | Geeklist title |
 | `Username` | `string` | Owner's BGG username |
 | `EditTimestamp` | `long` | Unix timestamp of last edit — use for cache invalidation |
-| `ItemCount` | `int` | Declared item count (from BGG attribute, not `Items.Count`) |
+| `ItemCount` | `int` | Declared item count (from `<numitems>` element, not `Items.Count`) |
 | `Items` | `IReadOnlyList<GeeklistItem>` | |
 
 ### `GeeklistItem`

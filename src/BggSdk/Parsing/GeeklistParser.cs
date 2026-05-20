@@ -21,7 +21,7 @@ internal static class GeeklistParser
                     Subtype:    e.Attribute("subtype")!.Value,
                     Body:       ((string?)e.Element("body"))?.Trim() ?? string.Empty
                 ))
-                .ToList();
+                .ToList().AsReadOnly();
 
             return new Geeklist(
                 Id:            (int)root.Attribute("id")!,
