@@ -15,7 +15,11 @@ internal sealed class TestHttpMessageHandler : HttpMessageHandler
     protected override Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        RequestedPaths.Add(request.RequestUri!.PathAndQuery);
+        var path = request.RequestUri!.PathAndQuery;
+        RequestedPaths.Add(path);
+        if (_responses.Count == 0)
+            throw new InvalidOperationException(
+                $"TestHttpMessageHandler has no queued responses left. Unexpected request to: {path}");
         return Task.FromResult(_responses.Dequeue());
     }
 }

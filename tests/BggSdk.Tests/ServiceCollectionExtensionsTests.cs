@@ -41,6 +41,19 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void AddBggClient_CustomBaseAddress_NormalizesTrailingSlash()
+    {
+        var services = new ServiceCollection();
+
+        services.AddBggClient("token", "https://staging.example.com/api"); // no trailing slash
+
+        var provider = services.BuildServiceProvider();
+        var factory = provider.GetRequiredService<IHttpClientFactory>();
+        var httpClient = factory.CreateClient(nameof(BggClient));
+        httpClient.BaseAddress.Should().Be(new Uri("https://staging.example.com/api/"));
+    }
+
+    [Fact]
     public void AddBggClient_CalledTwiceWithDifferentTokens_DoesNotThrow()
     {
         // Callers should be able to register once without error; this guards against

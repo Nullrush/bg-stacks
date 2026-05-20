@@ -37,6 +37,21 @@ public class BggAuthHandlerTests
         captured!.Headers.Authorization.Should().BeNull();
     }
 
+    [Fact]
+    public async Task SendAsync_WhitespaceToken_DoesNotAddHeader()
+    {
+        HttpRequestMessage? captured = null;
+        var inner = new CaptureDelegatingHandler(req => captured = req);
+        var handler = new BggAuthHandler("   ") { InnerHandler = inner };
+        var invoker = new HttpMessageInvoker(handler);
+
+        await invoker.SendAsync(
+            new HttpRequestMessage(HttpMethod.Get, "https://example.com/"),
+            CancellationToken.None);
+
+        captured!.Headers.Authorization.Should().BeNull();
+    }
+
     private sealed class CaptureDelegatingHandler : HttpMessageHandler
     {
         private readonly Action<HttpRequestMessage> _capture;

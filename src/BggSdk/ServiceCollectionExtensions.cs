@@ -17,7 +17,8 @@ public static class ServiceCollectionExtensions
         string? baseAddress = null)
     {
         ArgumentNullException.ThrowIfNull(bearerToken);
-        var uri = new Uri(baseAddress ?? "https://boardgamegeek.com/xmlapi2/");
+        var rawBase = baseAddress ?? "https://boardgamegeek.com/xmlapi2/";
+        var uri = new Uri(rawBase.EndsWith('/') ? rawBase : rawBase + '/');
         return services
             .AddHttpClient<BggClient>(client => client.BaseAddress = uri)
             .AddHttpMessageHandler(() => new BggAuthHandler(bearerToken));

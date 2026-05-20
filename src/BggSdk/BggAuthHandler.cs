@@ -11,7 +11,7 @@ public sealed class BggAuthHandler : DelegatingHandler
     protected override Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        if (!string.IsNullOrEmpty(_token))
+        if (!string.IsNullOrWhiteSpace(_token))
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         return base.SendAsync(request, cancellationToken);
     }
