@@ -1,4 +1,5 @@
 using System.Net;
+using BggSdk;
 using BggSdk.Tests.Helpers;
 
 namespace BggSdk.Tests;

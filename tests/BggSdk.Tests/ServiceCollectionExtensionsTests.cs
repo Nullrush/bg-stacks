@@ -1,3 +1,4 @@
+using BggSdk;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BggSdk.Tests;

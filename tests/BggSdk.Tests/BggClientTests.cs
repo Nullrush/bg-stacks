@@ -1,5 +1,6 @@
 // tests/BggSdk.Tests/BggClientTests.cs
 using System.Net;
+using BggSdk;
 using BggSdk.Exceptions;
 using BggSdk.Tests.Helpers;
 
@@ -77,7 +78,7 @@ public class BggClientTests
     public async Task GetGeeklistAsync_202ThenOk_RetriesAndReturnsResult()
     {
         var handler = new TestHttpMessageHandler(
-            new HttpResponseMessage((HttpStatusCode)202),
+            new HttpResponseMessage(HttpStatusCode.Accepted),
             Ok(MinimalGeeklistXml));
 
         var result = await MakeClient(handler).GetGeeklistAsync(1);
@@ -90,7 +91,7 @@ public class BggClientTests
     public async Task GetGeeklistAsync_202Then429_ThrowsRateLimitException()
     {
         var handler = new TestHttpMessageHandler(
-            new HttpResponseMessage((HttpStatusCode)202),
+            new HttpResponseMessage(HttpStatusCode.Accepted),
             new HttpResponseMessage(HttpStatusCode.TooManyRequests));
 
         await FluentActions
@@ -102,7 +103,7 @@ public class BggClientTests
     public async Task GetGeeklistAsync_Repeated202_ThrowsRetryException()
     {
         var responses = Enumerable.Range(0, 5)
-            .Select(_ => new HttpResponseMessage((HttpStatusCode)202))
+            .Select(_ => new HttpResponseMessage(HttpStatusCode.Accepted))
             .ToArray();
         var handler = new TestHttpMessageHandler(responses);
 
