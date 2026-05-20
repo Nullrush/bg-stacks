@@ -7,6 +7,8 @@ on:
       - 'src/**'
       - 'tests/**'
       - 'src/BgStacks.Web/Dockerfile'
+      - 'bg-stacks.slnx'
+      - '.github/workflows/app.yml'
   workflow_dispatch:
 
 permissions:
