@@ -22,6 +22,8 @@ public sealed class BggClient
             throw new ArgumentException(
                 "HttpClient.BaseAddress must be set before passing to BggClient.",
                 nameof(httpClient));
+        if (!httpClient.BaseAddress.AbsoluteUri.EndsWith('/'))
+            httpClient.BaseAddress = new Uri(httpClient.BaseAddress.AbsoluteUri + '/');
         _http        = httpClient;
         _retryDelay  = retryDelay ?? TimeSpan.FromSeconds(5);
     }

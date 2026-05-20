@@ -40,6 +40,29 @@ public class BggClientTests
     private static HttpResponseMessage Ok(string body)
         => new(HttpStatusCode.OK) { Content = new StringContent(body) };
 
+    // ── Constructor ───────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Constructor_BaseAddressWithoutTrailingSlash_NormalizesToSlash()
+    {
+        var handler = new TestHttpMessageHandler();
+        var http = new HttpClient(handler) { BaseAddress = new Uri("https://boardgamegeek.com/xmlapi2") };
+
+        var client = new BggClient(http);
+
+        http.BaseAddress!.AbsoluteUri.Should().EndWith("/");
+    }
+
+    [Fact]
+    public void Constructor_NullBaseAddress_Throws()
+    {
+        var http = new HttpClient();
+
+        var act = () => new BggClient(http);
+
+        act.Should().Throw<ArgumentException>().WithParameterName("httpClient");
+    }
+
     // ── Geeklist ──────────────────────────────────────────────────────────────
 
     [Fact]
