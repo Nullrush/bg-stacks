@@ -17,6 +17,7 @@ using Microsoft.Azure.Cosmos;
 var builder = WebApplication.CreateBuilder(args);
 
 var credential = new DefaultAzureCredential();
+builder.Services.AddSingleton<Azure.Core.TokenCredential>(credential);
 
 // ── Cosmos DB ──────────────────────────────────────────────────────────────
 var cosmosDatabaseId = builder.Configuration["Cosmos:DatabaseId"] ?? "bgstacks";

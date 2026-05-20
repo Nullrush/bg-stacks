@@ -35,8 +35,9 @@ public class ServiceCollectionExtensionsTests
         services.AddBggClient("token", "https://staging.example.com/api/");
 
         var provider = services.BuildServiceProvider();
-        var client = provider.GetRequiredService<BggClient>();
-        client.Should().NotBeNull();
+        var factory = provider.GetRequiredService<IHttpClientFactory>();
+        var httpClient = factory.CreateClient(nameof(BggClient));
+        httpClient.BaseAddress.Should().Be(new Uri("https://staging.example.com/api/"));
     }
 
     [Fact]

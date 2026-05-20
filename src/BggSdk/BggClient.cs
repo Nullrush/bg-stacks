@@ -23,7 +23,7 @@ public sealed class BggClient
 
     public async Task<Geeklist> GetGeeklistAsync(int id, CancellationToken ct = default)
     {
-        var response = await SendWithRetryAsync($"geeklist/{id}", ct);
+        using var response = await SendWithRetryAsync($"geeklist/{id}", ct);
         var xml = await response.Content.ReadAsStringAsync(ct);
         return GeeklistParser.Parse(xml);
     }
@@ -52,7 +52,7 @@ public sealed class BggClient
         var results = new List<Thing>();
         foreach (var chunk in idList.Chunk(20))
         {
-            var response = await SendWithRetryAsync(
+            using var response = await SendWithRetryAsync(
                 $"thing?id={string.Join(",", chunk)}&stats=1", ct);
             var xml = await response.Content.ReadAsStringAsync(ct);
             results.AddRange(ThingParser.Parse(xml));

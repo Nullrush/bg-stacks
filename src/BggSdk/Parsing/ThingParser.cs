@@ -26,17 +26,17 @@ internal static class ThingParser
     private static Thing ParseItem(XElement e)
     {
         var name = e.Elements("name")
-            .First(n => (string)n.Attribute("type")! == "primary")
+            .First(n => n.Attribute("type")!.Value == "primary")
             .Attribute("value")!.Value;
 
         var mechanics = e.Elements("link")
-            .Where(l => (string)l.Attribute("type")! == "boardgamemechanic")
-            .Select(l => (string)l.Attribute("value")!)
+            .Where(l => l.Attribute("type")!.Value == "boardgamemechanic")
+            .Select(l => l.Attribute("value")!.Value)
             .ToList();
 
         var categories = e.Elements("link")
-            .Where(l => (string)l.Attribute("type")! == "boardgamecategory")
-            .Select(l => (string)l.Attribute("value")!)
+            .Where(l => l.Attribute("type")!.Value == "boardgamecategory")
+            .Select(l => l.Attribute("value")!.Value)
             .ToList();
 
         var (avgRating, bayesRating, userRatings, avgWeight, bggRank, subRanks)
