@@ -5,7 +5,10 @@ on:
     branches: [main]
     paths:
       - 'src/**'
+      - 'tests/**'
       - 'src/BgStacks.Web/Dockerfile'
+      - 'bg-stacks.slnx'
+      - '.github/workflows/app.yml'
   workflow_dispatch:
 
 permissions:
@@ -32,7 +35,7 @@ jobs:
           dotnet-version: '10.x'
       - name: Run tests
         run: |
-          dotnet test tests/BgStacks.Web.Tests --no-restore \
+          dotnet test bg-stacks.slnx \
             --logger "trx;LogFileName=results.trx" \
             --logger "console;verbosity=normal" 2>&1 | tee test-output.txt
           EXIT_CODE=${PIPESTATUS[0]}

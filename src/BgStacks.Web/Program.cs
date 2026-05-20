@@ -16,6 +16,8 @@ using Microsoft.Azure.Cosmos;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var credential = new DefaultAzureCredential();
+
 // ── Cosmos DB ──────────────────────────────────────────────────────────────
 var cosmosDatabaseId = builder.Configuration["Cosmos:DatabaseId"] ?? "bgstacks";
 var cosmosConnStr = builder.Configuration["Cosmos:ConnectionString"];
@@ -28,14 +30,14 @@ var cosmosOptions = new CosmosClientOptions
 };
 var cosmosClient = cosmosConnStr is not null
     ? new CosmosClient(cosmosConnStr, cosmosOptions)
-    : new CosmosClient(builder.Configuration["Cosmos:Endpoint"]!, new DefaultAzureCredential(), cosmosOptions);
+    : new CosmosClient(builder.Configuration["Cosmos:Endpoint"]!, credential, cosmosOptions);
 builder.Services.AddSingleton(cosmosClient);
 
 // ── Blob Storage ───────────────────────────────────────────────────────────
 var blobConnStr = builder.Configuration["Blob:ConnectionString"];
 var blobClient = blobConnStr is not null
     ? new BlobServiceClient(blobConnStr)
-    : new BlobServiceClient(new Uri(builder.Configuration["Blob:ServiceUri"]!), new DefaultAzureCredential());
+    : new BlobServiceClient(new Uri(builder.Configuration["Blob:ServiceUri"]!), credential);
 builder.Services.AddSingleton(blobClient);
 
 // ── Domain Repositories ────────────────────────────────────────────────────
@@ -121,10 +123,10 @@ var dpBlobUri = builder.Configuration["DataProtection:BlobUri"];
 var dpKeyUri = builder.Configuration["DataProtection:KeyVaultKeyUri"];
 if (dpBlobUri is not null && dpKeyUri is not null)
 {
-    var dpBlob = new Azure.Storage.Blobs.BlobClient(new Uri(dpBlobUri), new DefaultAzureCredential());
+    var dpBlob = new Azure.Storage.Blobs.BlobClient(new Uri(dpBlobUri), credential);
     builder.Services.AddDataProtection()
         .PersistKeysToAzureBlobStorage(dpBlob)
-        .ProtectKeysWithAzureKeyVault(new Uri(dpKeyUri), new DefaultAzureCredential());
+        .ProtectKeysWithAzureKeyVault(new Uri(dpKeyUri), credential);
 }
 
 builder.Services.AddAuthorization();

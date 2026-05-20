@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/BgStacks.Web/BgStacks.Web.csproj" />
+    <Project Path="src/BggSdk/BggSdk.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/BgStacks.Web.Tests/BgStacks.Web.Tests.csproj" />
+    <Project Path="tests/BggSdk.Tests/BggSdk.Tests.csproj" />
   </Folder>
 </Solution>

@@ -109,14 +109,13 @@ Two paths, both work:
 ASP.NET Core Minimal API. DDD structure: Domain → Application → Infrastructure → Presentation.
 
 ```bash
-dotnet run --project src/BgStacks.Web          # requires Cosmos emulator + Azurite running locally
+dotnet run --project src/BgStacks.Web          # standalone; requires Cosmos emulator + Azurite running separately
 dotnet test tests/BgStacks.Web.Tests
 docker build -f src/BgStacks.Web/Dockerfile -t bgstacks:local .
 ```
 
 ### Local dev prerequisites
-- [Cosmos DB emulator](https://aka.ms/cosmosdb-emulator) running on https://localhost:8081/
-- [Azurite](https://github.com/Azure/Azurite) running: `npx azurite --silent`
+- When using `src/BgStacks.Web` standalone: [Cosmos DB emulator](https://aka.ms/cosmosdb-emulator) on https://localhost:8081/ and [Azurite](https://github.com/Azure/Azurite) (`npx azurite --silent`) must be running
 - OAuth client IDs/secrets are not needed for local dev (auth flows won't work without them, but the rest of the app does)
 
 ### Key config (appsettings.Development.json)
