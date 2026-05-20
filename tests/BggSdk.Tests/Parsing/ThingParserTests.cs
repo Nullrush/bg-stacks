@@ -166,6 +166,13 @@ public class ThingParserTests
     }
 
     [Fact]
+    public void Parse_ExtractsSubRanks_ExcludesBoardgameRank()
+    {
+        var result = ThingParser.Parse(SingleThingXml);
+        result[0].SubRanks.Should().NotContainKey("boardgame");
+    }
+
+    [Fact]
     public void Parse_ExtractsMechanics()
     {
         var result = ThingParser.Parse(SingleThingXml);

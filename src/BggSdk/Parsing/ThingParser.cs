@@ -116,12 +116,12 @@ internal static class ThingParser
                 }
             }
 
-            if (bestVotes >= recVotes && bestVotes >= notRecVotes && bestVotes > 0)
+            if (bestVotes > recVotes && bestVotes > notRecVotes && bestVotes > 0)
             {
                 best.Add(n);
                 recommended.Add(n);
             }
-            else if (recVotes > bestVotes && recVotes >= notRecVotes && recVotes > 0)
+            else if (recVotes > bestVotes && recVotes > notRecVotes && recVotes > 0)
             {
                 recommended.Add(n);
             }

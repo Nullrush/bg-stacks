@@ -50,10 +50,14 @@ public sealed class BggClient
             var response = await _http.GetAsync(path, ct);
 
             if ((int)response.StatusCode == 429)
+            {
+                response.Dispose();
                 throw new BggRateLimitException();
+            }
 
             if ((int)response.StatusCode == 202)
             {
+                response.Dispose();
                 if (attempt == maxAttempts - 1)
                     throw new BggRetryException(maxAttempts);
                 await Task.Delay(_retryDelay, ct);

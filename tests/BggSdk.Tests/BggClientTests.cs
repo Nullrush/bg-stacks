@@ -87,6 +87,18 @@ public class BggClientTests
     }
 
     [Fact]
+    public async Task GetGeeklistAsync_202Then429_ThrowsRateLimitException()
+    {
+        var handler = new TestHttpMessageHandler(
+            new HttpResponseMessage((HttpStatusCode)202),
+            new HttpResponseMessage(HttpStatusCode.TooManyRequests));
+
+        await FluentActions
+            .Awaiting(() => MakeClient(handler).GetGeeklistAsync(1))
+            .Should().ThrowAsync<BggRateLimitException>();
+    }
+
+    [Fact]
     public async Task GetGeeklistAsync_Repeated202_ThrowsRetryException()
     {
         var responses = Enumerable.Range(0, 5)
