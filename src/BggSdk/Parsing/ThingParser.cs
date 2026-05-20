@@ -1,4 +1,5 @@
 // src/BggSdk/Parsing/ThingParser.cs
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Xml.Linq;
 using BggSdk.Exceptions;
@@ -71,7 +72,7 @@ internal static class ThingParser
         ParseStats(XElement? ratings)
     {
         if (ratings is null)
-            return (0, 0, 0, 0, null, new Dictionary<string, int?>().AsReadOnly());
+            return (0, 0, 0, 0, null, new ReadOnlyDictionary<string, int?>(new Dictionary<string, int?>()));
 
         int? bggRank = null;
         var subRanks = new Dictionary<string, int?>();
@@ -94,7 +95,7 @@ internal static class ThingParser
             IntAttr   (ratings.Element("usersrated"),    "value"),
             DoubleAttr(ratings.Element("averageweight"), "value"),
             bggRank,
-            subRanks.AsReadOnly()
+            new ReadOnlyDictionary<string, int?>(subRanks)
         );
     }
 
