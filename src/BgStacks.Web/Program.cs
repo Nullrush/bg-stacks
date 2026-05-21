@@ -1,213 +1,28 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
-using BggSdk;
-using Microsoft.AspNetCore.DataProtection;
 using BgStacks.Web.Application.Events;
 using BgStacks.Web.Application.Tags;
-using BgStacks.Web.Domain.Events;
-using BgStacks.Web.Domain.Tags;
+using BgStacks.Web.Infrastructure;
 using BgStacks.Web.Infrastructure.Auth;
-using BgStacks.Web.Infrastructure.Cache;
 using BgStacks.Web.Infrastructure.Events;
-using BgStacks.Web.Infrastructure.Tags;
-using BgStacks.Web.Presentation.Api;
 using BgStacks.Web.Presentation.Auth;
 using BgStacks.Web.Presentation.Events;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.AspNetCore.HttpOverrides;
-using System.Threading.RateLimiting;
-using ZiggyCreatures.Caching.Fusion;
+using BgStacks.Web.Presentation.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var credential = new DefaultAzureCredential();
 
-// ── Cosmos DB ──────────────────────────────────────────────────────────────
-var cosmosDatabaseId = builder.Configuration["Cosmos:DatabaseId"] ?? "bgstacks";
-var cosmosConnStr = builder.Configuration["Cosmos:ConnectionString"];
-var cosmosOptions = new CosmosClientOptions
-{
-    UseSystemTextJsonSerializerWithOptions = new System.Text.Json.JsonSerializerOptions
-    {
-        PropertyNameCaseInsensitive = true,
-    },
-};
-var cosmosClient = cosmosConnStr is not null
-    ? new CosmosClient(cosmosConnStr, cosmosOptions)
-    : new CosmosClient(builder.Configuration["Cosmos:Endpoint"]!, credential, cosmosOptions);
-builder.Services.AddSingleton(cosmosClient);
+builder.Services.AddAzureInfrastructure(builder.Configuration, credential);
+builder.Services.AddProxyForwardedHeaders(builder.Configuration);
+builder.Services.AddEventDataRateLimiting();
+builder.Services.AddBggServices(builder.Configuration, builder.Environment);
 
-// ── Blob Storage ───────────────────────────────────────────────────────────
-var blobConnStr = builder.Configuration["Blob:ConnectionString"];
-var blobClient = blobConnStr is not null
-    ? new BlobServiceClient(blobConnStr)
-    : new BlobServiceClient(new Uri(builder.Configuration["Blob:ServiceUri"]!), credential);
-builder.Services.AddSingleton(blobClient);
-
-// ── Domain Repositories ────────────────────────────────────────────────────
-builder.Services.AddScoped<ITagsRepository>(sp =>
-    new CosmosTagsRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
-builder.Services.AddScoped<IEventRepository>(sp =>
-    new CosmosEventRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
-builder.Services.AddScoped<IGameDetailsRepository>(sp =>
-    new CosmosGameDetailsRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
-builder.Services.AddScoped<IGameStatsRepository>(sp =>
-    new CosmosGameStatsRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
-
-// ── Caching ────────────────────────────────────────────────────────────────
-builder.Services.AddSingleton<IDistributedCache, BlobDistributedCache>();
-builder.Services.AddFusionCache()
-    .WithSystemTextJsonSerializer()
-    .WithRegisteredDistributedCache();
-
-// ── Forwarded Headers ─────────────────────────────────────────────────────
-// In production/staging all traffic arrives through the ACA LB. ForwardLimit=1
-// ensures only the LB-appended (rightmost) X-Forwarded-For entry is trusted,
-// so a client-crafted header earlier in the chain is ignored.
-// Both the options and the middleware are scoped to production/staging only;
-// in dev/test RemoteIpAddress is already the real client address with no proxy.
-//
-// When ForwardedHeaders:KnownNetworks is configured (CIDR list), only proxies in
-// those ranges are trusted. When unset, we clear KnownNetworks/KnownProxies as
-// recommended for ACA (proxy IPs are dynamic/platform-managed).
-var isBehindProxy = builder.Environment.IsProduction() || builder.Environment.IsEnvironment("Staging");
-if (isBehindProxy)
-{
-    var knownNetworks = builder.Configuration.GetSection("ForwardedHeaders:KnownNetworks").Get<string[]>();
-    builder.Services.Configure<ForwardedHeadersOptions>(options =>
-    {
-        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
-        options.ForwardLimit = 1;
-
-        if (knownNetworks is { Length: > 0 })
-        {
-            options.KnownIPNetworks.Clear();
-            options.KnownProxies.Clear();
-            foreach (var cidr in knownNetworks)
-            {
-                options.KnownIPNetworks.Add(System.Net.IPNetwork.Parse(cidr));
-            }
-        }
-        else
-        {
-            // ACA default: proxy IPs are dynamic, trust any source with ForwardLimit=1
-            options.KnownIPNetworks.Clear();
-            options.KnownProxies.Clear();
-        }
-    });
-}
-
-// ── Rate Limiting ──────────────────────────────────────────────────────────
-builder.Services.AddRateLimiter(options =>
-{
-    options.AddPolicy("event-data", httpContext =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
-            _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 60,
-                Window = TimeSpan.FromMinutes(1),
-                QueueLimit = 0,
-            }));
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-});
-
-// ── BGG Client & Services ──────────────────────────────────────────────────
-var bggApiToken = builder.Configuration["Bgg:ApiToken"];
-if (string.IsNullOrEmpty(bggApiToken)
-    && (builder.Environment.IsProduction() || builder.Environment.IsEnvironment("Staging")))
-    throw new InvalidOperationException("Bgg:ApiToken configuration is required.");
-builder.Services.AddBggClient(bggApiToken ?? "");
-builder.Services.AddScoped<IBggThingService, BggThingService>();
-builder.Services.AddScoped<IBggGeeklistService>(sp =>
-    new BggGeeklistService(
-        sp.GetRequiredService<BggClient>(),
-        sp.GetRequiredService<IBggThingService>(),
-        sp.GetRequiredService<IFusionCache>(),
-        builder.Configuration.GetValue("Bgg:CacheCheckIntervalMinutes", 30)));
-
-// ── Application Services ───────────────────────────────────────────────────
 builder.Services.AddScoped<TagsService>();
 builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<EventDataService>();
 
-// ── Authentication ─────────────────────────────────────────────────────────
-var authBuilder = builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
-.AddCookie(options =>
-{
-    options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-    options.LoginPath = "/.auth/login/google";
-    options.Events.OnRedirectToLogin = ctx =>
-    {
-        ctx.Response.StatusCode = 401;
-        return Task.CompletedTask;
-    };
-});
-
-var googleClientId = builder.Configuration["Auth:Google:ClientId"];
-if (!string.IsNullOrEmpty(googleClientId))
-    authBuilder.AddGoogle(options =>
-    {
-        options.ClientId = googleClientId;
-        options.ClientSecret = builder.Configuration["Auth:Google:ClientSecret"]!;
-        options.Events.OnCreatingTicket = ctx =>
-        {
-            if (ctx.User.TryGetProperty("picture", out var pic) && pic.ValueKind == System.Text.Json.JsonValueKind.String)
-                ctx.Identity!.AddClaim(new System.Security.Claims.Claim("picture", pic.GetString()!));
-            ctx.Identity!.AddClaim(new System.Security.Claims.Claim("idp", "google"));
-            return Task.CompletedTask;
-        };
-    });
-
-var facebookClientId = builder.Configuration["Auth:Facebook:ClientId"];
-if (!string.IsNullOrEmpty(facebookClientId))
-    authBuilder.AddFacebook(options =>
-    {
-        options.ClientId = facebookClientId;
-        options.ClientSecret = builder.Configuration["Auth:Facebook:ClientSecret"]!;
-        options.Events.OnCreatingTicket = ctx =>
-        {
-            ctx.Identity!.AddClaim(new System.Security.Claims.Claim("idp", "facebook"));
-            return Task.CompletedTask;
-        };
-    });
-
-var discordClientId = builder.Configuration["Auth:Discord:ClientId"];
-if (!string.IsNullOrEmpty(discordClientId))
-    authBuilder.AddDiscord(options =>
-    {
-        options.ClientId = discordClientId;
-        options.ClientSecret = builder.Configuration["Auth:Discord:ClientSecret"]!;
-        options.Scope.Add("identify");
-        options.Scope.Add("email");
-        options.Events.OnCreatingTicket = ctx =>
-        {
-            if (ctx.User.TryGetProperty("avatar", out var avatar) && avatar.ValueKind == System.Text.Json.JsonValueKind.String)
-                ctx.Identity!.AddClaim(new System.Security.Claims.Claim("avatar", avatar.GetString()!));
-            ctx.Identity!.AddClaim(new System.Security.Claims.Claim("idp", "discord"));
-            return Task.CompletedTask;
-        };
-    });
-
-// ── Data Protection ────────────────────────────────────────────────────────
-var dpBlobUri = builder.Configuration["DataProtection:BlobUri"];
-var dpKeyUri = builder.Configuration["DataProtection:KeyVaultKeyUri"];
-if (dpBlobUri is not null && dpKeyUri is not null)
-{
-    var dpBlob = new Azure.Storage.Blobs.BlobClient(new Uri(dpBlobUri), credential);
-    builder.Services.AddDataProtection()
-        .PersistKeysToAzureBlobStorage(dpBlob)
-        .ProtectKeysWithAzureKeyVault(new Uri(dpKeyUri), credential);
-}
-
+builder.Services.AddAuthServices(builder.Configuration, credential);
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -217,7 +32,8 @@ if (!app.Environment.IsEnvironment("Testing"))
         .GetBlobContainerClient("cache")
         .CreateIfNotExistsAsync();
 
-if (isBehindProxy) app.UseForwardedHeaders();
+if (app.Environment.IsProduction() || app.Environment.IsEnvironment("Staging"))
+    app.UseForwardedHeaders();
 app.UseMiddleware<EventMiddleware>();
 app.UseStaticFiles();
 app.UseRateLimiter();
