@@ -67,6 +67,7 @@ public sealed class BggGeeklistService : IBggGeeklistService
 
                 return new EventData
                 {
+                    SlugValue = geeklistId.ToString(),
                     Title = geeklist.Title,
                     EditTimestamp = geeklist.EditTimestamp,
                     GamesJson = JsonSerializer.Serialize(entries),
@@ -83,6 +84,7 @@ public sealed class BggGeeklistService : IBggGeeklistService
             },
             ct);
 
-        return data is null ? null : data with { SlugValue = slug.Value };
+        return data is null ? null :
+            data.SlugValue == slug.Value ? data : data with { SlugValue = slug.Value };
     }
 }
