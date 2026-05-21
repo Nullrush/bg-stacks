@@ -56,7 +56,7 @@ public sealed class BlobDistributedCache : IDistributedCache
     {
         using var stream = new MemoryStream(value);
         _container.GetBlobClient(key).Upload(stream,
-            new BlobUploadOptions { Metadata = BuildMetadata(options) });
+            new BlobUploadOptions { Metadata = BuildMetadata(options), Conditions = new BlobRequestConditions() });
     }
 
     public async Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options,
@@ -64,7 +64,7 @@ public sealed class BlobDistributedCache : IDistributedCache
     {
         using var stream = new MemoryStream(value);
         await _container.GetBlobClient(key).UploadAsync(stream,
-            new BlobUploadOptions { Metadata = BuildMetadata(options) }, token);
+            new BlobUploadOptions { Metadata = BuildMetadata(options), Conditions = new BlobRequestConditions() }, token);
     }
 
     public void Remove(string key) => _container.GetBlobClient(key).DeleteIfExists();
@@ -117,17 +117,19 @@ public sealed class BlobDistributedCache : IDistributedCache
                 ? DateTimeOffset.UtcNow + options.AbsoluteExpirationRelativeToNow.Value
                 : (DateTimeOffset?)null);
 
-        DateTimeOffset? expiry = absoluteDeadline
-            ?? (options.SlidingExpiration.HasValue
-                ? DateTimeOffset.UtcNow + options.SlidingExpiration.Value
-                : (DateTimeOffset?)null);
+        // When both are set, expires = min(now+sliding, absolute) so sliding window is respected
+        DateTimeOffset? expiry = null;
+        if (absoluteDeadline.HasValue) expiry = absoluteDeadline;
+        if (options.SlidingExpiration.HasValue)
+        {
+            var slidingExpiry = DateTimeOffset.UtcNow + options.SlidingExpiration.Value;
+            expiry = expiry.HasValue && expiry.Value < slidingExpiry ? expiry : slidingExpiry;
+        }
 
-        if (!expiry.HasValue && !options.SlidingExpiration.HasValue)
+        if (!expiry.HasValue)
             return null;
 
-        var metadata = new Dictionary<string, string>();
-        if (expiry.HasValue)
-            metadata[ExpiresKey] = expiry.Value.UtcTicks.ToString();
+        var metadata = new Dictionary<string, string> { [ExpiresKey] = expiry.Value.UtcTicks.ToString() };
         if (options.SlidingExpiration.HasValue)
             metadata[SlidingKey] = options.SlidingExpiration.Value.Ticks.ToString();
         if (absoluteDeadline.HasValue && options.SlidingExpiration.HasValue)
