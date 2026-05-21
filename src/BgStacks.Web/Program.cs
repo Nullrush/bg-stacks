@@ -68,15 +68,34 @@ builder.Services.AddFusionCache()
 // so a client-crafted header earlier in the chain is ignored.
 // Both the options and the middleware are scoped to production/staging only;
 // in dev/test RemoteIpAddress is already the real client address with no proxy.
+//
+// When ForwardedHeaders:KnownNetworks is configured (CIDR list), only proxies in
+// those ranges are trusted. When unset, we clear KnownNetworks/KnownProxies as
+// recommended for ACA (proxy IPs are dynamic/platform-managed).
 var isBehindProxy = builder.Environment.IsProduction() || builder.Environment.IsEnvironment("Staging");
 if (isBehindProxy)
 {
+    var knownNetworks = builder.Configuration.GetSection("ForwardedHeaders:KnownNetworks").Get<string[]>();
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
     {
         options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
         options.ForwardLimit = 1;
-        options.KnownIPNetworks.Clear();
-        options.KnownProxies.Clear();
+
+        if (knownNetworks is { Length: > 0 })
+        {
+            options.KnownIPNetworks.Clear();
+            options.KnownProxies.Clear();
+            foreach (var cidr in knownNetworks)
+            {
+                options.KnownIPNetworks.Add(System.Net.IPNetwork.Parse(cidr));
+            }
+        }
+        else
+        {
+            // ACA default: proxy IPs are dynamic, trust any source with ForwardLimit=1
+            options.KnownIPNetworks.Clear();
+            options.KnownProxies.Clear();
+        }
     });
 }
 
