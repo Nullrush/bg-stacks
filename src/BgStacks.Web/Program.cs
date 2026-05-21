@@ -1,11 +1,13 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
+using BggSdk;
 using Microsoft.AspNetCore.DataProtection;
 using BgStacks.Web.Application.Events;
 using BgStacks.Web.Application.Tags;
 using BgStacks.Web.Domain.Events;
 using BgStacks.Web.Domain.Tags;
 using BgStacks.Web.Infrastructure.Auth;
+using BgStacks.Web.Infrastructure.Cache;
 using BgStacks.Web.Infrastructure.Events;
 using BgStacks.Web.Infrastructure.Tags;
 using BgStacks.Web.Presentation.Api;
@@ -13,6 +15,8 @@ using BgStacks.Web.Presentation.Auth;
 using BgStacks.Web.Presentation.Events;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Caching.Distributed;
+using ZiggyCreatures.Caching.Fusion;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,14 +49,36 @@ builder.Services.AddScoped<ITagsRepository>(sp =>
     new CosmosTagsRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
 builder.Services.AddScoped<IEventRepository>(sp =>
     new CosmosEventRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
-builder.Services.AddSingleton<IEventDataRepository>(sp =>
-    new BlobEventDataRepository(sp.GetRequiredService<BlobServiceClient>()));
+builder.Services.AddScoped<IGameDetailsRepository>(sp =>
+    new CosmosGameDetailsRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
+builder.Services.AddScoped<IGameStatsRepository>(sp =>
+    new CosmosGameStatsRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
+
+// ── Caching ────────────────────────────────────────────────────────────────
+builder.Services.AddSingleton<IDistributedCache, BlobDistributedCache>();
+builder.Services.AddFusionCache()
+    .WithSystemTextJsonSerializer()
+    .WithRegisteredDistributedCache();
+
+// ── BGG Client & Services ──────────────────────────────────────────────────
+var bggApiToken = builder.Configuration["Bgg:ApiToken"] ?? "";
+builder.Services.AddBggClient(bggApiToken);
+builder.Services.AddScoped<IBggThingService>(sp =>
+    new BggThingService(
+        sp.GetRequiredService<BggClient>(),
+        sp.GetRequiredService<IGameDetailsRepository>(),
+        sp.GetRequiredService<IGameStatsRepository>()));
+builder.Services.AddScoped<IBggGeeklistService>(sp =>
+    new BggGeeklistService(
+        sp.GetRequiredService<BggClient>(),
+        sp.GetRequiredService<IBggThingService>(),
+        sp.GetRequiredService<IFusionCache>(),
+        builder.Configuration.GetValue("Bgg:CacheCheckIntervalMinutes", 30)));
 
 // ── Application Services ───────────────────────────────────────────────────
 builder.Services.AddScoped<TagsService>();
 builder.Services.AddScoped<EventService>();
-builder.Services.AddSingleton<EventDataService>();
-builder.Services.AddMemoryCache();
+builder.Services.AddScoped<EventDataService>();
 
 // ── Authentication ─────────────────────────────────────────────────────────
 var authBuilder = builder.Services.AddAuthentication(options =>
@@ -133,6 +159,10 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+await app.Services.GetRequiredService<BlobServiceClient>()
+    .GetBlobContainerClient("cache")
+    .CreateIfNotExistsAsync();
+
 app.UseMiddleware<EventMiddleware>();
 app.UseStaticFiles();
 app.UseAuthentication();
@@ -144,14 +174,26 @@ app.MapEventsEndpoints();
 app.MapGameDataEndpoints();
 
 // SPA fallback: event subdomain → index.html, root domain → home.html
-app.MapFallback(async (HttpContext ctx) =>
+app.MapFallback(async (HttpContext ctx, EventDataService eventDataService) =>
 {
     var slug = ctx.Items[EventMiddleware.SlugKey];
-    var file = slug is not null ? "index.html" : "home.html";
-    var path = Path.Combine(app.Environment.WebRootPath, file);
-    if (!File.Exists(path)) { ctx.Response.StatusCode = 404; return; }
+
+    if (slug is null)
+    {
+        var homePath = Path.Combine(app.Environment.WebRootPath, "home.html");
+        if (!File.Exists(homePath)) { ctx.Response.StatusCode = 404; return; }
+        ctx.Response.ContentType = "text/html";
+        await ctx.Response.SendFileAsync(homePath);
+        return;
+    }
+
+    var eventData = await eventDataService.GetEventDataAsync((EventSlug)slug, ctx.RequestAborted);
+    if (eventData is null) { ctx.Response.StatusCode = 404; return; }
+
+    var indexPath = Path.Combine(app.Environment.WebRootPath, "index.html");
+    if (!File.Exists(indexPath)) { ctx.Response.StatusCode = 404; return; }
     ctx.Response.ContentType = "text/html";
-    await ctx.Response.SendFileAsync(path);
+    await ctx.Response.SendFileAsync(indexPath);
 });
 
 app.Run();
