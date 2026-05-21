@@ -50,7 +50,7 @@ public sealed class BggThingService : IBggThingService
                     thing.MinPlayers, thing.MaxPlayers,
                     thing.MinPlayTime, thing.MaxPlayTime,
                     thing.Mechanics, thing.Categories,
-                    thing.Thumbnail), ct);
+                    thing.Thumbnail, thing.YearPublished), ct);
 
             if (missingStats.Contains(thing.Id))
                 await _stats.UpsertAsync(GameStatsDocument.FromThing(
@@ -109,7 +109,8 @@ public sealed class BggThingService : IBggThingService
             Mechanics = detail.Mechanics,
             Categories = detail.Categories,
             Thumbnail = detail.Thumbnail,
-            Body = body,
+            YearPublished = detail.YearPublished,
+            Description = body,
         };
     }
 }

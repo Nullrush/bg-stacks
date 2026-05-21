@@ -77,12 +77,13 @@ public sealed class GameDetailsDocument
     [JsonPropertyName("maxTime")]     public int MaxTime { get; set; }
     [JsonPropertyName("mechanics")]   public List<string> Mechanics { get; set; } = [];
     [JsonPropertyName("categories")]  public List<string> Categories { get; set; } = [];
-    [JsonPropertyName("thumbnail")]   public string? Thumbnail { get; set; }
+    [JsonPropertyName("thumbnail")]    public string? Thumbnail { get; set; }
+    [JsonPropertyName("yearPublished")] public int? YearPublished { get; set; }
 
     public static GameDetailsDocument FromThing(int id, string name,
         int minPlayers, int maxPlayers, int minTime, int maxTime,
         IEnumerable<string> mechanics, IEnumerable<string> categories,
-        string? thumbnail) => new()
+        string? thumbnail, int? yearPublished) => new()
     {
         Id = id.ToString(),
         Name = name,
@@ -93,5 +94,6 @@ public sealed class GameDetailsDocument
         Mechanics = mechanics.ToList(),
         Categories = categories.ToList(),
         Thumbnail = thumbnail,
+        YearPublished = yearPublished,
     };
 }

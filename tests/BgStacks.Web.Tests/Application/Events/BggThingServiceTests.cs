@@ -245,7 +245,7 @@ public class BggThingServiceTests
         entry.Players.Should().Be("2-4");
         entry.Time.Should().Be("60-90");
         entry.AvgRating.Should().Be(8.5);
-        entry.Body.Should().Be("A great game about searching for ET.");
+        entry.Description.Should().Be("A great game about searching for ET.");
     }
 
     [Fact]

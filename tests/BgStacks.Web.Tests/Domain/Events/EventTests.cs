@@ -35,10 +35,22 @@ public class EventTests
     [InlineData("42")]
     [InlineData("12345")]
     [InlineData("0")]
-    public void Constructor_NumericSlug_Throws(string numericSlug)
+    public void Create_NumericSlug_Throws(string numericSlug)
     {
         var slug = EventSlug.From(numericSlug);
-        var act = () => new Event(slug, "Some Event", new DateOnly(2026, 6, 1), true);
+        var act = () => Event.Create(slug, "Some Event", new DateOnly(2026, 6, 1), true);
         act.Should().Throw<ArgumentException>().WithMessage("*numeric*");
+    }
+
+    [Theory]
+    [InlineData("42")]
+    [InlineData("12345")]
+    [InlineData("0")]
+    public void Constructor_NumericSlug_DoesNotThrow(string numericSlug)
+    {
+        // Constructor is the deserialization path — must not throw on numeric slugs.
+        var slug = EventSlug.From(numericSlug);
+        var act = () => new Event(slug, "Some Event", new DateOnly(2026, 6, 1), true);
+        act.Should().NotThrow();
     }
 }

@@ -23,5 +23,6 @@ public sealed class GameEntry
     [JsonPropertyName("mechanics")]          public IReadOnlyList<string> Mechanics { get; init; } = [];
     [JsonPropertyName("categories")]         public IReadOnlyList<string> Categories { get; init; } = [];
     [JsonPropertyName("thumbnail")]          public string? Thumbnail { get; init; }
-    [JsonPropertyName("body")]               public string Body { get; init; } = "";
+    [JsonPropertyName("yearPublished")]       public int? YearPublished { get; init; }
+    [JsonPropertyName("description")]         public string Description { get; init; } = "";
 }

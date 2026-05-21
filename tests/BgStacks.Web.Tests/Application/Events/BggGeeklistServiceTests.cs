@@ -50,7 +50,7 @@ public class BggGeeklistServiceTests
         AvgRating = 8.5, GeekRating = 7.9, Votes = 1000, Weight = 3.2, BggRank = 15,
         SubRanks = new Dictionary<string, int?>(), Mechanics = ["Worker Placement"],
         Categories = ["Strategy"], BestPlayers = [], RecommendedPlayers = [],
-        Body = "Donated by someone",
+        Description = "Donated by someone",
     };
 
     [Fact]

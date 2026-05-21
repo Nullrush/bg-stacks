@@ -49,6 +49,7 @@ internal static class ThingParser
             Id:                     (int)e.Attribute("id")!,
             Name:                   name,
             Thumbnail:              (string?)e.Element("thumbnail"),
+            YearPublished:          NullableIntAttr(e.Element("yearpublished"), "value"),
             MinPlayers:             IntAttr(e.Element("minplayers"), "value"),
             MaxPlayers:             IntAttr(e.Element("maxplayers"), "value"),
             PlayingTime:            IntAttr(e.Element("playingtime"), "value"),
@@ -154,6 +155,9 @@ internal static class ThingParser
 
     private static int IntAttr(XElement? el, string attr)
         => el is not null && int.TryParse((string?)el.Attribute(attr), out var v) ? v : 0;
+
+    private static int? NullableIntAttr(XElement? el, string attr)
+        => el is not null && int.TryParse((string?)el.Attribute(attr), out var v) ? v : (int?)null;
 
     private static double DoubleAttr(XElement? el, string attr)
         => el is not null && double.TryParse(

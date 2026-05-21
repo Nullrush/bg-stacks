@@ -230,26 +230,18 @@ app.MapEventsEndpoints();
 app.MapGameDataEndpoints();
 
 // SPA fallback: event subdomain → index.html, root domain → home.html
-app.MapFallback(async (HttpContext ctx, EventDataService eventDataService) =>
+app.MapFallback(async (HttpContext ctx) =>
 {
     var slug = ctx.Items[EventMiddleware.SlugKey];
 
-    if (slug is null)
-    {
-        var homePath = Path.Combine(app.Environment.WebRootPath, "home.html");
-        if (!File.Exists(homePath)) { ctx.Response.StatusCode = 404; return; }
-        ctx.Response.ContentType = "text/html";
-        await ctx.Response.SendFileAsync(homePath);
-        return;
-    }
-
-    var eventData = await eventDataService.GetEventDataAsync((EventSlug)slug, ctx.RequestAborted);
-    if (eventData is null) { ctx.Response.StatusCode = 404; return; }
-
-    var indexPath = Path.Combine(app.Environment.WebRootPath, "index.html");
-    if (!File.Exists(indexPath)) { ctx.Response.StatusCode = 404; return; }
+    // Serve the shell unconditionally: the rate-limited /games.json endpoint gates
+    // actual data and returns 404 for unknown slugs. Calling GetEventDataAsync here
+    // would couple shell delivery to a live BGG round-trip and bypass rate limiting.
+    var file = slug is null ? "home.html" : "index.html";
+    var filePath = Path.Combine(app.Environment.WebRootPath, file);
+    if (!File.Exists(filePath)) { ctx.Response.StatusCode = 404; return; }
     ctx.Response.ContentType = "text/html";
-    await ctx.Response.SendFileAsync(indexPath);
+    await ctx.Response.SendFileAsync(filePath);
 });
 
 app.Run();
