@@ -43,16 +43,16 @@ public sealed class BggThingService : IBggThingService
     public async Task<IReadOnlyList<GameEntry>> GetGameEntriesAsync(
         IReadOnlyList<(int ObjectId, string Body)> items, CancellationToken ct = default)
     {
-        var detailTasks = items.Select(item => _details.GetAsync(item.ObjectId, ct)).ToArray();
-        var statTasks = items.Select(item => _stats.GetAsync(item.ObjectId, ct)).ToArray();
-        var details = await Task.WhenAll(detailTasks);
-        var stats = await Task.WhenAll(statTasks);
+        var ids = items.Select(i => i.ObjectId).ToList();
+        var detailMap = await _details.GetManyAsync(ids, ct);
+        var statMap = await _stats.GetManyAsync(ids, ct);
 
         var entries = new List<GameEntry>(items.Count);
-        for (var i = 0; i < items.Count; i++)
+        foreach (var (objectId, body) in items)
         {
-            if (details[i] is null) continue;
-            entries.Add(BuildEntry(items[i].ObjectId, details[i]!, stats[i], items[i].Body));
+            if (!detailMap.TryGetValue(objectId, out var detail)) continue;
+            statMap.TryGetValue(objectId, out var stat);
+            entries.Add(BuildEntry(objectId, detail, stat, body));
         }
         return entries;
     }

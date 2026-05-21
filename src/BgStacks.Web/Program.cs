@@ -61,8 +61,8 @@ builder.Services.AddFusionCache()
     .WithRegisteredDistributedCache();
 
 // ── BGG Client & Services ──────────────────────────────────────────────────
-var bggApiToken = builder.Configuration["Bgg:ApiToken"] ?? "";
-builder.Services.AddBggClient(bggApiToken);
+var bggApiToken = builder.Configuration["Bgg:ApiToken"];
+builder.Services.AddBggClient(bggApiToken ?? "");
 builder.Services.AddScoped<IBggThingService>(sp =>
     new BggThingService(
         sp.GetRequiredService<BggClient>(),

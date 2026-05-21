@@ -80,12 +80,12 @@ public sealed class BlobDistributedCache : IDistributedCache
                 ? DateTimeOffset.UtcNow + options.AbsoluteExpirationRelativeToNow.Value
                 : null);
         return expiry.HasValue
-            ? new Dictionary<string, string> { [ExpiresKey] = expiry.Value.Ticks.ToString() }
+            ? new Dictionary<string, string> { [ExpiresKey] = expiry.Value.UtcTicks.ToString() }
             : null;
     }
 
     private static bool IsExpired(IDictionary<string, string> metadata)
         => metadata.TryGetValue(ExpiresKey, out var s)
             && long.TryParse(s, out var ticks)
-            && DateTimeOffset.UtcNow.Ticks >= ticks;
+            && DateTimeOffset.UtcNow.UtcTicks >= ticks;
 }

@@ -11,6 +11,23 @@ public sealed class CosmosGameStatsRepository : IGameStatsRepository
     public CosmosGameStatsRepository(CosmosClient client, string databaseId)
         => _container = client.GetContainer(databaseId, "game-stats");
 
+    public async Task<IReadOnlyDictionary<int, GameStatsDocument>> GetManyAsync(
+        IEnumerable<int> ids, CancellationToken ct = default)
+    {
+        var pairs = ids.Distinct().Select(id => (id.ToString(), new PartitionKey(id.ToString()))).ToList();
+        if (pairs.Count == 0) return new Dictionary<int, GameStatsDocument>();
+
+        var result = new Dictionary<int, GameStatsDocument>();
+        foreach (var chunk in pairs.Chunk(100))
+        {
+            var response = await _container.ReadManyItemsAsync<GameStatsDocument>(chunk, cancellationToken: ct);
+            foreach (var doc in response)
+                if (int.TryParse(doc.Id, out var numId))
+                    result[numId] = doc;
+        }
+        return result;
+    }
+
     public async Task UpsertAsync(GameStatsDocument doc, CancellationToken ct = default)
         => await _container.UpsertItemAsync(doc, new PartitionKey(doc.Id), cancellationToken: ct);
 

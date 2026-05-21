@@ -13,15 +13,35 @@ public sealed class CosmosGameDetailsRepository : IGameDetailsRepository
 
     public async Task<IReadOnlySet<int>> GetExistingIdsAsync(IEnumerable<int> ids, CancellationToken ct = default)
     {
-        var pairs = ids.Select(id => (id.ToString(), new PartitionKey(id.ToString()))).ToList();
+        var pairs = ids.Distinct().Select(id => (id.ToString(), new PartitionKey(id.ToString()))).ToList();
         if (pairs.Count == 0) return new HashSet<int>();
 
-        var response = await _container.ReadManyItemsAsync<IdProjection>(pairs, cancellationToken: ct);
         var found = new HashSet<int>();
-        foreach (var item in response)
-            if (int.TryParse(item.Id, out var numId))
-                found.Add(numId);
+        foreach (var chunk in pairs.Chunk(100))
+        {
+            var response = await _container.ReadManyItemsAsync<IdProjection>(chunk, cancellationToken: ct);
+            foreach (var item in response)
+                if (int.TryParse(item.Id, out var numId))
+                    found.Add(numId);
+        }
         return found;
+    }
+
+    public async Task<IReadOnlyDictionary<int, GameDetailsDocument>> GetManyAsync(
+        IEnumerable<int> ids, CancellationToken ct = default)
+    {
+        var pairs = ids.Distinct().Select(id => (id.ToString(), new PartitionKey(id.ToString()))).ToList();
+        if (pairs.Count == 0) return new Dictionary<int, GameDetailsDocument>();
+
+        var result = new Dictionary<int, GameDetailsDocument>();
+        foreach (var chunk in pairs.Chunk(100))
+        {
+            var response = await _container.ReadManyItemsAsync<GameDetailsDocument>(chunk, cancellationToken: ct);
+            foreach (var doc in response)
+                if (int.TryParse(doc.Id, out var numId))
+                    result[numId] = doc;
+        }
+        return result;
     }
 
     public async Task UpsertAsync(GameDetailsDocument doc, CancellationToken ct = default)

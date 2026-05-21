@@ -148,8 +148,10 @@ public class BggThingServiceTests
             RecommendedPlayers = [2, 3],
         };
 
-        detailsRepo.GetAsync(42, Arg.Any<CancellationToken>()).Returns(detail);
-        statsRepo.GetAsync(42, Arg.Any<CancellationToken>()).Returns(stat);
+        detailsRepo.GetManyAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new Dictionary<int, GameDetailsDocument> { [42] = detail });
+        statsRepo.GetManyAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new Dictionary<int, GameStatsDocument> { [42] = stat });
 
         var handler = new TestHttpMessageHandler();
         var sut = new BggThingService(MakeBggClient(handler), detailsRepo, statsRepo);
@@ -182,8 +184,10 @@ public class BggThingServiceTests
             MaxTime = 90,
         };
 
-        detailsRepo.GetAsync(42, Arg.Any<CancellationToken>()).Returns(detail);
-        statsRepo.GetAsync(42, Arg.Any<CancellationToken>()).Returns((GameStatsDocument?)null);
+        detailsRepo.GetManyAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new Dictionary<int, GameDetailsDocument> { [42] = detail });
+        statsRepo.GetManyAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new Dictionary<int, GameStatsDocument>());
 
         var handler = new TestHttpMessageHandler();
         var sut = new BggThingService(MakeBggClient(handler), detailsRepo, statsRepo);
