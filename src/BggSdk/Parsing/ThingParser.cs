@@ -67,6 +67,15 @@ internal static class ThingParser
         );
     }
 
+    // BGG XML uses verbose rank names; normalize to the compact keys the UI expects.
+    private static readonly Dictionary<string, string> SubRankKeyMap = new()
+    {
+        ["childrensgames"] = "childrens",
+        ["familygames"]    = "family",
+        ["partygames"]     = "party",
+        ["strategygames"]  = "strategy",
+    };
+
     private static (double avg, double bayes, int users, double weight, int? bggRank,
                     IReadOnlyDictionary<string, int?> subRanks)
         ParseStats(XElement? ratings)
@@ -86,7 +95,7 @@ internal static class ThingParser
             if (type == "subtype" && rname == "boardgame")
                 bggRank = val;
             else if (type == "family")
-                subRanks[rname] = val;
+                subRanks[SubRankKeyMap.TryGetValue(rname, out var mapped) ? mapped : rname] = val;
         }
 
         return (

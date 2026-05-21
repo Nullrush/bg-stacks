@@ -223,7 +223,7 @@ public class BggThingServiceTests
             Votes = 1000,
             Weight = 3.2,
             BggRank = 15,
-            SubRanks = new Dictionary<string, int?> { ["strategygames"] = 5 },
+            SubRanks = new Dictionary<string, int?> { ["strategy"] = 5 },
             BestPlayers = [3],
             RecommendedPlayers = [2, 3],
         };

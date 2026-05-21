@@ -23,7 +23,9 @@ public class BggGeeklistServiceTests
             <username>testuser</username>
             <title>Test Geeklist</title>
             <item id="1" objecttype="thing" objectid="{objectId}" objectname="Test Game"
-                  subtype="boardgame" body="Donated by someone" />
+                  subtype="boardgame">
+                <body>Donated by someone</body>
+            </item>
         </geeklist>
         """;
 

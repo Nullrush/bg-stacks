@@ -16,6 +16,7 @@ using BgStacks.Web.Presentation.Events;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.AspNetCore.HttpOverrides;
 using System.Threading.RateLimiting;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -60,6 +61,16 @@ builder.Services.AddSingleton<IDistributedCache, BlobDistributedCache>();
 builder.Services.AddFusionCache()
     .WithSystemTextJsonSerializer()
     .WithRegisteredDistributedCache();
+
+// ── Forwarded Headers ─────────────────────────────────────────────────────
+// Azure Container Apps terminate TLS at the LB and forward the real client IP
+// via X-Forwarded-For. Clear KnownNetworks/KnownProxies so all proxies are trusted.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // ── Rate Limiting ──────────────────────────────────────────────────────────
 builder.Services.AddRateLimiter(options =>
@@ -179,6 +190,7 @@ if (!app.Environment.IsEnvironment("Testing"))
         .GetBlobContainerClient("cache")
         .CreateIfNotExistsAsync();
 
+app.UseForwardedHeaders();
 app.UseMiddleware<EventMiddleware>();
 app.UseStaticFiles();
 app.UseRateLimiter();
