@@ -13,7 +13,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     public InMemoryTagsRepository TagsRepository { get; } = new();
     public InMemoryEventRepository EventRepository { get; } = new();
-    public InMemoryEventDataRepository EventDataRepository { get; } = new();
+    public InMemoryBggGeeklistService BggGeeklistService { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -23,13 +23,11 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         {
             services.RemoveAll<ITagsRepository>();
             services.RemoveAll<IEventRepository>();
-            services.RemoveAll<IEventDataRepository>();
-            services.RemoveAll<EventDataService>();
+            services.RemoveAll<IBggGeeklistService>();
 
             services.AddScoped<ITagsRepository>(_ => TagsRepository);
             services.AddScoped<IEventRepository>(_ => EventRepository);
-            services.AddSingleton<IEventDataRepository>(_ => EventDataRepository);
-            services.AddSingleton<EventDataService>();
+            services.AddScoped<IBggGeeklistService>(_ => BggGeeklistService);
 
             services.AddAuthentication(options =>
             {

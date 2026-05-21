@@ -49,6 +49,7 @@ internal static class ThingParser
             Id:                     (int)e.Attribute("id")!,
             Name:                   name,
             Thumbnail:              (string?)e.Element("thumbnail"),
+            YearPublished:          NullableIntAttr(e.Element("yearpublished"), "value"),
             MinPlayers:             IntAttr(e.Element("minplayers"), "value"),
             MaxPlayers:             IntAttr(e.Element("maxplayers"), "value"),
             PlayingTime:            IntAttr(e.Element("playingtime"), "value"),
@@ -66,6 +67,17 @@ internal static class ThingParser
             RecommendedPlayerCounts: recommendedPlayers
         );
     }
+
+    // BGG XML uses verbose rank names; normalize to the compact keys the UI expects.
+    // Keys not listed here (thematic, wargames, cgs) already match the UI schema.
+    private static readonly Dictionary<string, string> SubRankKeyMap = new()
+    {
+        ["abstractgames"]  = "abstracts",
+        ["childrensgames"] = "childrens",
+        ["familygames"]    = "family",
+        ["partygames"]     = "party",
+        ["strategygames"]  = "strategy",
+    };
 
     private static (double avg, double bayes, int users, double weight, int? bggRank,
                     IReadOnlyDictionary<string, int?> subRanks)
@@ -86,7 +98,7 @@ internal static class ThingParser
             if (type == "subtype" && rname == "boardgame")
                 bggRank = val;
             else if (type == "family")
-                subRanks[rname] = val;
+                subRanks[SubRankKeyMap.TryGetValue(rname, out var mapped) ? mapped : rname] = val;
         }
 
         return (
@@ -143,6 +155,9 @@ internal static class ThingParser
 
     private static int IntAttr(XElement? el, string attr)
         => el is not null && int.TryParse((string?)el.Attribute(attr), out var v) ? v : 0;
+
+    private static int? NullableIntAttr(XElement? el, string attr)
+        => el is not null && int.TryParse((string?)el.Attribute(attr), out var v) ? v : (int?)null;
 
     private static double DoubleAttr(XElement? el, string attr)
         => el is not null && double.TryParse(

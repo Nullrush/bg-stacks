@@ -8,13 +8,13 @@ public static class GamesJsonEndpoint
     public static IEndpointRouteBuilder MapGameDataEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapGet("/games.json", (HttpContext ctx, EventDataService service) =>
-            ServeEventFile(ctx, service, data => data.GamesJson));
+            ServeEventFile(ctx, service, data => data.GamesJson)).RequireRateLimiting("event-data");
 
         app.MapGet("/mechanics.json", (HttpContext ctx, EventDataService service) =>
-            ServeEventFile(ctx, service, data => data.MechanicsJson));
+            ServeEventFile(ctx, service, data => data.MechanicsJson)).RequireRateLimiting("event-data");
 
         app.MapGet("/categories.json", (HttpContext ctx, EventDataService service) =>
-            ServeEventFile(ctx, service, data => data.CategoriesJson));
+            ServeEventFile(ctx, service, data => data.CategoriesJson)).RequireRateLimiting("event-data");
 
         return app;
     }
@@ -25,7 +25,7 @@ public static class GamesJsonEndpoint
         if (ctx.Items[EventMiddleware.SlugKey] is not EventSlug slug)
             return Results.NotFound();
 
-        var data = await service.GetEventDataAsync(slug);
+        var data = await service.GetEventDataAsync(slug, ctx.RequestAborted);
         return data is null
             ? Results.NotFound()
             : Results.Content(selector(data), "application/json");

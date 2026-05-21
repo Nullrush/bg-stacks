@@ -4,6 +4,7 @@ public sealed record Thing(
     int Id,
     string Name,
     string? Thumbnail,
+    int? YearPublished,
     int MinPlayers,
     int MaxPlayers,
     int PlayingTime,

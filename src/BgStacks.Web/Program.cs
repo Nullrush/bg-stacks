@@ -1,140 +1,42 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
-using Microsoft.AspNetCore.DataProtection;
 using BgStacks.Web.Application.Events;
 using BgStacks.Web.Application.Tags;
-using BgStacks.Web.Domain.Events;
-using BgStacks.Web.Domain.Tags;
+using BgStacks.Web.Infrastructure;
 using BgStacks.Web.Infrastructure.Auth;
 using BgStacks.Web.Infrastructure.Events;
-using BgStacks.Web.Infrastructure.Tags;
-using BgStacks.Web.Presentation.Api;
 using BgStacks.Web.Presentation.Auth;
 using BgStacks.Web.Presentation.Events;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Azure.Cosmos;
+using BgStacks.Web.Presentation.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var credential = new DefaultAzureCredential();
 
-// ── Cosmos DB ──────────────────────────────────────────────────────────────
-var cosmosDatabaseId = builder.Configuration["Cosmos:DatabaseId"] ?? "bgstacks";
-var cosmosConnStr = builder.Configuration["Cosmos:ConnectionString"];
-var cosmosOptions = new CosmosClientOptions
-{
-    UseSystemTextJsonSerializerWithOptions = new System.Text.Json.JsonSerializerOptions
-    {
-        PropertyNameCaseInsensitive = true,
-    },
-};
-var cosmosClient = cosmosConnStr is not null
-    ? new CosmosClient(cosmosConnStr, cosmosOptions)
-    : new CosmosClient(builder.Configuration["Cosmos:Endpoint"]!, credential, cosmosOptions);
-builder.Services.AddSingleton(cosmosClient);
+builder.Services.AddAzureInfrastructure(builder.Configuration, credential);
+builder.Services.AddProxyForwardedHeaders(builder.Configuration);
+builder.Services.AddEventDataRateLimiting();
+builder.Services.AddBggServices(builder.Configuration, builder.Environment);
 
-// ── Blob Storage ───────────────────────────────────────────────────────────
-var blobConnStr = builder.Configuration["Blob:ConnectionString"];
-var blobClient = blobConnStr is not null
-    ? new BlobServiceClient(blobConnStr)
-    : new BlobServiceClient(new Uri(builder.Configuration["Blob:ServiceUri"]!), credential);
-builder.Services.AddSingleton(blobClient);
-
-// ── Domain Repositories ────────────────────────────────────────────────────
-builder.Services.AddScoped<ITagsRepository>(sp =>
-    new CosmosTagsRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
-builder.Services.AddScoped<IEventRepository>(sp =>
-    new CosmosEventRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
-builder.Services.AddSingleton<IEventDataRepository>(sp =>
-    new BlobEventDataRepository(sp.GetRequiredService<BlobServiceClient>()));
-
-// ── Application Services ───────────────────────────────────────────────────
 builder.Services.AddScoped<TagsService>();
 builder.Services.AddScoped<EventService>();
-builder.Services.AddSingleton<EventDataService>();
-builder.Services.AddMemoryCache();
+builder.Services.AddScoped<EventDataService>();
 
-// ── Authentication ─────────────────────────────────────────────────────────
-var authBuilder = builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
-.AddCookie(options =>
-{
-    options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-    options.LoginPath = "/.auth/login/google";
-    options.Events.OnRedirectToLogin = ctx =>
-    {
-        ctx.Response.StatusCode = 401;
-        return Task.CompletedTask;
-    };
-});
-
-var googleClientId = builder.Configuration["Auth:Google:ClientId"];
-if (!string.IsNullOrEmpty(googleClientId))
-    authBuilder.AddGoogle(options =>
-    {
-        options.ClientId = googleClientId;
-        options.ClientSecret = builder.Configuration["Auth:Google:ClientSecret"]!;
-        options.Events.OnCreatingTicket = ctx =>
-        {
-            if (ctx.User.TryGetProperty("picture", out var pic) && pic.ValueKind == System.Text.Json.JsonValueKind.String)
-                ctx.Identity!.AddClaim(new System.Security.Claims.Claim("picture", pic.GetString()!));
-            ctx.Identity!.AddClaim(new System.Security.Claims.Claim("idp", "google"));
-            return Task.CompletedTask;
-        };
-    });
-
-var facebookClientId = builder.Configuration["Auth:Facebook:ClientId"];
-if (!string.IsNullOrEmpty(facebookClientId))
-    authBuilder.AddFacebook(options =>
-    {
-        options.ClientId = facebookClientId;
-        options.ClientSecret = builder.Configuration["Auth:Facebook:ClientSecret"]!;
-        options.Events.OnCreatingTicket = ctx =>
-        {
-            ctx.Identity!.AddClaim(new System.Security.Claims.Claim("idp", "facebook"));
-            return Task.CompletedTask;
-        };
-    });
-
-var discordClientId = builder.Configuration["Auth:Discord:ClientId"];
-if (!string.IsNullOrEmpty(discordClientId))
-    authBuilder.AddDiscord(options =>
-    {
-        options.ClientId = discordClientId;
-        options.ClientSecret = builder.Configuration["Auth:Discord:ClientSecret"]!;
-        options.Scope.Add("identify");
-        options.Scope.Add("email");
-        options.Events.OnCreatingTicket = ctx =>
-        {
-            if (ctx.User.TryGetProperty("avatar", out var avatar) && avatar.ValueKind == System.Text.Json.JsonValueKind.String)
-                ctx.Identity!.AddClaim(new System.Security.Claims.Claim("avatar", avatar.GetString()!));
-            ctx.Identity!.AddClaim(new System.Security.Claims.Claim("idp", "discord"));
-            return Task.CompletedTask;
-        };
-    });
-
-// ── Data Protection ────────────────────────────────────────────────────────
-var dpBlobUri = builder.Configuration["DataProtection:BlobUri"];
-var dpKeyUri = builder.Configuration["DataProtection:KeyVaultKeyUri"];
-if (dpBlobUri is not null && dpKeyUri is not null)
-{
-    var dpBlob = new Azure.Storage.Blobs.BlobClient(new Uri(dpBlobUri), credential);
-    builder.Services.AddDataProtection()
-        .PersistKeysToAzureBlobStorage(dpBlob)
-        .ProtectKeysWithAzureKeyVault(new Uri(dpKeyUri), credential);
-}
-
+builder.Services.AddAuthServices(builder.Configuration, credential);
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+if (!app.Environment.IsEnvironment("Testing"))
+    await app.Services.GetRequiredService<BlobServiceClient>()
+        .GetBlobContainerClient("cache")
+        .CreateIfNotExistsAsync();
+
+if (app.Environment.IsProduction() || app.Environment.IsEnvironment("Staging"))
+    app.UseForwardedHeaders();
 app.UseMiddleware<EventMiddleware>();
 app.UseStaticFiles();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -147,11 +49,15 @@ app.MapGameDataEndpoints();
 app.MapFallback(async (HttpContext ctx) =>
 {
     var slug = ctx.Items[EventMiddleware.SlugKey];
-    var file = slug is not null ? "index.html" : "home.html";
-    var path = Path.Combine(app.Environment.WebRootPath, file);
-    if (!File.Exists(path)) { ctx.Response.StatusCode = 404; return; }
+
+    // Serve the shell unconditionally: the rate-limited /games.json endpoint gates
+    // actual data and returns 404 for unknown slugs. Calling GetEventDataAsync here
+    // would couple shell delivery to a live BGG round-trip and bypass rate limiting.
+    var file = slug is null ? "home.html" : "index.html";
+    var filePath = Path.Combine(app.Environment.WebRootPath, file);
+    if (!File.Exists(filePath)) { ctx.Response.StatusCode = 404; return; }
     ctx.Response.ContentType = "text/html";
-    await ctx.Response.SendFileAsync(path);
+    await ctx.Response.SendFileAsync(filePath);
 });
 
 app.Run();

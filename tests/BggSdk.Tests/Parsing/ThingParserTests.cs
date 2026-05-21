@@ -155,7 +155,7 @@ public class ThingParserTests
     public void Parse_ExtractsSubRanks_RankedValueIsInt()
     {
         var result = ThingParser.Parse(SingleThingXml);
-        result[0].SubRanks["strategygames"].Should().Be(5);
+        result[0].SubRanks["strategy"].Should().Be(5);
     }
 
     [Fact]
