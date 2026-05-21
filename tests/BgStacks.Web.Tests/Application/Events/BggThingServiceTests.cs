@@ -4,6 +4,7 @@ using BgStacks.Web.Application.Events;
 using BgStacks.Web.Infrastructure.Events;
 using BgStacks.Web.Tests.Helpers;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 
 namespace BgStacks.Web.Tests.Application.Events;
@@ -70,6 +71,11 @@ public class BggThingServiceTests
     private static HttpResponseMessage Ok(string body)
         => new(HttpStatusCode.OK) { Content = new StringContent(body) };
 
+    private static BggThingService MakeSut(TestHttpMessageHandler handler,
+        IGameDetailsRepository detailsRepo, IGameStatsRepository statsRepo)
+        => new(MakeBggClient(handler), detailsRepo, statsRepo,
+            Substitute.For<ILogger<BggThingService>>());
+
     // ── EnsureThingsAsync ────────────────────────────────────────────────────
 
     [Fact]
@@ -79,11 +85,11 @@ public class BggThingServiceTests
         var statsRepo = Substitute.For<IGameStatsRepository>();
         detailsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
             .Returns(new HashSet<int>());
-        statsRepo.GetManyAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
-            .Returns(new Dictionary<int, GameStatsDocument>());
+        statsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new HashSet<int>());
 
         var handler = new TestHttpMessageHandler(Ok(ThingXml));
-        var sut = new BggThingService(MakeBggClient(handler), detailsRepo, statsRepo);
+        var sut = MakeSut(handler, detailsRepo, statsRepo);
 
         await sut.EnsureThingsAsync([42]);
 
@@ -103,11 +109,11 @@ public class BggThingServiceTests
         var statsRepo = Substitute.For<IGameStatsRepository>();
         detailsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
             .Returns(new HashSet<int> { 42 });
-        statsRepo.GetManyAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
-            .Returns(new Dictionary<int, GameStatsDocument> { [42] = new GameStatsDocument { Id = "42" } });
+        statsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new HashSet<int> { 42 });
 
         var handler = new TestHttpMessageHandler();
-        var sut = new BggThingService(MakeBggClient(handler), detailsRepo, statsRepo);
+        var sut = MakeSut(handler, detailsRepo, statsRepo);
 
         await sut.EnsureThingsAsync([42]);
 
@@ -116,6 +122,77 @@ public class BggThingServiceTests
             Arg.Any<GameDetailsDocument>(), Arg.Any<CancellationToken>());
         await statsRepo.DidNotReceive().UpsertAsync(
             Arg.Any<GameStatsDocument>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EnsureThingsAsync_DetailsMissingStatExists_UpsertDetailsOnly()
+    {
+        var detailsRepo = Substitute.For<IGameDetailsRepository>();
+        var statsRepo = Substitute.For<IGameStatsRepository>();
+        detailsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new HashSet<int>());
+        statsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new HashSet<int> { 42 });
+
+        var handler = new TestHttpMessageHandler(Ok(ThingXml));
+        var sut = MakeSut(handler, detailsRepo, statsRepo);
+
+        await sut.EnsureThingsAsync([42]);
+
+        handler.RequestCount.Should().Be(1);
+        await detailsRepo.Received(1).UpsertAsync(
+            Arg.Is<GameDetailsDocument>(d => d.Id == "42"),
+            Arg.Any<CancellationToken>());
+        await statsRepo.DidNotReceive().UpsertAsync(
+            Arg.Any<GameStatsDocument>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EnsureThingsAsync_DetailsExistStatsMissing_UpsertStatsOnly()
+    {
+        var detailsRepo = Substitute.For<IGameDetailsRepository>();
+        var statsRepo = Substitute.For<IGameStatsRepository>();
+        detailsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new HashSet<int> { 42 });
+        statsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new HashSet<int>());
+
+        var handler = new TestHttpMessageHandler(Ok(ThingXml));
+        var sut = MakeSut(handler, detailsRepo, statsRepo);
+
+        await sut.EnsureThingsAsync([42]);
+
+        handler.RequestCount.Should().Be(1);
+        await detailsRepo.DidNotReceive().UpsertAsync(
+            Arg.Any<GameDetailsDocument>(), Arg.Any<CancellationToken>());
+        await statsRepo.Received(1).UpsertAsync(
+            Arg.Is<GameStatsDocument>(s => s.Id == "42"),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EnsureThingsAsync_BggReturnsPartialResults_ProcessesWhatWasReturned()
+    {
+        var detailsRepo = Substitute.For<IGameDetailsRepository>();
+        var statsRepo = Substitute.For<IGameStatsRepository>();
+        detailsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new HashSet<int>());
+        statsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new HashSet<int>());
+
+        // BGG returns only one item even though two were requested
+        var handler = new TestHttpMessageHandler(Ok(ThingXml));
+        var sut = MakeSut(handler, detailsRepo, statsRepo);
+
+        await sut.EnsureThingsAsync([42, 99]);
+
+        // Only id=42 was in the response; id=99 is silently skipped
+        await detailsRepo.Received(1).UpsertAsync(
+            Arg.Is<GameDetailsDocument>(d => d.Id == "42"),
+            Arg.Any<CancellationToken>());
+        await detailsRepo.DidNotReceive().UpsertAsync(
+            Arg.Is<GameDetailsDocument>(d => d.Id == "99"),
+            Arg.Any<CancellationToken>());
     }
 
     // ── GetGameEntriesAsync ──────────────────────────────────────────────────
@@ -157,7 +234,7 @@ public class BggThingServiceTests
             .Returns(new Dictionary<int, GameStatsDocument> { [42] = stat });
 
         var handler = new TestHttpMessageHandler();
-        var sut = new BggThingService(MakeBggClient(handler), detailsRepo, statsRepo);
+        var sut = MakeSut(handler, detailsRepo, statsRepo);
 
         var entries = await sut.GetGameEntriesAsync([(42, "A great game about searching for ET.")]);
 
@@ -193,7 +270,7 @@ public class BggThingServiceTests
             .Returns(new Dictionary<int, GameStatsDocument>());
 
         var handler = new TestHttpMessageHandler();
-        var sut = new BggThingService(MakeBggClient(handler), detailsRepo, statsRepo);
+        var sut = MakeSut(handler, detailsRepo, statsRepo);
 
         var entries = await sut.GetGameEntriesAsync([(42, "body text")]);
 

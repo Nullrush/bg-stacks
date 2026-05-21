@@ -11,6 +11,23 @@ public sealed class CosmosGameStatsRepository : IGameStatsRepository
     public CosmosGameStatsRepository(CosmosClient client, string databaseId)
         => _container = client.GetContainer(databaseId, "game-stats");
 
+    public async Task<IReadOnlySet<int>> GetExistingIdsAsync(
+        IEnumerable<int> ids, CancellationToken ct = default)
+    {
+        var pairs = ids.Distinct().Select(id => (id.ToString(), new PartitionKey(id.ToString()))).ToList();
+        if (pairs.Count == 0) return new HashSet<int>();
+
+        var found = new HashSet<int>();
+        foreach (var chunk in pairs.Chunk(100))
+        {
+            var response = await _container.ReadManyItemsAsync<IdProjection>(chunk, cancellationToken: ct);
+            foreach (var item in response)
+                if (int.TryParse(item.Id, out var numId))
+                    found.Add(numId);
+        }
+        return found;
+    }
+
     public async Task<IReadOnlyDictionary<int, GameStatsDocument>> GetManyAsync(
         IEnumerable<int> ids, CancellationToken ct = default)
     {
@@ -43,6 +60,11 @@ public sealed class CosmosGameStatsRepository : IGameStatsRepository
         {
             return null;
         }
+    }
+
+    private sealed class IdProjection
+    {
+        [JsonPropertyName("id")] public string Id { get; set; } = "";
     }
 }
 

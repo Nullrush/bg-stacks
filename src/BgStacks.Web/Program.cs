@@ -16,6 +16,7 @@ using BgStacks.Web.Presentation.Events;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Caching.Distributed;
+using System.Threading.RateLimiting;
 using ZiggyCreatures.Caching.Fusion;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,16 +61,28 @@ builder.Services.AddFusionCache()
     .WithSystemTextJsonSerializer()
     .WithRegisteredDistributedCache();
 
+// ── Rate Limiting ──────────────────────────────────────────────────────────
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("event-data", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 60,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+            }));
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
+
 // ── BGG Client & Services ──────────────────────────────────────────────────
 var bggApiToken = builder.Configuration["Bgg:ApiToken"];
-if (string.IsNullOrEmpty(bggApiToken) && builder.Environment.IsProduction())
+if (string.IsNullOrEmpty(bggApiToken)
+    && (builder.Environment.IsProduction() || builder.Environment.IsEnvironment("Staging")))
     throw new InvalidOperationException("Bgg:ApiToken configuration is required.");
 builder.Services.AddBggClient(bggApiToken ?? "");
-builder.Services.AddScoped<IBggThingService>(sp =>
-    new BggThingService(
-        sp.GetRequiredService<BggClient>(),
-        sp.GetRequiredService<IGameDetailsRepository>(),
-        sp.GetRequiredService<IGameStatsRepository>()));
+builder.Services.AddScoped<IBggThingService, BggThingService>();
 builder.Services.AddScoped<IBggGeeklistService>(sp =>
     new BggGeeklistService(
         sp.GetRequiredService<BggClient>(),
@@ -168,6 +181,7 @@ if (!app.Environment.IsEnvironment("Testing"))
 
 app.UseMiddleware<EventMiddleware>();
 app.UseStaticFiles();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -197,7 +211,7 @@ app.MapFallback(async (HttpContext ctx, EventDataService eventDataService) =>
     if (!File.Exists(indexPath)) { ctx.Response.StatusCode = 404; return; }
     ctx.Response.ContentType = "text/html";
     await ctx.Response.SendFileAsync(indexPath);
-});
+}).RequireRateLimiting("event-data");
 
 app.Run();
 

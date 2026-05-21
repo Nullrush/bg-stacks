@@ -8,8 +8,6 @@ namespace BgStacks.Web.Infrastructure.Cache;
 public sealed class BlobDistributedCache : IDistributedCache
 {
     private const string ExpiresKey = "expires";
-    private const string SlidingKey = "sliding";
-    private const string AbsoluteKey = "absolute";
     private readonly BlobContainerClient _container;
 
     public BlobDistributedCache(BlobServiceClient blobService)
@@ -20,12 +18,7 @@ public sealed class BlobDistributedCache : IDistributedCache
         try
         {
             var response = _container.GetBlobClient(key).DownloadContent();
-            if (IsExpired(response.Value.Details.Metadata))
-            {
-                _container.GetBlobClient(key).DeleteIfExists();
-                return null;
-            }
-            return response.Value.Content.ToArray();
+            return IsExpired(response.Value.Details.Metadata) ? null : response.Value.Content.ToArray();
         }
         catch (RequestFailedException ex) when (ex.Status == 404)
         {
@@ -37,14 +30,8 @@ public sealed class BlobDistributedCache : IDistributedCache
     {
         try
         {
-            var blob = _container.GetBlobClient(key);
-            var response = await blob.DownloadContentAsync(token);
-            if (IsExpired(response.Value.Details.Metadata))
-            {
-                await blob.DeleteIfExistsAsync(cancellationToken: token);
-                return null;
-            }
-            return response.Value.Content.ToArray();
+            var response = await _container.GetBlobClient(key).DownloadContentAsync(token);
+            return IsExpired(response.Value.Details.Metadata) ? null : response.Value.Content.ToArray();
         }
         catch (RequestFailedException ex) when (ex.Status == 404)
         {
@@ -72,69 +59,20 @@ public sealed class BlobDistributedCache : IDistributedCache
     public async Task RemoveAsync(string key, CancellationToken token = default)
         => await _container.GetBlobClient(key).DeleteIfExistsAsync(cancellationToken: token);
 
-    public void Refresh(string key)
-    {
-        try
-        {
-            var blob = _container.GetBlobClient(key);
-            var props = blob.GetProperties();
-            var metadata = new Dictionary<string, string>(props.Value.Metadata);
-            if (!metadata.TryGetValue(SlidingKey, out var s) || !long.TryParse(s, out var slidingTicks))
-                return;
-            var newExpiry = DateTimeOffset.UtcNow + TimeSpan.FromTicks(slidingTicks);
-            if (metadata.TryGetValue(AbsoluteKey, out var a) && long.TryParse(a, out var absoluteTicks))
-                newExpiry = newExpiry < new DateTimeOffset(absoluteTicks, TimeSpan.Zero)
-                    ? newExpiry : new DateTimeOffset(absoluteTicks, TimeSpan.Zero);
-            metadata[ExpiresKey] = newExpiry.UtcTicks.ToString();
-            blob.SetMetadata(metadata);
-        }
-        catch (RequestFailedException ex) when (ex.Status == 404) { }
-    }
-
-    public async Task RefreshAsync(string key, CancellationToken token = default)
-    {
-        try
-        {
-            var blob = _container.GetBlobClient(key);
-            var props = await blob.GetPropertiesAsync(cancellationToken: token);
-            var metadata = new Dictionary<string, string>(props.Value.Metadata);
-            if (!metadata.TryGetValue(SlidingKey, out var s) || !long.TryParse(s, out var slidingTicks))
-                return;
-            var newExpiry = DateTimeOffset.UtcNow + TimeSpan.FromTicks(slidingTicks);
-            if (metadata.TryGetValue(AbsoluteKey, out var a) && long.TryParse(a, out var absoluteTicks))
-                newExpiry = newExpiry < new DateTimeOffset(absoluteTicks, TimeSpan.Zero)
-                    ? newExpiry : new DateTimeOffset(absoluteTicks, TimeSpan.Zero);
-            metadata[ExpiresKey] = newExpiry.UtcTicks.ToString();
-            await blob.SetMetadataAsync(metadata, cancellationToken: token);
-        }
-        catch (RequestFailedException ex) when (ex.Status == 404) { }
-    }
+    // FusionCache uses absolute durations for L2; Refresh is never called.
+    public void Refresh(string key) { }
+    public Task RefreshAsync(string key, CancellationToken token = default) => Task.CompletedTask;
 
     private static Dictionary<string, string>? BuildMetadata(DistributedCacheEntryOptions options)
     {
-        DateTimeOffset? absoluteDeadline = options.AbsoluteExpiration
+        DateTimeOffset? expiry = options.AbsoluteExpiration
             ?? (options.AbsoluteExpirationRelativeToNow.HasValue
                 ? DateTimeOffset.UtcNow + options.AbsoluteExpirationRelativeToNow.Value
                 : (DateTimeOffset?)null);
 
-        // When both are set, expires = min(now+sliding, absolute) so sliding window is respected
-        DateTimeOffset? expiry = null;
-        if (absoluteDeadline.HasValue) expiry = absoluteDeadline;
-        if (options.SlidingExpiration.HasValue)
-        {
-            var slidingExpiry = DateTimeOffset.UtcNow + options.SlidingExpiration.Value;
-            expiry = expiry.HasValue && expiry.Value < slidingExpiry ? expiry : slidingExpiry;
-        }
-
-        if (!expiry.HasValue)
-            return null;
-
-        var metadata = new Dictionary<string, string> { [ExpiresKey] = expiry.Value.UtcTicks.ToString() };
-        if (options.SlidingExpiration.HasValue)
-            metadata[SlidingKey] = options.SlidingExpiration.Value.Ticks.ToString();
-        if (absoluteDeadline.HasValue && options.SlidingExpiration.HasValue)
-            metadata[AbsoluteKey] = absoluteDeadline.Value.UtcTicks.ToString();
-        return metadata;
+        return expiry.HasValue
+            ? new Dictionary<string, string> { [ExpiresKey] = expiry.Value.UtcTicks.ToString() }
+            : null;
     }
 
     private static bool IsExpired(IDictionary<string, string> metadata)
