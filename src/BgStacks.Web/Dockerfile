@@ -5,7 +5,7 @@ RUN dotnet restore
 COPY src/BgStacks.Web/ ./
 RUN dotnet publish -c Release -o /app --no-restore
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-jammy-chiseled
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-azurelinux3.0-distroless
 WORKDIR /app
 COPY --from=build /app .
 ENV ASPNETCORE_URLS=http://+:8080
