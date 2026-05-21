@@ -23,24 +23,28 @@ public sealed class BggThingService : IBggThingService
 
         var existingDetails = await _details.GetExistingIdsAsync(deduped, ct);
         var existingStats = (await _stats.GetManyAsync(deduped, ct)).Keys.ToHashSet();
-        var missing = deduped.Where(id => !existingDetails.Contains(id) || !existingStats.Contains(id)).ToList();
-        if (missing.Count == 0) return;
+        var missingDetails = deduped.Where(id => !existingDetails.Contains(id)).ToHashSet();
+        var missingStats = deduped.Where(id => !existingStats.Contains(id)).ToHashSet();
+        var toFetch = missingDetails.Union(missingStats).ToList();
+        if (toFetch.Count == 0) return;
 
-        var things = await _bgg.GetThingsAsync(missing, ct);
+        var things = await _bgg.GetThingsAsync(toFetch, ct);
         foreach (var thing in things)
         {
-            await _details.UpsertAsync(GameDetailsDocument.FromThing(
-                thing.Id, thing.Name,
-                thing.MinPlayers, thing.MaxPlayers,
-                thing.MinPlayTime, thing.MaxPlayTime,
-                thing.Mechanics, thing.Categories,
-                thing.Thumbnail), ct);
+            if (missingDetails.Contains(thing.Id))
+                await _details.UpsertAsync(GameDetailsDocument.FromThing(
+                    thing.Id, thing.Name,
+                    thing.MinPlayers, thing.MaxPlayers,
+                    thing.MinPlayTime, thing.MaxPlayTime,
+                    thing.Mechanics, thing.Categories,
+                    thing.Thumbnail), ct);
 
-            await _stats.UpsertAsync(GameStatsDocument.FromThing(
-                thing.Id,
-                thing.AverageRating, thing.BayesRating, thing.UserRatings, thing.AverageWeight,
-                thing.BggRank, thing.SubRanks,
-                thing.BestPlayerCounts, thing.RecommendedPlayerCounts), ct);
+            if (missingStats.Contains(thing.Id))
+                await _stats.UpsertAsync(GameStatsDocument.FromThing(
+                    thing.Id,
+                    thing.AverageRating, thing.BayesRating, thing.UserRatings, thing.AverageWeight,
+                    thing.BggRank, thing.SubRanks,
+                    thing.BestPlayerCounts, thing.RecommendedPlayerCounts), ct);
         }
     }
 
