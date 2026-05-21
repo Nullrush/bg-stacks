@@ -35,6 +35,11 @@ resource discordClientSecret 'Microsoft.KeyVault/vaults/secrets@2025-05-01' exis
   name: 'discord-client-secret'
 }
 
+resource bggApiToken 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = {
+  parent: kv
+  name: 'bgg-api-token'
+}
+
 // Versionless secretUri so the Container App picks up rotated secrets on restart
 output secretRefs array = [
   { name: 'google-client-id',       keyVaultUrl: googleClientId.properties.secretUri,       identity: 'system' }
@@ -43,4 +48,5 @@ output secretRefs array = [
   { name: 'facebook-client-secret', keyVaultUrl: facebookClientSecret.properties.secretUri, identity: 'system' }
   { name: 'discord-client-id',      keyVaultUrl: discordClientId.properties.secretUri,      identity: 'system' }
   { name: 'discord-client-secret',  keyVaultUrl: discordClientSecret.properties.secretUri,  identity: 'system' }
+  { name: 'bgg-api-token',          keyVaultUrl: bggApiToken.properties.secretUri,          identity: 'system' }
 ]

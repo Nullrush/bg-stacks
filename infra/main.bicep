@@ -142,6 +142,15 @@ module cosmos 'br/public:avm/res/document-db/database-account:0.19.0' = {
             name: 'events'
             paths: ['/slug']
           }
+          {
+            name: 'game-details'
+            paths: ['/id']
+          }
+          {
+            name: 'game-stats'
+            paths: ['/id']
+            defaultTtl: 86400
+          }
         ]
       }
     ]
@@ -182,6 +191,10 @@ module storage 'br/public:avm/res/storage/storage-account:0.32.0' = {
         }
         {
           name: 'dataprotection'
+          publicAccess: 'None'
+        }
+        {
+          name: 'cache'
           publicAccess: 'None'
         }
       ]
@@ -235,6 +248,8 @@ module containerApp 'br/public:avm/res/app/container-app:0.22.1' = {
           { name: 'Auth__Facebook__ClientSecret',  secretRef: 'facebook-client-secret' }
           { name: 'Auth__Discord__ClientId',       secretRef: 'discord-client-id' }
           { name: 'Auth__Discord__ClientSecret',   secretRef: 'discord-client-secret' }
+          { name: 'Bgg__ApiToken',                    secretRef: 'bgg-api-token' }
+          { name: 'Bgg__CacheCheckIntervalMinutes',   value: '30' }
         ]
         resources: {
           cpu: json('0.25')
