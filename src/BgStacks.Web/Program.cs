@@ -64,10 +64,12 @@ builder.Services.AddFusionCache()
 
 // ── Forwarded Headers ─────────────────────────────────────────────────────
 // Azure Container Apps terminate TLS at the LB and forward the real client IP
-// via X-Forwarded-For. Clear KnownNetworks/KnownProxies so all proxies are trusted.
+// via X-Forwarded-For. ForwardLimit=1 ensures only the rightmost (LB-appended)
+// entry is used, so a client-spoofed header earlier in the chain is ignored.
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
+    options.ForwardLimit = 1;
     options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
 });
