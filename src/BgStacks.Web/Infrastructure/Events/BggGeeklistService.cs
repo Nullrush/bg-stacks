@@ -28,7 +28,7 @@ public sealed class BggGeeklistService : IBggGeeklistService
         CancellationToken ct = default)
     {
         var checkInterval = TimeSpan.FromMinutes(Math.Max(_checkIntervalMinutes, 1));
-        var cacheKey = $"bgg-event:{geeklistId}";
+        var cacheKey = $"bgg-event:v1:{geeklistId}";
 
         var data = await _cache.GetOrSetAsync<EventData?>(
             cacheKey,
