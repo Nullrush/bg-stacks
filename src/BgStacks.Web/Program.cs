@@ -63,16 +63,20 @@ builder.Services.AddFusionCache()
     .WithRegisteredDistributedCache();
 
 // ── Forwarded Headers ─────────────────────────────────────────────────────
-// Azure Container Apps terminate TLS at the LB and forward the real client IP
-// via X-Forwarded-For. ForwardLimit=1 ensures only the rightmost (LB-appended)
-// entry is used, so a client-spoofed header earlier in the chain is ignored.
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
+// In production/staging all traffic arrives through the ACA LB. ForwardLimit=1
+// ensures only the LB-appended (rightmost) X-Forwarded-For entry is trusted,
+// so a client-crafted header earlier in the chain is ignored.
+// Only applied in production/staging where the ACA LB is guaranteed to be in front.
+if (builder.Environment.IsProduction() || builder.Environment.IsEnvironment("Staging"))
 {
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
-    options.ForwardLimit = 1;
-    options.KnownIPNetworks.Clear();
-    options.KnownProxies.Clear();
-});
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
+        options.ForwardLimit = 1;
+        options.KnownIPNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
+}
 
 // ── Rate Limiting ──────────────────────────────────────────────────────────
 builder.Services.AddRateLimiter(options =>

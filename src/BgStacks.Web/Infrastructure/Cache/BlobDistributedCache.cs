@@ -43,7 +43,7 @@ public sealed class BlobDistributedCache : IDistributedCache
     {
         using var stream = new MemoryStream(value);
         _container.GetBlobClient(key).Upload(stream,
-            new BlobUploadOptions { Metadata = BuildMetadata(options), Conditions = new BlobRequestConditions() });
+            new BlobUploadOptions { Metadata = BuildMetadata(options) });
     }
 
     public async Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options,
@@ -51,7 +51,7 @@ public sealed class BlobDistributedCache : IDistributedCache
     {
         using var stream = new MemoryStream(value);
         await _container.GetBlobClient(key).UploadAsync(stream,
-            new BlobUploadOptions { Metadata = BuildMetadata(options), Conditions = new BlobRequestConditions() }, token);
+            new BlobUploadOptions { Metadata = BuildMetadata(options) }, token);
     }
 
     public void Remove(string key) => _container.GetBlobClient(key).DeleteIfExists();
