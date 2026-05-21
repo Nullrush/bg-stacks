@@ -67,7 +67,6 @@ public class BlobDistributedCacheTests
         var result = await sut.GetAsync("test-key");
 
         result.Should().BeEquivalentTo(data);
-        // Expired blobs must not be deleted on read (fail-safe relies on stale values staying readable)
         await blobClient.DidNotReceiveWithAnyArgs().DeleteIfExistsAsync();
     }
 
@@ -85,7 +84,7 @@ public class BlobDistributedCacheTests
         var result = await sut.GetAsync("test-key");
 
         result.Should().BeNull();
-        // Must NOT delete — FusionCache fail-safe needs to read expired blobs as stale values
+        // No delete call — expired entries return null without any storage mutation.
         await blobClient.DidNotReceiveWithAnyArgs().DeleteIfExistsAsync();
     }
 

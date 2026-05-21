@@ -66,8 +66,10 @@ builder.Services.AddFusionCache()
 // In production/staging all traffic arrives through the ACA LB. ForwardLimit=1
 // ensures only the LB-appended (rightmost) X-Forwarded-For entry is trusted,
 // so a client-crafted header earlier in the chain is ignored.
-// Only applied in production/staging where the ACA LB is guaranteed to be in front.
-if (builder.Environment.IsProduction() || builder.Environment.IsEnvironment("Staging"))
+// Both the options and the middleware are scoped to production/staging only;
+// in dev/test RemoteIpAddress is already the real client address with no proxy.
+var isBehindProxy = builder.Environment.IsProduction() || builder.Environment.IsEnvironment("Staging");
+if (isBehindProxy)
 {
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
     {
@@ -196,7 +198,7 @@ if (!app.Environment.IsEnvironment("Testing"))
         .GetBlobContainerClient("cache")
         .CreateIfNotExistsAsync();
 
-app.UseForwardedHeaders();
+if (isBehindProxy) app.UseForwardedHeaders();
 app.UseMiddleware<EventMiddleware>();
 app.UseStaticFiles();
 app.UseRateLimiter();
