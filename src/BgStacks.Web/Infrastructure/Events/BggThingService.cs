@@ -18,8 +18,12 @@ public sealed class BggThingService : IBggThingService
 
     public async Task EnsureThingsAsync(IReadOnlyList<int> objectIds, CancellationToken ct = default)
     {
-        var existing = await _details.GetExistingIdsAsync(objectIds, ct);
-        var missing = objectIds.Where(id => !existing.Contains(id)).ToList();
+        var deduped = objectIds.Distinct().ToList();
+        if (deduped.Count == 0) return;
+
+        var existingDetails = await _details.GetExistingIdsAsync(deduped, ct);
+        var existingStats = (await _stats.GetManyAsync(deduped, ct)).Keys.ToHashSet();
+        var missing = deduped.Where(id => !existingDetails.Contains(id) || !existingStats.Contains(id)).ToList();
         if (missing.Count == 0) return;
 
         var things = await _bgg.GetThingsAsync(missing, ct);
