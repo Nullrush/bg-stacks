@@ -62,6 +62,8 @@ builder.Services.AddFusionCache()
 
 // ── BGG Client & Services ──────────────────────────────────────────────────
 var bggApiToken = builder.Configuration["Bgg:ApiToken"];
+if (string.IsNullOrEmpty(bggApiToken) && !builder.Environment.IsEnvironment("Testing"))
+    throw new InvalidOperationException("Bgg:ApiToken configuration is required.");
 builder.Services.AddBggClient(bggApiToken ?? "");
 builder.Services.AddScoped<IBggThingService>(sp =>
     new BggThingService(

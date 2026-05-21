@@ -7,6 +7,7 @@ namespace BgStacks.Web.Infrastructure.Cache;
 public sealed class BlobDistributedCache : IDistributedCache
 {
     private const string ExpiresKey = "expires";
+    private const string SlidingKey = "sliding";
     private readonly BlobContainerClient _container;
 
     public BlobDistributedCache(BlobServiceClient blobService)
@@ -75,18 +76,54 @@ public sealed class BlobDistributedCache : IDistributedCache
     public async Task RemoveAsync(string key, CancellationToken token = default)
         => await _container.GetBlobClient(key).DeleteIfExistsAsync(cancellationToken: token);
 
-    public void Refresh(string key) { }
-    public Task RefreshAsync(string key, CancellationToken token = default) => Task.CompletedTask;
+    public void Refresh(string key)
+    {
+        try
+        {
+            var blob = _container.GetBlobClient(key);
+            var props = blob.GetProperties();
+            var metadata = new Dictionary<string, string>(props.Value.Metadata);
+            if (!metadata.TryGetValue(SlidingKey, out var s) || !long.TryParse(s, out var slidingTicks))
+                return;
+            metadata[ExpiresKey] = (DateTimeOffset.UtcNow + TimeSpan.FromTicks(slidingTicks)).UtcTicks.ToString();
+            blob.SetMetadata(metadata);
+        }
+        catch (RequestFailedException ex) when (ex.Status == 404) { }
+    }
+
+    public async Task RefreshAsync(string key, CancellationToken token = default)
+    {
+        try
+        {
+            var blob = _container.GetBlobClient(key);
+            var props = await blob.GetPropertiesAsync(cancellationToken: token);
+            var metadata = new Dictionary<string, string>(props.Value.Metadata);
+            if (!metadata.TryGetValue(SlidingKey, out var s) || !long.TryParse(s, out var slidingTicks))
+                return;
+            metadata[ExpiresKey] = (DateTimeOffset.UtcNow + TimeSpan.FromTicks(slidingTicks)).UtcTicks.ToString();
+            await blob.SetMetadataAsync(metadata, cancellationToken: token);
+        }
+        catch (RequestFailedException ex) when (ex.Status == 404) { }
+    }
 
     private static Dictionary<string, string>? BuildMetadata(DistributedCacheEntryOptions options)
     {
         DateTimeOffset? expiry = options.AbsoluteExpiration
             ?? (options.AbsoluteExpirationRelativeToNow.HasValue
                 ? DateTimeOffset.UtcNow + options.AbsoluteExpirationRelativeToNow.Value
-                : null);
-        return expiry.HasValue
-            ? new Dictionary<string, string> { [ExpiresKey] = expiry.Value.UtcTicks.ToString() }
-            : null;
+                : options.SlidingExpiration.HasValue
+                    ? DateTimeOffset.UtcNow + options.SlidingExpiration.Value
+                    : (DateTimeOffset?)null);
+
+        if (!expiry.HasValue && !options.SlidingExpiration.HasValue)
+            return null;
+
+        var metadata = new Dictionary<string, string>();
+        if (expiry.HasValue)
+            metadata[ExpiresKey] = expiry.Value.UtcTicks.ToString();
+        if (options.SlidingExpiration.HasValue)
+            metadata[SlidingKey] = options.SlidingExpiration.Value.Ticks.ToString();
+        return metadata;
     }
 
     private static bool IsExpired(IDictionary<string, string> metadata)

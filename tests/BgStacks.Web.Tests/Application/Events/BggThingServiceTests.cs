@@ -80,6 +80,8 @@ public class BggThingServiceTests
         var statsRepo = Substitute.For<IGameStatsRepository>();
         detailsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
             .Returns(new HashSet<int>());
+        statsRepo.GetManyAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new Dictionary<int, GameStatsDocument>());
 
         var handler = new TestHttpMessageHandler(Ok(ThingXml));
         var sut = new BggThingService(MakeBggClient(handler), detailsRepo, statsRepo);
@@ -102,6 +104,8 @@ public class BggThingServiceTests
         var statsRepo = Substitute.For<IGameStatsRepository>();
         detailsRepo.GetExistingIdsAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
             .Returns(new HashSet<int> { 42 });
+        statsRepo.GetManyAsync(Arg.Any<IEnumerable<int>>(), Arg.Any<CancellationToken>())
+            .Returns(new Dictionary<int, GameStatsDocument> { [42] = new GameStatsDocument { Id = "42" } });
 
         var handler = new TestHttpMessageHandler();
         var sut = new BggThingService(MakeBggClient(handler), detailsRepo, statsRepo);
