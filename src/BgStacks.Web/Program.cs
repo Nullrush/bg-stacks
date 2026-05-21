@@ -229,7 +229,7 @@ app.MapFallback(async (HttpContext ctx, EventDataService eventDataService) =>
     if (!File.Exists(indexPath)) { ctx.Response.StatusCode = 404; return; }
     ctx.Response.ContentType = "text/html";
     await ctx.Response.SendFileAsync(indexPath);
-}).RequireRateLimiting("event-data");
+});
 
 app.Run();
 

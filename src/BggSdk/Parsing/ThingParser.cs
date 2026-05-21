@@ -68,8 +68,10 @@ internal static class ThingParser
     }
 
     // BGG XML uses verbose rank names; normalize to the compact keys the UI expects.
+    // Keys not listed here (thematic, wargames, cgs) already match the UI schema.
     private static readonly Dictionary<string, string> SubRankKeyMap = new()
     {
+        ["abstractgames"]  = "abstracts",
         ["childrensgames"] = "childrens",
         ["familygames"]    = "family",
         ["partygames"]     = "party",
