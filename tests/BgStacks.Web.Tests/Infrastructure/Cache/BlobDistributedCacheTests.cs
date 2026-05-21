@@ -3,7 +3,6 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using BgStacks.Web.Infrastructure.Cache;
 using FluentAssertions;
-using Microsoft.Extensions.Caching.Distributed;
 using NSubstitute;
 
 namespace BgStacks.Web.Tests.Infrastructure.Cache;
