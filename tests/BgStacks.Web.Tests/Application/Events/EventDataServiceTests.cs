@@ -61,11 +61,10 @@ public class EventDataServiceTests
     }
 
     [Fact]
-    public async Task GetEventDataAsync_NumericSlug_NoCosmosEvent_UsesSlugAsGeeklistId()
+    public async Task GetEventDataAsync_NumericSlug_CallsGeeklistDirectlyWithoutCosmosLookup()
     {
         var eventRepo = Substitute.For<IEventRepository>();
         var geeklistService = Substitute.For<IBggGeeklistService>();
-        eventRepo.GetAsync(NumericSlug).Returns((Event?)null);
         var expectedData = MakeData(NumericSlug);
         geeklistService.GetEventDataAsync(12345, NumericSlug, Arg.Any<CancellationToken>()).Returns(expectedData);
 
@@ -75,6 +74,7 @@ public class EventDataServiceTests
 
         result.Should().Be(expectedData);
         await geeklistService.Received(1).GetEventDataAsync(12345, NumericSlug, Arg.Any<CancellationToken>());
+        await eventRepo.DidNotReceive().GetAsync(Arg.Any<EventSlug>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -94,21 +94,20 @@ public class EventDataServiceTests
     }
 
     [Fact]
-    public async Task GetEventDataAsync_CosmosEventWithNullGeeklistId_NumericSlugFallback()
+    public async Task GetEventDataAsync_NamedSlug_CosmosEventWithNullGeeklistId_ReturnsNull()
     {
         var eventRepo = Substitute.For<IEventRepository>();
         var geeklistService = Substitute.For<IBggGeeklistService>();
-        var @event = new Event(NumericSlug, "Some Event",
+        var @event = new Event(NamedSlug, "Some Event",
             DateOnly.Parse("2026-01-01"), isPublic: true, geeklistId: null);
-        eventRepo.GetAsync(NumericSlug).Returns(@event);
-        var expectedData = MakeData(NumericSlug);
-        geeklistService.GetEventDataAsync(12345, NumericSlug, Arg.Any<CancellationToken>()).Returns(expectedData);
+        eventRepo.GetAsync(NamedSlug).Returns(@event);
 
         var sut = new EventDataService(eventRepo, geeklistService);
 
-        var result = await sut.GetEventDataAsync(NumericSlug);
+        var result = await sut.GetEventDataAsync(NamedSlug);
 
-        result.Should().Be(expectedData);
-        await geeklistService.Received(1).GetEventDataAsync(12345, NumericSlug, Arg.Any<CancellationToken>());
+        result.Should().BeNull();
+        await geeklistService.DidNotReceive()
+            .GetEventDataAsync(Arg.Any<int>(), Arg.Any<EventSlug>(), Arg.Any<CancellationToken>());
     }
 }

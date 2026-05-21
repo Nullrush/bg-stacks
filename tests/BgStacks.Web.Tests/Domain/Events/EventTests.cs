@@ -30,4 +30,15 @@ public class EventTests
         var act = () => new Event(Slug, "", new DateOnly(2026, 6, 1), true);
         act.Should().Throw<ArgumentException>();
     }
+
+    [Theory]
+    [InlineData("42")]
+    [InlineData("12345")]
+    [InlineData("0")]
+    public void Constructor_NumericSlug_Throws(string numericSlug)
+    {
+        var slug = EventSlug.From(numericSlug);
+        var act = () => new Event(slug, "Some Event", new DateOnly(2026, 6, 1), true);
+        act.Should().Throw<ArgumentException>().WithMessage("*numeric*");
+    }
 }

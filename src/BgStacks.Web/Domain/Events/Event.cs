@@ -11,6 +11,8 @@ public sealed class Event
     public Event(EventSlug slug, string name, DateOnly eventDate, bool isPublic, int? geeklistId = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        if (int.TryParse(slug.Value, out _))
+            throw new ArgumentException("Event slug must not be purely numeric — numeric subdomains are reserved for direct geeklist ID lookups.", nameof(slug));
         Slug = slug;
         Name = name;
         EventDate = eventDate;
