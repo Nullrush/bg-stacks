@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 using BggSdk;
 using BggSdk.Exceptions;
@@ -29,7 +30,7 @@ public sealed class BggGeeklistService : IBggGeeklistService
         var checkInterval = TimeSpan.FromMinutes(Math.Max(_checkIntervalMinutes, 1));
         var cacheKey = $"bgg-event:{geeklistId}";
 
-        return await _cache.GetOrSetAsync<EventData?>(
+        var data = await _cache.GetOrSetAsync<EventData?>(
             cacheKey,
             async (ctx, token) =>
             {
@@ -40,8 +41,11 @@ public sealed class BggGeeklistService : IBggGeeklistService
                 {
                     geeklist = await _bgg.GetGeeklistAsync(geeklistId, token);
                 }
-                catch (BggApiException)
+                catch (BggApiException ex)
                 {
+                    var statusCode = (ex.InnerException as HttpRequestException)?.StatusCode;
+                    if (statusCode != HttpStatusCode.NotFound)
+                        throw;
                     ctx.Options.Duration = TimeSpan.FromMinutes(5);
                     ctx.Options.IsFailSafeEnabled = false;
                     return null;
@@ -63,7 +67,6 @@ public sealed class BggGeeklistService : IBggGeeklistService
 
                 return new EventData
                 {
-                    SlugValue = slug.Value,
                     Title = geeklist.Title,
                     EditTimestamp = geeklist.EditTimestamp,
                     GamesJson = JsonSerializer.Serialize(entries),
@@ -79,5 +82,7 @@ public sealed class BggGeeklistService : IBggGeeklistService
                 FailSafeThrottleDuration = TimeSpan.FromSeconds(30),
             },
             ct);
+
+        return data is null ? null : data with { SlugValue = slug.Value };
     }
 }

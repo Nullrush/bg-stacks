@@ -13,20 +13,14 @@ public sealed class CosmosGameDetailsRepository : IGameDetailsRepository
 
     public async Task<IReadOnlySet<int>> GetExistingIdsAsync(IEnumerable<int> ids, CancellationToken ct = default)
     {
-        var idStrings = ids.Select(id => $"'{id}'").ToList();
-        if (idStrings.Count == 0) return new HashSet<int>();
+        var pairs = ids.Select(id => (id.ToString(), new PartitionKey(id.ToString()))).ToList();
+        if (pairs.Count == 0) return new HashSet<int>();
 
-        var query = new QueryDefinition(
-            $"SELECT c.id FROM c WHERE c.id IN ({string.Join(",", idStrings)})");
-        using var feed = _container.GetItemQueryIterator<IdProjection>(query);
+        var response = await _container.ReadManyItemsAsync<IdProjection>(pairs, cancellationToken: ct);
         var found = new HashSet<int>();
-        while (feed.HasMoreResults)
-        {
-            var page = await feed.ReadNextAsync(ct);
-            foreach (var item in page)
-                if (int.TryParse(item.Id, out var numId))
-                    found.Add(numId);
-        }
+        foreach (var item in response)
+            if (int.TryParse(item.Id, out var numId))
+                found.Add(numId);
         return found;
     }
 

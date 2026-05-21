@@ -159,9 +159,10 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-await app.Services.GetRequiredService<BlobServiceClient>()
-    .GetBlobContainerClient("cache")
-    .CreateIfNotExistsAsync();
+if (!app.Environment.IsEnvironment("Testing"))
+    await app.Services.GetRequiredService<BlobServiceClient>()
+        .GetBlobContainerClient("cache")
+        .CreateIfNotExistsAsync();
 
 app.UseMiddleware<EventMiddleware>();
 app.UseStaticFiles();

@@ -1,5 +1,3 @@
-using BgStacks.Web.Infrastructure.Events;
-
 namespace BgStacks.Web.Application.Events;
 
 public interface IBggThingService

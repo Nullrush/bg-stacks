@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace BgStacks.Web.Domain.Events;
 
-public sealed class EventData
+public sealed record EventData
 {
     [JsonPropertyName("slug")]
     public string SlugValue { get; init; } = "";

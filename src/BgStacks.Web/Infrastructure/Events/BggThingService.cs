@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using BggSdk;
 using BgStacks.Web.Application.Events;
 
@@ -44,13 +43,16 @@ public sealed class BggThingService : IBggThingService
     public async Task<IReadOnlyList<GameEntry>> GetGameEntriesAsync(
         IReadOnlyList<(int ObjectId, string Body)> items, CancellationToken ct = default)
     {
+        var detailTasks = items.Select(item => _details.GetAsync(item.ObjectId, ct)).ToArray();
+        var statTasks = items.Select(item => _stats.GetAsync(item.ObjectId, ct)).ToArray();
+        var details = await Task.WhenAll(detailTasks);
+        var stats = await Task.WhenAll(statTasks);
+
         var entries = new List<GameEntry>(items.Count);
-        foreach (var (objectId, body) in items)
+        for (var i = 0; i < items.Count; i++)
         {
-            var detail = await _details.GetAsync(objectId, ct);
-            if (detail is null) continue;
-            var stat = await _stats.GetAsync(objectId, ct);
-            entries.Add(BuildEntry(objectId, detail, stat, body));
+            if (details[i] is null) continue;
+            entries.Add(BuildEntry(items[i].ObjectId, details[i]!, stats[i], items[i].Body));
         }
         return entries;
     }
@@ -87,28 +89,4 @@ public sealed class BggThingService : IBggThingService
             Body = body,
         };
     }
-}
-
-public sealed class GameEntry
-{
-    [JsonPropertyName("id")]                  public int Id { get; init; }
-    [JsonPropertyName("name")]               public string Name { get; init; } = "";
-    [JsonPropertyName("players")]            public string Players { get; init; } = "";
-    [JsonPropertyName("minPlayers")]         public int MinPlayers { get; init; }
-    [JsonPropertyName("maxPlayers")]         public int MaxPlayers { get; init; }
-    [JsonPropertyName("bestPlayers")]        public IReadOnlyList<int> BestPlayers { get; init; } = [];
-    [JsonPropertyName("recommendedPlayers")] public IReadOnlyList<int> RecommendedPlayers { get; init; } = [];
-    [JsonPropertyName("weight")]             public double Weight { get; init; }
-    [JsonPropertyName("time")]               public string Time { get; init; } = "";
-    [JsonPropertyName("minTime")]            public int MinTime { get; init; }
-    [JsonPropertyName("maxTime")]            public int MaxTime { get; init; }
-    [JsonPropertyName("avgRating")]          public double AvgRating { get; init; }
-    [JsonPropertyName("geekRating")]         public double GeekRating { get; init; }
-    [JsonPropertyName("votes")]              public int Votes { get; init; }
-    [JsonPropertyName("bggRank")]            public int? BggRank { get; init; }
-    [JsonPropertyName("subRanks")]           public IReadOnlyDictionary<string, int?> SubRanks { get; init; } = new Dictionary<string, int?>();
-    [JsonPropertyName("mechanics")]          public IReadOnlyList<string> Mechanics { get; init; } = [];
-    [JsonPropertyName("categories")]         public IReadOnlyList<string> Categories { get; init; } = [];
-    [JsonPropertyName("thumbnail")]          public string? Thumbnail { get; init; }
-    [JsonPropertyName("body")]               public string Body { get; init; } = "";
 }
