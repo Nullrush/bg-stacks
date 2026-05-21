@@ -24,12 +24,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll<ITagsRepository>();
             services.RemoveAll<IEventRepository>();
             services.RemoveAll<IBggGeeklistService>();
-            services.RemoveAll<EventDataService>();
 
             services.AddScoped<ITagsRepository>(_ => TagsRepository);
             services.AddScoped<IEventRepository>(_ => EventRepository);
             services.AddScoped<IBggGeeklistService>(_ => BggGeeklistService);
-            services.AddScoped<EventDataService>();
 
             services.AddAuthentication(options =>
             {
