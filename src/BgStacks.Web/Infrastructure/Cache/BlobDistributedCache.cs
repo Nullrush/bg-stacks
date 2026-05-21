@@ -1,5 +1,6 @@
 using Azure;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace BgStacks.Web.Infrastructure.Cache;
@@ -53,23 +54,17 @@ public sealed class BlobDistributedCache : IDistributedCache
 
     public void Set(string key, byte[] value, DistributedCacheEntryOptions options)
     {
-        var blob = _container.GetBlobClient(key);
-        var metadata = BuildMetadata(options);
         using var stream = new MemoryStream(value);
-        blob.Upload(stream, overwrite: true);
-        if (metadata is not null)
-            blob.SetMetadata(metadata);
+        _container.GetBlobClient(key).Upload(stream,
+            new BlobUploadOptions { Metadata = BuildMetadata(options) });
     }
 
     public async Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options,
         CancellationToken token = default)
     {
-        var blob = _container.GetBlobClient(key);
-        var metadata = BuildMetadata(options);
         using var stream = new MemoryStream(value);
-        await blob.UploadAsync(stream, overwrite: true, cancellationToken: token);
-        if (metadata is not null)
-            await blob.SetMetadataAsync(metadata, cancellationToken: token);
+        await _container.GetBlobClient(key).UploadAsync(stream,
+            new BlobUploadOptions { Metadata = BuildMetadata(options) }, token);
     }
 
     public void Remove(string key) => _container.GetBlobClient(key).DeleteIfExists();
