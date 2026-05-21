@@ -8,6 +8,7 @@ public sealed class BlobDistributedCache : IDistributedCache
 {
     private const string ExpiresKey = "expires";
     private const string SlidingKey = "sliding";
+    private const string AbsoluteKey = "absolute";
     private readonly BlobContainerClient _container;
 
     public BlobDistributedCache(BlobServiceClient blobService)
@@ -85,7 +86,11 @@ public sealed class BlobDistributedCache : IDistributedCache
             var metadata = new Dictionary<string, string>(props.Value.Metadata);
             if (!metadata.TryGetValue(SlidingKey, out var s) || !long.TryParse(s, out var slidingTicks))
                 return;
-            metadata[ExpiresKey] = (DateTimeOffset.UtcNow + TimeSpan.FromTicks(slidingTicks)).UtcTicks.ToString();
+            var newExpiry = DateTimeOffset.UtcNow + TimeSpan.FromTicks(slidingTicks);
+            if (metadata.TryGetValue(AbsoluteKey, out var a) && long.TryParse(a, out var absoluteTicks))
+                newExpiry = newExpiry < new DateTimeOffset(absoluteTicks, TimeSpan.Zero)
+                    ? newExpiry : new DateTimeOffset(absoluteTicks, TimeSpan.Zero);
+            metadata[ExpiresKey] = newExpiry.UtcTicks.ToString();
             blob.SetMetadata(metadata);
         }
         catch (RequestFailedException ex) when (ex.Status == 404) { }
@@ -100,7 +105,11 @@ public sealed class BlobDistributedCache : IDistributedCache
             var metadata = new Dictionary<string, string>(props.Value.Metadata);
             if (!metadata.TryGetValue(SlidingKey, out var s) || !long.TryParse(s, out var slidingTicks))
                 return;
-            metadata[ExpiresKey] = (DateTimeOffset.UtcNow + TimeSpan.FromTicks(slidingTicks)).UtcTicks.ToString();
+            var newExpiry = DateTimeOffset.UtcNow + TimeSpan.FromTicks(slidingTicks);
+            if (metadata.TryGetValue(AbsoluteKey, out var a) && long.TryParse(a, out var absoluteTicks))
+                newExpiry = newExpiry < new DateTimeOffset(absoluteTicks, TimeSpan.Zero)
+                    ? newExpiry : new DateTimeOffset(absoluteTicks, TimeSpan.Zero);
+            metadata[ExpiresKey] = newExpiry.UtcTicks.ToString();
             await blob.SetMetadataAsync(metadata, cancellationToken: token);
         }
         catch (RequestFailedException ex) when (ex.Status == 404) { }
@@ -108,12 +117,15 @@ public sealed class BlobDistributedCache : IDistributedCache
 
     private static Dictionary<string, string>? BuildMetadata(DistributedCacheEntryOptions options)
     {
-        DateTimeOffset? expiry = options.AbsoluteExpiration
+        DateTimeOffset? absoluteDeadline = options.AbsoluteExpiration
             ?? (options.AbsoluteExpirationRelativeToNow.HasValue
                 ? DateTimeOffset.UtcNow + options.AbsoluteExpirationRelativeToNow.Value
-                : options.SlidingExpiration.HasValue
-                    ? DateTimeOffset.UtcNow + options.SlidingExpiration.Value
-                    : (DateTimeOffset?)null);
+                : (DateTimeOffset?)null);
+
+        DateTimeOffset? expiry = absoluteDeadline
+            ?? (options.SlidingExpiration.HasValue
+                ? DateTimeOffset.UtcNow + options.SlidingExpiration.Value
+                : (DateTimeOffset?)null);
 
         if (!expiry.HasValue && !options.SlidingExpiration.HasValue)
             return null;
@@ -123,6 +135,8 @@ public sealed class BlobDistributedCache : IDistributedCache
             metadata[ExpiresKey] = expiry.Value.UtcTicks.ToString();
         if (options.SlidingExpiration.HasValue)
             metadata[SlidingKey] = options.SlidingExpiration.Value.Ticks.ToString();
+        if (absoluteDeadline.HasValue && options.SlidingExpiration.HasValue)
+            metadata[AbsoluteKey] = absoluteDeadline.Value.UtcTicks.ToString();
         return metadata;
     }
 
