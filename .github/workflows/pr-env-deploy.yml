@@ -274,7 +274,7 @@ jobs:
             --name "$APP_NAME" \
             --resource-group "$RG" \
             --image "$IMAGE_TAG" \
-            --revision-suffix "pr-${PR_NUMBER}-${SHORT_SHA}" \
+            --revision-suffix "pr-${PR_NUMBER}-${SHORT_SHA}-${GITHUB_RUN_NUMBER}" \
             --target-label "pr-${PR_NUMBER}" \
             --set-env-vars "${ENV_VARS[@]}"
 
@@ -291,7 +291,7 @@ jobs:
           # applied it, the CLI moves the label to the same revision (effectively a no-op).
           az containerapp revision label add \
             -n "$APP_NAME" -g "$RG" \
-            --revision "${APP_NAME}--pr-${PR_NUMBER}-${SHORT_SHA}" \
+            --revision "${APP_NAME}--pr-${PR_NUMBER}-${SHORT_SHA}-${GITHUB_RUN_NUMBER}" \
             --label "pr-${PR_NUMBER}"
 
       - name: Get PR environment URL
