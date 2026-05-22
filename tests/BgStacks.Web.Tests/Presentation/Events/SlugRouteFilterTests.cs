@@ -75,7 +75,7 @@ public class SlugRouteFilterTests
     }
 
     [Fact]
-    public async Task ValidSlug_UpperCase_NormalisesToLower()
+    public async Task MixedCaseSlug_StoresNormalizedSlugInItems()
     {
         var filter = new SlugRouteFilter();
         var context = MakeContext("Geekway-2026");     // mixed case

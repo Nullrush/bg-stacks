@@ -65,9 +65,10 @@ public class EventsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await client.GetAsync("/api/events");
         var json = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var ev = doc.RootElement.EnumerateArray()
-            .First(e => e.GetProperty("slug").GetString() == "pb-url-test");
+            .Single(e => e.GetProperty("slug").GetString() == "pb-url-test");
         ev.GetProperty("url").GetString().Should().Be("/event/pb-url-test/");
     }
 
@@ -83,9 +84,10 @@ public class EventsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await client.GetAsync("/api/events");
         var json = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var ev = doc.RootElement.EnumerateArray()
-            .First(e => e.GetProperty("slug").GetString() == "subdomain-url-test");
-        ev.GetProperty("url").GetString().Should().StartWith("https://subdomain-url-test.");
+            .Single(e => e.GetProperty("slug").GetString() == "subdomain-url-test");
+        ev.GetProperty("url").GetString().Should().StartWith("https://subdomain-url-test.").And.EndWith("/");
     }
 }
