@@ -8,6 +8,7 @@ using BgStacks.Web.Infrastructure.Tags;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using System.Threading.RateLimiting;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -17,44 +18,63 @@ public static class InfrastructureExtensions
 {
     public static IServiceCollection AddAzureInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration,
         TokenCredential credential)
     {
-        var cosmosDatabaseId = configuration["Cosmos:DatabaseId"] ?? "bgstacks";
-        var cosmosConnStr = configuration["Cosmos:ConnectionString"];
-        var cosmosOptions = new CosmosClientOptions
-        {
-            UseSystemTextJsonSerializerWithOptions = new System.Text.Json.JsonSerializerOptions
+        services.AddOptions<CosmosOptions>()
+            .BindConfiguration(CosmosOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddOptions<BlobOptions>()
+            .BindConfiguration(BlobOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddSingleton(sp => {
+            var o = sp.GetRequiredService<IOptions<CosmosOptions>>().Value;
+            var opts = new CosmosClientOptions
             {
-                PropertyNameCaseInsensitive = true,
-            },
-        };
-        var cosmosClient = cosmosConnStr is not null
-            ? new CosmosClient(cosmosConnStr, cosmosOptions)
-            : new CosmosClient(configuration["Cosmos:Endpoint"]!, credential, cosmosOptions);
-        services.AddSingleton(cosmosClient);
+                UseSystemTextJsonSerializerWithOptions = new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                },
+            };
+            return o.ConnectionString is not null
+                ? new CosmosClient(o.ConnectionString, opts)
+                : new CosmosClient(o.Endpoint!, credential, opts);
+        });
 
-        var blobConnStr = configuration["Blob:ConnectionString"];
-        var blobClient = blobConnStr is not null
-            ? new BlobServiceClient(blobConnStr)
-            : new BlobServiceClient(new Uri(configuration["Blob:ServiceUri"]!), credential);
-        services.AddSingleton(blobClient);
-
-        services.Configure<BlobOptions>(configuration.GetSection(BlobOptions.SectionName));
-
-        services.AddScoped<ITagsRepository>(sp =>
-            new CosmosTagsRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
-        services.AddScoped<IEventRepository>(sp =>
-            new CosmosEventRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
-        services.AddScoped<IGameDetailsRepository>(sp =>
-            new CosmosGameDetailsRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
-        services.AddScoped<IGameStatsRepository>(sp =>
-            new CosmosGameStatsRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
+        services.AddSingleton(sp => {
+            var o = sp.GetRequiredService<IOptions<BlobOptions>>().Value;
+            return o.ConnectionString is not null
+                ? new BlobServiceClient(o.ConnectionString)
+                : new BlobServiceClient(new Uri(o.ServiceUri!), credential);
+        });
 
         services.AddSingleton<IDistributedCache, BlobDistributedCache>();
         services.AddFusionCache()
             .WithSystemTextJsonSerializer()
             .WithRegisteredDistributedCache();
+
+        // CRITICAL: resolve DatabaseId from IOptions at scope time, not construction time.
+        // PR revisions receive Cosmos__DatabaseId as an env var override — if captured as a
+        // local, all revisions silently point at prod.
+        services.AddScoped<ITagsRepository>(sp => {
+            var dbId = sp.GetRequiredService<IOptions<CosmosOptions>>().Value.DatabaseId;
+            return new CosmosTagsRepository(sp.GetRequiredService<CosmosClient>(), dbId);
+        });
+        services.AddScoped<IEventRepository>(sp => {
+            var dbId = sp.GetRequiredService<IOptions<CosmosOptions>>().Value.DatabaseId;
+            return new CosmosEventRepository(sp.GetRequiredService<CosmosClient>(), dbId);
+        });
+        services.AddScoped<IGameDetailsRepository>(sp => {
+            var dbId = sp.GetRequiredService<IOptions<CosmosOptions>>().Value.DatabaseId;
+            return new CosmosGameDetailsRepository(sp.GetRequiredService<CosmosClient>(), dbId);
+        });
+        services.AddScoped<IGameStatsRepository>(sp => {
+            var dbId = sp.GetRequiredService<IOptions<CosmosOptions>>().Value.DatabaseId;
+            return new CosmosGameStatsRepository(sp.GetRequiredService<CosmosClient>(), dbId);
+        });
 
         return services;
     }

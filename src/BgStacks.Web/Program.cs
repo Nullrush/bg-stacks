@@ -4,6 +4,7 @@ using BgStacks.Web.Application.Events;
 using BgStacks.Web.Application.Tags;
 using BgStacks.Web.Infrastructure;
 using BgStacks.Web.Infrastructure.Auth;
+using BgStacks.Web.Infrastructure.Cache;
 using BgStacks.Web.Infrastructure.Events;
 using BgStacks.Web.Presentation.Auth;
 using BgStacks.Web.Presentation.Events;
@@ -13,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var credential = new DefaultAzureCredential();
 
-builder.Services.AddAzureInfrastructure(builder.Configuration, credential);
+builder.Services.AddAzureInfrastructure(credential);
 builder.Services.AddProxyForwardedHeaders(builder.Configuration);
 builder.Services.AddEventDataRateLimiting();
 builder.Services.AddBggServices(builder.Configuration, builder.Environment);
@@ -29,7 +30,8 @@ var app = builder.Build();
 
 if (!app.Environment.IsEnvironment("Testing"))
     await app.Services.GetRequiredService<BlobServiceClient>()
-        .GetBlobContainerClient("cache")
+        .GetBlobContainerClient(
+            app.Configuration[$"{BlobOptions.SectionName}:CacheContainer"] ?? "cache")
         .CreateIfNotExistsAsync();
 
 if (app.Environment.IsProduction() || app.Environment.IsEnvironment("Staging"))
