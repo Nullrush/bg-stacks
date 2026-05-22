@@ -11,6 +11,10 @@ on:
       - '.github/workflows/app.yml'
   workflow_dispatch:
 
+concurrency:
+  group: container-app-ca-bgstacks-prod
+  cancel-in-progress: false
+
 permissions:
   id-token: write
   contents: read
@@ -100,7 +104,8 @@ jobs:
           az containerapp update \
             --name ca-bgstacks-prod \
             --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
-            --image "$SHA_TAG"
+            --image "$SHA_TAG" \
+            --target-label prod
       - name: Post deployment summary
         if: success()
         run: |
