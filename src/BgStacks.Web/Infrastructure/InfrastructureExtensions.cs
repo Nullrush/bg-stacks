@@ -40,6 +40,8 @@ public static class InfrastructureExtensions
             : new BlobServiceClient(new Uri(configuration["Blob:ServiceUri"]!), credential);
         services.AddSingleton(blobClient);
 
+        services.Configure<BlobOptions>(configuration.GetSection(BlobOptions.SectionName));
+
         services.AddScoped<ITagsRepository>(sp =>
             new CosmosTagsRepository(sp.GetRequiredService<CosmosClient>(), cosmosDatabaseId));
         services.AddScoped<IEventRepository>(sp =>
