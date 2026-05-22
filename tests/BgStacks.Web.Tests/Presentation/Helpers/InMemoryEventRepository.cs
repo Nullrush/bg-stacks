@@ -6,8 +6,6 @@ public class InMemoryEventRepository : IEventRepository
 {
     private readonly Dictionary<string, Event> _store = new();
 
-    public void Clear() => _store.Clear();
-
     public void Seed(Event @event) => _store[@event.Slug.Value] = @event;
 
     public Task<Event?> GetAsync(EventSlug slug, CancellationToken ct = default)

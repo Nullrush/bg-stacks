@@ -13,12 +13,9 @@ public class EventsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
 
     public EventsEndpointsTests(CustomWebApplicationFactory factory) => _factory = factory;
 
-    private void SetUp() => _factory.EventRepository.Clear();
-
     [Fact]
     public async Task GetEvents_ReturnsPublicEventsOnly()
     {
-        SetUp();
         _factory.EventRepository.Seed(new Event(
             EventSlug.From("gw-2026-pnw"), "Geekway 2026 PnW",
             new DateOnly(2026, 6, 12), isPublic: true));
@@ -40,7 +37,6 @@ public class EventsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task GetEvents_SetsIsUpcomingCorrectly()
     {
-        SetUp();
         var pastDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-10);
         _factory.EventRepository.Seed(new Event(
             EventSlug.From("past-event"), "Past Event", pastDate, isPublic: true));
@@ -58,12 +54,12 @@ public class EventsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task GetEvents_PathBasedRoutingEnabled_ReturnsRelativeEventUrls()
     {
-        SetUp();
-        _factory.EventRepository.Seed(new Event(
+        await using var factory = new CustomWebApplicationFactory();
+        factory.EventRepository.Seed(new Event(
             EventSlug.From("pb-url-test"), "PB URL Test",
             new DateOnly(2026, 6, 12), isPublic: true));
 
-        var client = _factory
+        var client = factory
             .WithWebHostBuilder(b => b.UseSetting("Events:PathBasedRouting", "true"))
             .CreateClient();
         var response = await client.GetAsync("/api/events");
@@ -78,12 +74,12 @@ public class EventsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task GetEvents_PathBasedRoutingDisabled_ReturnsSubdomainUrls()
     {
-        SetUp();
-        _factory.EventRepository.Seed(new Event(
+        await using var factory = new CustomWebApplicationFactory();
+        factory.EventRepository.Seed(new Event(
             EventSlug.From("subdomain-url-test"), "Subdomain URL Test",
             new DateOnly(2026, 6, 12), isPublic: true));
 
-        var client = _factory.CreateClient();   // no PathBasedRouting
+        var client = factory.CreateClient();   // no PathBasedRouting
         var response = await client.GetAsync("/api/events");
         var json = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
