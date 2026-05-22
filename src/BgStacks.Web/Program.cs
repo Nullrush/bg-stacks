@@ -45,6 +45,26 @@ app.MapTagsEndpoints();
 app.MapEventsEndpoints();
 app.MapGameDataEndpoints();
 
+if (app.Configuration.GetValue<bool>("Events:PathBasedRouting"))
+{
+    var slugGroup = app
+        .MapGroup("/event/{slug}")
+        .AddEndpointFilter<SlugRouteFilter>();
+
+    // Reuses the existing handlers + RequireRateLimiting("event-data") from GamesJsonEndpoint.
+    // RouteGroupBuilder implements IEndpointRouteBuilder, so the extension method composes
+    // routes under the /event/{slug} prefix automatically.
+    slugGroup.MapGameDataEndpoints();
+
+    slugGroup.MapGet("/{**path}", async (HttpContext ctx) =>
+    {
+        var filePath = Path.Combine(app.Environment.WebRootPath, "index.html");
+        if (!File.Exists(filePath)) { ctx.Response.StatusCode = 404; return; }
+        ctx.Response.ContentType = "text/html";
+        await ctx.Response.SendFileAsync(filePath);
+    });
+}
+
 // SPA fallback: event subdomain → index.html, root domain → home.html
 app.MapFallback(async (HttpContext ctx) =>
 {
