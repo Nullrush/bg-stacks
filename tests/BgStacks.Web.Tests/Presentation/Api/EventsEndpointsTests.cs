@@ -13,9 +13,12 @@ public class EventsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
 
     public EventsEndpointsTests(CustomWebApplicationFactory factory) => _factory = factory;
 
+    private void SetUp() => _factory.EventRepository.Clear();
+
     [Fact]
     public async Task GetEvents_ReturnsPublicEventsOnly()
     {
+        SetUp();
         _factory.EventRepository.Seed(new Event(
             EventSlug.From("gw-2026-pnw"), "Geekway 2026 PnW",
             new DateOnly(2026, 6, 12), isPublic: true));
@@ -37,6 +40,7 @@ public class EventsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task GetEvents_SetsIsUpcomingCorrectly()
     {
+        SetUp();
         var pastDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-10);
         _factory.EventRepository.Seed(new Event(
             EventSlug.From("past-event"), "Past Event", pastDate, isPublic: true));
@@ -49,5 +53,43 @@ public class EventsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var ev = doc.RootElement.EnumerateArray().First(e =>
             e.GetProperty("slug").GetString() == "past-event");
         ev.GetProperty("isUpcoming").GetBoolean().Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task GetEvents_PathBasedRoutingEnabled_ReturnsRelativeEventUrls()
+    {
+        SetUp();
+        _factory.EventRepository.Seed(new Event(
+            EventSlug.From("pb-url-test"), "PB URL Test",
+            new DateOnly(2026, 6, 12), isPublic: true));
+
+        var client = _factory
+            .WithWebHostBuilder(b => b.UseSetting("Events:PathBasedRouting", "true"))
+            .CreateClient();
+        var response = await client.GetAsync("/api/events");
+        var json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+
+        var ev = doc.RootElement.EnumerateArray()
+            .First(e => e.GetProperty("slug").GetString() == "pb-url-test");
+        ev.GetProperty("url").GetString().Should().Be("/event/pb-url-test/");
+    }
+
+    [Fact]
+    public async Task GetEvents_PathBasedRoutingDisabled_ReturnsSubdomainUrls()
+    {
+        SetUp();
+        _factory.EventRepository.Seed(new Event(
+            EventSlug.From("subdomain-url-test"), "Subdomain URL Test",
+            new DateOnly(2026, 6, 12), isPublic: true));
+
+        var client = _factory.CreateClient();   // no PathBasedRouting
+        var response = await client.GetAsync("/api/events");
+        var json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+
+        var ev = doc.RootElement.EnumerateArray()
+            .First(e => e.GetProperty("slug").GetString() == "subdomain-url-test");
+        ev.GetProperty("url").GetString().Should().StartWith("https://subdomain-url-test.");
     }
 }

@@ -8,6 +8,7 @@ public static class EventsEndpoints
     {
         app.MapGet("/api/events", async (EventService eventService, IConfiguration config) =>
         {
+            var pathBased = config.GetValue<bool>("Events:PathBasedRouting");
             var baseDomain = config["Events:BaseDomain"] ?? "bgstacks.com";
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
             var events = await eventService.ListPublicEventsAsync();
@@ -17,7 +18,9 @@ public static class EventsEndpoints
                 name = e.Name,
                 eventDate = e.EventDate.ToString("yyyy-MM-dd"),
                 isUpcoming = e.IsUpcoming(today),
-                url = $"https://{e.Slug.Value}.{baseDomain}/",
+                url = pathBased
+                    ? $"/event/{e.Slug.Value}/"
+                    : $"https://{e.Slug.Value}.{baseDomain}/",
                 geeklistId = e.GeeklistId,
             });
             return Results.Ok(result);
