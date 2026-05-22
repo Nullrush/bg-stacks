@@ -30,10 +30,17 @@ jobs:
         github.event.comment.author_association == 'COLLABORATOR'
       )
     steps:
+      - name: Get comment body
+        id: comment
+        uses: actions/github-script@v7
+        with:
+          script: core.setOutput('body', context.payload.comment.body);
+
       - name: Parse command
         id: parse
+        env:
+          BODY: ${{ steps.comment.outputs.body }}
         run: |
-          BODY="${{ github.event.comment.body }}"
           if [[ "$BODY" =~ ^/deploy-test-env ]]; then
             echo "match=true" >> $GITHUB_OUTPUT
             # Extract optional slug (first non-flag word after the command)
@@ -145,11 +152,13 @@ jobs:
                 --revision "$EXISTING_REV" 2>/dev/null || true
             fi
             # Delete Cosmos database (all containers inside are also deleted)
-            az cosmosdb sql database delete \
-              --account-name "$COSMOS_ACCOUNT" \
-              --resource-group "$RG" \
-              --name "$DB_NAME" \
-              --yes 2>/dev/null || true
+            if [[ -n "$DB_EXISTS" ]]; then
+              az cosmosdb sql database delete \
+                --account-name "$COSMOS_ACCOUNT" \
+                --resource-group "$RG" \
+                --name "$DB_NAME" \
+                --yes
+            fi
             # Delete blob container
             az storage container delete \
               --account-name "$STORAGE_ACCOUNT" \
@@ -203,7 +212,7 @@ jobs:
                 --query resource \
                 --output json 2>/dev/null || echo "")
               if [[ -n "$ITEM" && "$ITEM" != "null" ]]; then
-                echo "$ITEM" > /tmp/event-doc.json
+                echo "$ITEM" | jq 'del(._rid, ._self, ._etag, ._attachments, ._ts)' > /tmp/event-doc.json
                 az cosmosdb sql item create \
                   --account-name "$COSMOS_ACCOUNT" \
                   --resource-group "$RG" \
@@ -252,9 +261,13 @@ jobs:
           DB_NAME="bgstacks-pr-${PR_NUMBER}"
           BLOB_CONTAINER="cache-pr-${PR_NUMBER}"
 
-          ENV_VARS="Cosmos__DatabaseId=${DB_NAME} Blob__CacheContainer=${BLOB_CONTAINER} Events__PathBasedRouting=true"
+          ENV_VARS=(
+            "Cosmos__DatabaseId=${DB_NAME}"
+            "Blob__CacheContainer=${BLOB_CONTAINER}"
+            "Events__PathBasedRouting=true"
+          )
           if [[ -n "$SLUG" ]]; then
-            ENV_VARS="$ENV_VARS Events__DevFallbackSlug=${SLUG}"
+            ENV_VARS+=("Events__DevFallbackSlug=${SLUG}")
           fi
 
           az containerapp update \
@@ -263,7 +276,7 @@ jobs:
             --image "$IMAGE_TAG" \
             --revision-suffix "pr-${PR_NUMBER}-${SHORT_SHA}" \
             --target-label "pr-${PR_NUMBER}" \
-            --set-env-vars $ENV_VARS
+            --set-env-vars "${ENV_VARS[@]}"
 
       - name: Apply PR label to revision
         if: steps.parse.outputs.match == 'true'
