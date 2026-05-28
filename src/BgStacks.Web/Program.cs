@@ -58,13 +58,17 @@ if (app.Configuration.GetValue<bool>("Events:PathBasedRouting"))
     // routes under the /event/{slug} prefix automatically.
     slugGroup.MapGameDataEndpoints();
 
-    slugGroup.MapGet("/{**path}", async (HttpContext ctx) =>
+    async Task ServeIndex(HttpContext ctx)
     {
         var filePath = Path.Combine(app.Environment.WebRootPath, "index.html");
         if (!File.Exists(filePath)) { ctx.Response.StatusCode = 404; return; }
         ctx.Response.ContentType = "text/html";
         await ctx.Response.SendFileAsync(filePath);
-    });
+    }
+
+    // "" matches /event/{slug} (no trailing slash); "/{**path}" matches /event/{slug}/...
+    slugGroup.MapGet("", ServeIndex);
+    slugGroup.MapGet("/{**path}", ServeIndex);
 }
 
 // SPA fallback: event subdomain → index.html, root domain → home.html

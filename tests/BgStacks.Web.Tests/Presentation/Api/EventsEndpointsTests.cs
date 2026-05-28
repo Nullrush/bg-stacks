@@ -59,9 +59,8 @@ public class EventsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
             EventSlug.From("pb-url-test"), "PB URL Test",
             new DateOnly(2026, 6, 12), isPublic: true));
 
-        var client = factory
-            .WithWebHostBuilder(b => b.UseSetting("Events:PathBasedRouting", "true"))
-            .CreateClient();
+        await using var pathFactory = factory.WithWebHostBuilder(b => b.UseSetting("Events:PathBasedRouting", "true"));
+        var client = pathFactory.CreateClient();
         var response = await client.GetAsync("/api/events");
         var json = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);

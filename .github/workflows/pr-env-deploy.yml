@@ -40,10 +40,10 @@ jobs:
         env:
           BODY: ${{ steps.comment.outputs.body }}
         run: |
-          if [[ "$BODY" =~ ^/deploy-test-env ]]; then
+          if [[ "$BODY" =~ ^/deploy-test-env($|[[:space:]]) ]]; then
             echo "match=true" >> $GITHUB_OUTPUT
-            # Extract optional slug (first non-flag word after the command)
-            SLUG=$(echo "$BODY" | sed 's|/deploy-test-env||' | tr -s ' ' | xargs | sed 's/ --reset//' | xargs)
+            # Strip command, remove --reset flag, trim whitespace to get optional slug
+            SLUG=$(echo "$BODY" | sed 's|^/deploy-test-env||' | sed 's/--reset//g' | tr -s ' ' | xargs)
             echo "slug=$SLUG" >> $GITHUB_OUTPUT
             if echo "$BODY" | grep -q -- '--reset'; then
               echo "reset=true" >> $GITHUB_OUTPUT

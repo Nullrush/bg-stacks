@@ -3,19 +3,25 @@ using BgStacks.Web.Application.Events;
 using BgStacks.Web.Domain.Events;
 using BgStacks.Web.Tests.Presentation.Helpers;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace BgStacks.Web.Tests.Presentation.Events;
 
 [Collection("integration")]
-public class PathBasedRoutingTests : IClassFixture<CustomWebApplicationFactory>
+public class PathBasedRoutingTests : IClassFixture<CustomWebApplicationFactory>, IAsyncDisposable
 {
     private readonly CustomWebApplicationFactory _factory;
+    private readonly WebApplicationFactory<Program> _pathBasedFactory;
 
-    public PathBasedRoutingTests(CustomWebApplicationFactory factory) => _factory = factory;
+    public PathBasedRoutingTests(CustomWebApplicationFactory factory)
+    {
+        _factory = factory;
+        _pathBasedFactory = factory.WithWebHostBuilder(b => b.UseSetting("Events:PathBasedRouting", "true"));
+    }
 
-    private HttpClient PathBasedClient() =>
-        _factory.WithWebHostBuilder(b => b.UseSetting("Events:PathBasedRouting", "true"))
-                .CreateClient();
+    public async ValueTask DisposeAsync() => await _pathBasedFactory.DisposeAsync();
+
+    private HttpClient PathBasedClient() => _pathBasedFactory.CreateClient();
 
     // ── happy-path data ──────────────────────────────────────────────────────────────────
 
