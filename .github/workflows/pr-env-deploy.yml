@@ -20,6 +20,7 @@ jobs:
     permissions:
       id-token: write
       pull-requests: write
+      issues: write
       contents: read
     # Only run on PR comments from authorized users — unauthorized → job skipped (not failed)
     if: |

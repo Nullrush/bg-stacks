@@ -8,7 +8,7 @@ on:
     - cron: '0 2 * * *'   # nightly orphan sweep at 02:00 UTC
 
 concurrency:
-  group: pr-env-${{ github.event.pull_request.number || 'nightly-sweep' }}
+  group: container-app-ca-bgstacks-prod
   cancel-in-progress: false
 
 permissions:
