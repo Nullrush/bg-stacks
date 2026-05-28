@@ -23,13 +23,15 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseEnvironment("Testing");
 
         // Provide stub connection strings so ValidateOnStart() passes at test host startup.
-        // Real connections are not used — repositories and cache are replaced by in-memory fakes.
+        // Cosmos repositories are replaced by in-memory fakes below; the BlobServiceClient
+        // and BlobDistributedCache are not replaced but are never exercised in tests
+        // (the Testing environment skips container creation and no test triggers a cache call).
         builder.ConfigureAppConfiguration(config =>
         {
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                [$"{CosmosOptions.SectionName}:ConnectionString"] = "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b5n/rCSlFy37cMOjggEAAAAAAAAAAAA==",
-                [$"{BlobOptions.SectionName}:ConnectionString"] = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;",
+                [$"{CosmosOptions.SectionName}:ConnectionString"] = "AccountEndpoint=https://fake.documents.azure.com:443/;AccountKey=fake==",
+                [$"{BlobOptions.SectionName}:ConnectionString"] = "DefaultEndpointsProtocol=https;AccountName=fake;AccountKey=fake==;EndpointSuffix=core.windows.net",
             });
         });
 
