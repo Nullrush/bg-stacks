@@ -5,24 +5,22 @@ on:
   issue_comment:
     types: [created]
 
-# Minimal top-level permissions; jobs declare only what they need.
+concurrency:
+  group: container-app-ca-bgstacks-prod
+  cancel-in-progress: false
+
+# Minimal permissions — no packages: write (image was already pushed by pr-image-build.yml)
 permissions:
   contents: read
   pull-requests: write
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/bg-stacks
-
 jobs:
-  # Build the Docker image from PR code. packages: write for GHCR push;
-  # deliberately no id-token so the untrusted checkout has no OIDC access.
-  build:
+  deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      packages: write
+      id-token: write
       pull-requests: write
+      contents: read
     # Only run on PR comments from authorized users — unauthorized → job skipped (not failed)
     if: |
       github.event.issue.pull_request != null && (
@@ -30,13 +28,6 @@ jobs:
         github.event.comment.author_association == 'MEMBER' ||
         github.event.comment.author_association == 'COLLABORATOR'
       )
-    outputs:
-      match: ${{ steps.parse.outputs.match }}
-      slug: ${{ steps.parse.outputs.slug }}
-      reset: ${{ steps.parse.outputs.reset }}
-      pr_number: ${{ steps.get-sha.outputs.pr_number }}
-      short_sha: ${{ steps.get-sha.outputs.short_sha }}
-      image_tag: ${{ steps.image.outputs.tag }}
     steps:
       - name: Get comment body
         id: comment
@@ -75,7 +66,7 @@ jobs:
               content: 'eyes'
             });
 
-      - name: Get PR head SHA
+      - name: Get PR head SHA and image tag
         if: steps.parse.outputs.match == 'true'
         id: get-sha
         uses: actions/github-script@v7
@@ -86,59 +77,18 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
-            core.setOutput('sha', pr.data.head.sha);
-            core.setOutput('short_sha', pr.data.head.sha.substring(0, 7));
-            core.setOutput('pr_number', context.issue.number);
+            const sha = pr.data.head.sha;
+            const shortSha = sha.substring(0, 7);
+            const prNumber = context.issue.number;
+            const owner = context.repo.owner.toLowerCase();
+            const imageTag = `ghcr.io/${owner}/bg-stacks:pr-${prNumber}-${shortSha}`;
+            core.setOutput('sha', sha);
+            core.setOutput('short_sha', shortSha);
+            core.setOutput('pr_number', prNumber);
+            core.setOutput('image_tag', imageTag);
 
-      - name: Checkout PR branch
-        if: steps.parse.outputs.match == 'true'
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.get-sha.outputs.sha }}
-
-      - name: Lowercase image name
-        if: steps.parse.outputs.match == 'true'
-        id: image
-        env:
-          PR_NUMBER: ${{ steps.get-sha.outputs.pr_number }}
-          SHORT_SHA: ${{ steps.get-sha.outputs.short_sha }}
-        run: |
-          IMAGE_NAME_LOWER="${IMAGE_NAME,,}"
-          echo "IMAGE_NAME=${IMAGE_NAME_LOWER}" >> $GITHUB_ENV
-          echo "tag=${REGISTRY}/${IMAGE_NAME_LOWER}:pr-${PR_NUMBER}-${SHORT_SHA}" >> $GITHUB_OUTPUT
-
-      - name: Log in to GHCR
-        if: steps.parse.outputs.match == 'true'
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image (PR tag only — no latest)
-        if: steps.parse.outputs.match == 'true'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: src/BgStacks.Web/Dockerfile
-          push: true
-          tags: ${{ steps.image.outputs.tag }}
-
-  # Provision Azure resources and deploy the revision. Runs only after build
-  # succeeds. No PR code is checked out here, so id-token: write is safe.
-  deploy:
-    needs: build
-    if: needs.build.outputs.match == 'true'
-    runs-on: ubuntu-latest
-    concurrency:
-      group: container-app-ca-bgstacks-prod
-      cancel-in-progress: false
-    permissions:
-      id-token: write
-      pull-requests: write
-      contents: read
-    steps:
       - name: Azure login (OIDC)
+        if: steps.parse.outputs.match == 'true'
         uses: azure/login@v2
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
@@ -146,11 +96,12 @@ jobs:
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
       - name: Provision or reset PR environment
+        if: steps.parse.outputs.match == 'true'
         id: provision
         env:
-          PR_NUMBER: ${{ needs.build.outputs.pr_number }}
-          SLUG: ${{ needs.build.outputs.slug }}
-          RESET: ${{ needs.build.outputs.reset }}
+          PR_NUMBER: ${{ steps.get-sha.outputs.pr_number }}
+          SLUG: ${{ steps.parse.outputs.slug }}
+          RESET: ${{ steps.parse.outputs.reset }}
           RG: ${{ vars.AZURE_RESOURCE_GROUP }}
           COSMOS_ACCOUNT: ${{ vars.AZURE_COSMOS_ACCOUNT }}
           STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
@@ -273,11 +224,12 @@ jobs:
           fi
 
       - name: Deploy PR revision
+        if: steps.parse.outputs.match == 'true'
         env:
-          PR_NUMBER: ${{ needs.build.outputs.pr_number }}
-          SHORT_SHA: ${{ needs.build.outputs.short_sha }}
-          SLUG: ${{ needs.build.outputs.slug }}
-          IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+          PR_NUMBER: ${{ steps.get-sha.outputs.pr_number }}
+          SHORT_SHA: ${{ steps.get-sha.outputs.short_sha }}
+          IMAGE_TAG: ${{ steps.get-sha.outputs.image_tag }}
+          SLUG: ${{ steps.parse.outputs.slug }}
           RG: ${{ vars.AZURE_RESOURCE_GROUP }}
           APP_NAME: ca-bgstacks-prod
         run: |
@@ -302,9 +254,10 @@ jobs:
             --set-env-vars "${ENV_VARS[@]}"
 
       - name: Apply PR label to revision
+        if: steps.parse.outputs.match == 'true'
         env:
-          PR_NUMBER: ${{ needs.build.outputs.pr_number }}
-          SHORT_SHA: ${{ needs.build.outputs.short_sha }}
+          PR_NUMBER: ${{ steps.get-sha.outputs.pr_number }}
+          SHORT_SHA: ${{ steps.get-sha.outputs.short_sha }}
           RG: ${{ vars.AZURE_RESOURCE_GROUP }}
           APP_NAME: ca-bgstacks-prod
         run: |
@@ -317,11 +270,12 @@ jobs:
             --label "pr-${PR_NUMBER}"
 
       - name: Get PR environment URL
+        if: steps.parse.outputs.match == 'true'
         id: get-url
         env:
           APP_NAME: ca-bgstacks-prod
           RG: ${{ vars.AZURE_RESOURCE_GROUP }}
-          PR_NUMBER: ${{ needs.build.outputs.pr_number }}
+          PR_NUMBER: ${{ steps.get-sha.outputs.pr_number }}
         run: |
           # Label URL format: <app>--<label>.<default-domain>
           FQDN=$(az containerapp show -n "$APP_NAME" -g "$RG" \
@@ -331,14 +285,15 @@ jobs:
           echo "url=https://${LABEL_FQDN}" >> $GITHUB_OUTPUT
 
       - name: Post result comment
+        if: steps.parse.outputs.match == 'true'
         uses: actions/github-script@v7
         env:
           PR_ENV_URL: ${{ steps.get-url.outputs.url }}
-          SHORT_SHA: ${{ needs.build.outputs.short_sha }}
+          SHORT_SHA: ${{ steps.get-sha.outputs.short_sha }}
           FRESH: ${{ steps.provision.outputs.fresh }}
           SEEDED: ${{ steps.provision.outputs.seeded }}
-          SLUG: ${{ needs.build.outputs.slug }}
-          RESET: ${{ needs.build.outputs.reset }}
+          SLUG: ${{ steps.parse.outputs.slug }}
+          RESET: ${{ steps.parse.outputs.reset }}
         with:
           script: |
             const url = process.env.PR_ENV_URL;
