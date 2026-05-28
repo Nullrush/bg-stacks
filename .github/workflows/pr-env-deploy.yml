@@ -5,30 +5,38 @@ on:
   issue_comment:
     types: [created]
 
-concurrency:
-  group: container-app-ca-bgstacks-prod
-  cancel-in-progress: false
-
+# Minimal top-level permissions; jobs declare only what they need.
 permissions:
   contents: read
-  id-token: write
   pull-requests: write
-  packages: write
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/bg-stacks
 
 jobs:
-  deploy:
+  # Build the Docker image from PR code. packages: write for GHCR push;
+  # deliberately no id-token so the untrusted checkout has no OIDC access.
+  build:
     runs-on: ubuntu-latest
-    # Only run on PR comments from authorized users — unauthorized → job skipped (not failed), per spec
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: write
+    # Only run on PR comments from authorized users — unauthorized → job skipped (not failed)
     if: |
       github.event.issue.pull_request != null && (
         github.event.comment.author_association == 'OWNER' ||
         github.event.comment.author_association == 'MEMBER' ||
         github.event.comment.author_association == 'COLLABORATOR'
       )
+    outputs:
+      match: ${{ steps.parse.outputs.match }}
+      slug: ${{ steps.parse.outputs.slug }}
+      reset: ${{ steps.parse.outputs.reset }}
+      pr_number: ${{ steps.get-sha.outputs.pr_number }}
+      short_sha: ${{ steps.get-sha.outputs.short_sha }}
+      image_tag: ${{ steps.image.outputs.tag }}
     steps:
       - name: Get comment body
         id: comment
@@ -90,7 +98,14 @@ jobs:
 
       - name: Lowercase image name
         if: steps.parse.outputs.match == 'true'
-        run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_ENV
+        id: image
+        env:
+          PR_NUMBER: ${{ steps.get-sha.outputs.pr_number }}
+          SHORT_SHA: ${{ steps.get-sha.outputs.short_sha }}
+        run: |
+          IMAGE_NAME_LOWER="${IMAGE_NAME,,}"
+          echo "IMAGE_NAME=${IMAGE_NAME_LOWER}" >> $GITHUB_ENV
+          echo "tag=${REGISTRY}/${IMAGE_NAME_LOWER}:pr-${PR_NUMBER}-${SHORT_SHA}" >> $GITHUB_OUTPUT
 
       - name: Log in to GHCR
         if: steps.parse.outputs.match == 'true'
@@ -102,16 +117,28 @@ jobs:
 
       - name: Build and push Docker image (PR tag only — no latest)
         if: steps.parse.outputs.match == 'true'
-        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           file: src/BgStacks.Web/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ steps.get-sha.outputs.pr_number }}-${{ steps.get-sha.outputs.short_sha }}
+          tags: ${{ steps.image.outputs.tag }}
 
+  # Provision Azure resources and deploy the revision. Runs only after build
+  # succeeds. No PR code is checked out here, so id-token: write is safe.
+  deploy:
+    needs: build
+    if: needs.build.outputs.match == 'true'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: container-app-ca-bgstacks-prod
+      cancel-in-progress: false
+    permissions:
+      id-token: write
+      pull-requests: write
+      contents: read
+    steps:
       - name: Azure login (OIDC)
-        if: steps.parse.outputs.match == 'true'
         uses: azure/login@v2
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
@@ -119,12 +146,11 @@ jobs:
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
       - name: Provision or reset PR environment
-        if: steps.parse.outputs.match == 'true'
         id: provision
         env:
-          PR_NUMBER: ${{ steps.get-sha.outputs.pr_number }}
-          SLUG: ${{ steps.parse.outputs.slug }}
-          RESET: ${{ steps.parse.outputs.reset }}
+          PR_NUMBER: ${{ needs.build.outputs.pr_number }}
+          SLUG: ${{ needs.build.outputs.slug }}
+          RESET: ${{ needs.build.outputs.reset }}
           RG: ${{ vars.AZURE_RESOURCE_GROUP }}
           COSMOS_ACCOUNT: ${{ vars.AZURE_COSMOS_ACCOUNT }}
           STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
@@ -247,17 +273,14 @@ jobs:
           fi
 
       - name: Deploy PR revision
-        if: steps.parse.outputs.match == 'true'
         env:
-          PR_NUMBER: ${{ steps.get-sha.outputs.pr_number }}
-          SHORT_SHA: ${{ steps.get-sha.outputs.short_sha }}
-          SLUG: ${{ steps.parse.outputs.slug }}
+          PR_NUMBER: ${{ needs.build.outputs.pr_number }}
+          SHORT_SHA: ${{ needs.build.outputs.short_sha }}
+          SLUG: ${{ needs.build.outputs.slug }}
+          IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
           RG: ${{ vars.AZURE_RESOURCE_GROUP }}
           APP_NAME: ca-bgstacks-prod
-          REGISTRY: ${{ env.REGISTRY }}
-          IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
-          IMAGE_TAG="${REGISTRY}/${IMAGE_NAME}:pr-${PR_NUMBER}-${SHORT_SHA}"
           DB_NAME="bgstacks-pr-${PR_NUMBER}"
           BLOB_CONTAINER="cache-pr-${PR_NUMBER}"
 
@@ -279,10 +302,9 @@ jobs:
             --set-env-vars "${ENV_VARS[@]}"
 
       - name: Apply PR label to revision
-        if: steps.parse.outputs.match == 'true'
         env:
-          PR_NUMBER: ${{ steps.get-sha.outputs.pr_number }}
-          SHORT_SHA: ${{ steps.get-sha.outputs.short_sha }}
+          PR_NUMBER: ${{ needs.build.outputs.pr_number }}
+          SHORT_SHA: ${{ needs.build.outputs.short_sha }}
           RG: ${{ vars.AZURE_RESOURCE_GROUP }}
           APP_NAME: ca-bgstacks-prod
         run: |
@@ -295,12 +317,11 @@ jobs:
             --label "pr-${PR_NUMBER}"
 
       - name: Get PR environment URL
-        if: steps.parse.outputs.match == 'true'
         id: get-url
         env:
           APP_NAME: ca-bgstacks-prod
           RG: ${{ vars.AZURE_RESOURCE_GROUP }}
-          PR_NUMBER: ${{ steps.get-sha.outputs.pr_number }}
+          PR_NUMBER: ${{ needs.build.outputs.pr_number }}
         run: |
           # Label URL format: <app>--<label>.<default-domain>
           FQDN=$(az containerapp show -n "$APP_NAME" -g "$RG" \
@@ -310,15 +331,14 @@ jobs:
           echo "url=https://${LABEL_FQDN}" >> $GITHUB_OUTPUT
 
       - name: Post result comment
-        if: steps.parse.outputs.match == 'true'
         uses: actions/github-script@v7
         env:
           PR_ENV_URL: ${{ steps.get-url.outputs.url }}
-          SHORT_SHA: ${{ steps.get-sha.outputs.short_sha }}
+          SHORT_SHA: ${{ needs.build.outputs.short_sha }}
           FRESH: ${{ steps.provision.outputs.fresh }}
           SEEDED: ${{ steps.provision.outputs.seeded }}
-          SLUG: ${{ steps.parse.outputs.slug }}
-          RESET: ${{ steps.parse.outputs.reset }}
+          SLUG: ${{ needs.build.outputs.slug }}
+          RESET: ${{ needs.build.outputs.reset }}
         with:
           script: |
             const url = process.env.PR_ENV_URL;
