@@ -44,7 +44,12 @@ jobs:
           if [[ "$BODY" =~ ^/deploy-test-env($|[[:space:]]) ]]; then
             echo "match=true" >> $GITHUB_OUTPUT
             # Strip command, remove --reset flag, trim whitespace to get optional slug
-            SLUG=$(echo "$BODY" | sed 's|^/deploy-test-env||' | sed 's/--reset//g' | tr -s ' ' | xargs)
+            SLUG=$(echo "$BODY" | sed 's|^/deploy-test-env||' | sed 's/--reset//g' | tr '[:upper:]' '[:lower:]' | tr -s ' ' | xargs)
+            # Validate slug format (lowercase kebab: a-z0-9 segments separated by hyphens)
+            if [[ -n "$SLUG" && ! "$SLUG" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+              echo "Invalid slug format: '$SLUG' — must be lowercase alphanumeric kebab-case"
+              exit 1
+            fi
             echo "slug=$SLUG" >> $GITHUB_OUTPUT
             if echo "$BODY" | grep -q -- '--reset'; then
               echo "reset=true" >> $GITHUB_OUTPUT

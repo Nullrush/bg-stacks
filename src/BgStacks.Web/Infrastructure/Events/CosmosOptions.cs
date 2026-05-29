@@ -16,5 +16,10 @@ public class CosmosOptions : IValidatableObject
             yield return new ValidationResult(
                 "Either Cosmos:ConnectionString or Cosmos:Endpoint must be configured.",
                 [nameof(ConnectionString), nameof(Endpoint)]);
+
+        if (string.IsNullOrWhiteSpace(DatabaseId))
+            yield return new ValidationResult(
+                "Cosmos:DatabaseId must not be empty.",
+                [nameof(DatabaseId)]);
     }
 }

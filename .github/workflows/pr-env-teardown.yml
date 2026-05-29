@@ -97,7 +97,7 @@ jobs:
             BLOB_CONTAINER="cache-pr-${PR_NUMBER}"
 
             # Check PR state — on failure, skip (assume still open)
-            PR_STATE=$(gh pr view "$PR_NUMBER" --json state --jq .state 2>/dev/null || echo "")
+            PR_STATE=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json state --jq .state 2>/dev/null || echo "")
             if [[ -z "$PR_STATE" ]]; then
               echo "Could not determine state for PR #${PR_NUMBER} — skipping"
               continue

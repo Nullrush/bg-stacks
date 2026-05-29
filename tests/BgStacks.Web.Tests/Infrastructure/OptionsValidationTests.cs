@@ -56,4 +56,22 @@ public class OptionsValidationTests
         var results = options.Validate(new ValidationContext(options)).ToList();
         results.Should().BeEmpty();
     }
+
+    [Fact]
+    public void CosmosOptions_EmptyDatabaseId_YieldsValidationError()
+    {
+        var options = new CosmosOptions { ConnectionString = "AccountEndpoint=https://localhost:8081/;AccountKey=test==", DatabaseId = "" };
+        var results = options.Validate(new ValidationContext(options)).ToList();
+        results.Should().ContainSingle()
+            .Which.MemberNames.Should().Contain(nameof(CosmosOptions.DatabaseId));
+    }
+
+    [Fact]
+    public void BlobOptions_EmptyCacheContainer_YieldsValidationError()
+    {
+        var options = new BlobOptions { ConnectionString = "DefaultEndpointsProtocol=https;AccountName=test;AccountKey=abc==", CacheContainer = "" };
+        var results = options.Validate(new ValidationContext(options)).ToList();
+        results.Should().ContainSingle()
+            .Which.MemberNames.Should().Contain(nameof(BlobOptions.CacheContainer));
+    }
 }
