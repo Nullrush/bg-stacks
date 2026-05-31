@@ -4,6 +4,8 @@ using BgStacks.Web.Application.Events;
 using BgStacks.Web.Application.Tags;
 using BgStacks.Web.Infrastructure;
 using BgStacks.Web.Infrastructure.Auth;
+using BgStacks.Web.Infrastructure.Cache;
+using Microsoft.Extensions.Options;
 using BgStacks.Web.Infrastructure.Events;
 using BgStacks.Web.Presentation.Auth;
 using BgStacks.Web.Presentation.Events;
@@ -13,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var credential = new DefaultAzureCredential();
 
-builder.Services.AddAzureInfrastructure(builder.Configuration, credential);
+builder.Services.AddAzureInfrastructure(credential);
 builder.Services.AddProxyForwardedHeaders(builder.Configuration);
 builder.Services.AddEventDataRateLimiting();
 builder.Services.AddBggServices(builder.Configuration, builder.Environment);
@@ -29,7 +31,8 @@ var app = builder.Build();
 
 if (!app.Environment.IsEnvironment("Testing"))
     await app.Services.GetRequiredService<BlobServiceClient>()
-        .GetBlobContainerClient("cache")
+        .GetBlobContainerClient(
+            app.Services.GetRequiredService<IOptions<BlobOptions>>().Value.CacheContainer)
         .CreateIfNotExistsAsync();
 
 if (app.Environment.IsProduction() || app.Environment.IsEnvironment("Staging"))
@@ -44,6 +47,30 @@ app.MapAuthEndpoints();
 app.MapTagsEndpoints();
 app.MapEventsEndpoints();
 app.MapGameDataEndpoints();
+
+if (app.Configuration.GetValue<bool>("Events:PathBasedRouting"))
+{
+    var slugGroup = app
+        .MapGroup("/event/{slug}")
+        .AddEndpointFilter<SlugRouteFilter>();
+
+    // Reuses the existing handlers + RequireRateLimiting("event-data") from GamesJsonEndpoint.
+    // RouteGroupBuilder implements IEndpointRouteBuilder, so the extension method composes
+    // routes under the /event/{slug} prefix automatically.
+    slugGroup.MapGameDataEndpoints();
+
+    async Task ServeIndex(HttpContext ctx)
+    {
+        var filePath = Path.Combine(app.Environment.WebRootPath, "index.html");
+        if (!File.Exists(filePath)) { ctx.Response.StatusCode = 404; return; }
+        ctx.Response.ContentType = "text/html";
+        await ctx.Response.SendFileAsync(filePath);
+    }
+
+    // "" matches /event/{slug} (no trailing slash); "/{**path}" matches /event/{slug}/...
+    slugGroup.MapGet("", ServeIndex);
+    slugGroup.MapGet("/{**path}", ServeIndex);
+}
 
 // SPA fallback: event subdomain → index.html, root domain → home.html
 app.MapFallback(async (HttpContext ctx) =>

@@ -1,0 +1,132 @@
+# .github/workflows/pr-env-teardown.yml
+name: Teardown PR Environment
+
+on:
+  pull_request:
+    types: [closed]
+  schedule:
+    - cron: '0 2 * * *'   # nightly orphan sweep at 02:00 UTC
+
+concurrency:
+  group: container-app-ca-bgstacks-prod
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: read
+
+jobs:
+  teardown-on-close:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Tear down PR environment
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RG: ${{ vars.AZURE_RESOURCE_GROUP }}
+          APP_NAME: ca-bgstacks-prod
+          COSMOS_ACCOUNT: ${{ vars.AZURE_COSMOS_ACCOUNT }}
+          STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+        run: |
+          DB_NAME="bgstacks-pr-${PR_NUMBER}"
+          BLOB_CONTAINER="cache-pr-${PR_NUMBER}"
+
+          # Find labeled revision before removing the label, then deactivate it
+          REVISION=$(az containerapp revision list -n "$APP_NAME" -g "$RG" \
+            --output json 2>/dev/null | \
+            jq -r ".[] | select(.properties.label == \"pr-${PR_NUMBER}\") | .name" || echo "")
+          az containerapp revision label remove \
+            -n "$APP_NAME" -g "$RG" --label "pr-${PR_NUMBER}" 2>/dev/null || true
+          if [[ -n "$REVISION" ]]; then
+            az containerapp revision deactivate \
+              -n "$APP_NAME" -g "$RG" --revision "$REVISION" 2>/dev/null || true
+          fi
+
+          # Delete Cosmos database (cascades to all containers)
+          az cosmosdb sql database delete \
+            --account-name "$COSMOS_ACCOUNT" \
+            --resource-group "$RG" \
+            --name "$DB_NAME" \
+            --yes 2>/dev/null || true
+
+          # Delete blob container
+          az storage container delete \
+            --account-name "$STORAGE_ACCOUNT" \
+            --name "$BLOB_CONTAINER" \
+            --auth-mode login 2>/dev/null || true
+
+  nightly-sweep:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Sweep orphaned PR environments
+        env:
+          RG: ${{ vars.AZURE_RESOURCE_GROUP }}
+          APP_NAME: ca-bgstacks-prod
+          COSMOS_ACCOUNT: ${{ vars.AZURE_COSMOS_ACCOUNT }}
+          STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # List all PR databases
+          DATABASES=$(az cosmosdb sql database list \
+            --account-name "$COSMOS_ACCOUNT" \
+            --resource-group "$RG" \
+            --query "[].name" --output tsv)
+
+          for DB_NAME in $DATABASES; do
+            # Only process bgstacks-pr-{number} entries
+            if [[ ! "$DB_NAME" =~ ^bgstacks-pr-([0-9]+)$ ]]; then
+              continue
+            fi
+            PR_NUMBER="${BASH_REMATCH[1]}"
+            BLOB_CONTAINER="cache-pr-${PR_NUMBER}"
+
+            # Check PR state — on failure, skip (assume still open)
+            PR_STATE=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json state --jq .state 2>/dev/null || echo "")
+            if [[ -z "$PR_STATE" ]]; then
+              echo "Could not determine state for PR #${PR_NUMBER} — skipping"
+              continue
+            fi
+
+            if [[ "$PR_STATE" == "CLOSED" || "$PR_STATE" == "MERGED" ]]; then
+              echo "PR #${PR_NUMBER} is ${PR_STATE} — tearing down environment"
+
+              SWEEP_REV=$(az containerapp revision list -n "$APP_NAME" -g "$RG" \
+                --output json 2>/dev/null | \
+                jq -r ".[] | select(.properties.label == \"pr-${PR_NUMBER}\") | .name" || echo "")
+              az containerapp revision label remove \
+                -n "$APP_NAME" -g "$RG" --label "pr-${PR_NUMBER}" 2>/dev/null || true
+              if [[ -n "$SWEEP_REV" ]]; then
+                az containerapp revision deactivate \
+                  -n "$APP_NAME" -g "$RG" --revision "$SWEEP_REV" 2>/dev/null || true
+              fi
+
+              az cosmosdb sql database delete \
+                --account-name "$COSMOS_ACCOUNT" \
+                --resource-group "$RG" \
+                --name "$DB_NAME" \
+                --yes 2>/dev/null || true
+
+              az storage container delete \
+                --account-name "$STORAGE_ACCOUNT" \
+                --name "$BLOB_CONTAINER" \
+                --auth-mode login 2>/dev/null || true
+            else
+              echo "PR #${PR_NUMBER} is ${PR_STATE} — keeping environment"
+            fi
+          done

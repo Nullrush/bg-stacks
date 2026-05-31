@@ -1,9 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /src
-COPY src/BgStacks.Web/BgStacks.Web.csproj ./
-RUN dotnet restore
-COPY src/BgStacks.Web/ ./
-RUN dotnet publish -c Release -o /app --no-restore
+WORKDIR /repo
+COPY src/BgStacks.Web/BgStacks.Web.csproj src/BgStacks.Web/
+COPY src/BggSdk/BggSdk.csproj src/BggSdk/
+RUN dotnet restore src/BgStacks.Web/BgStacks.Web.csproj
+COPY src/BgStacks.Web/ src/BgStacks.Web/
+COPY src/BggSdk/ src/BggSdk/
+RUN dotnet publish src/BgStacks.Web/BgStacks.Web.csproj -c Release -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-azurelinux3.0-distroless
 WORKDIR /app
