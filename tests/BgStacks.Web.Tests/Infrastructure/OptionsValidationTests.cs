@@ -7,10 +7,16 @@ namespace BgStacks.Web.Tests.Infrastructure;
 
 public class OptionsValidationTests
 {
-    [Fact]
-    public void CosmosOptions_BothNull_YieldsValidationError()
+    [Theory]
+    [InlineData(null, null)]
+    [InlineData("", null)]
+    [InlineData("  ", null)]
+    [InlineData(null, "")]
+    [InlineData(null, "  ")]
+    public void CosmosOptions_NullOrWhitespaceConnectionAndEndpoint_YieldsValidationError(
+        string? connectionString, string? endpoint)
     {
-        var options = new CosmosOptions { ConnectionString = null, Endpoint = null };
+        var options = new CosmosOptions { ConnectionString = connectionString, Endpoint = endpoint };
         var results = options.Validate(new ValidationContext(options)).ToList();
         results.Should().ContainSingle()
             .Which.MemberNames.Should().Contain(nameof(CosmosOptions.ConnectionString));
@@ -32,10 +38,16 @@ public class OptionsValidationTests
         results.Should().BeEmpty();
     }
 
-    [Fact]
-    public void BlobOptions_BothNull_YieldsValidationError()
+    [Theory]
+    [InlineData(null, null)]
+    [InlineData("", null)]
+    [InlineData("  ", null)]
+    [InlineData(null, "")]
+    [InlineData(null, "  ")]
+    public void BlobOptions_NullOrWhitespaceConnectionAndServiceUri_YieldsValidationError(
+        string? connectionString, string? serviceUri)
     {
-        var options = new BlobOptions { ConnectionString = null, ServiceUri = null };
+        var options = new BlobOptions { ConnectionString = connectionString, ServiceUri = serviceUri };
         var results = options.Validate(new ValidationContext(options)).ToList();
         results.Should().ContainSingle()
             .Which.MemberNames.Should().Contain(nameof(BlobOptions.ConnectionString));

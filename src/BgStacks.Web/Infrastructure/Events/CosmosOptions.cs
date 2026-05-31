@@ -12,7 +12,7 @@ public class CosmosOptions : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (ConnectionString is null && Endpoint is null)
+        if (string.IsNullOrWhiteSpace(ConnectionString) && string.IsNullOrWhiteSpace(Endpoint))
             yield return new ValidationResult(
                 "Either Cosmos:ConnectionString or Cosmos:Endpoint must be configured.",
                 [nameof(ConnectionString), nameof(Endpoint)]);

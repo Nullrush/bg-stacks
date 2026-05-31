@@ -12,7 +12,7 @@ public class BlobOptions : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (ConnectionString is null && ServiceUri is null)
+        if (string.IsNullOrWhiteSpace(ConnectionString) && string.IsNullOrWhiteSpace(ServiceUri))
             yield return new ValidationResult(
                 "Either Blob:ConnectionString or Blob:ServiceUri must be configured.",
                 [nameof(ConnectionString), nameof(ServiceUri)]);
