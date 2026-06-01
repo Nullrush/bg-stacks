@@ -67,8 +67,13 @@ if (app.Configuration.GetValue<bool>("Events:PathBasedRouting"))
         await ctx.Response.SendFileAsync(filePath);
     }
 
-    // "" matches /event/{slug} (no trailing slash); "/{**path}" matches /event/{slug}/...
-    slugGroup.MapGet("", ServeIndex);
+    // "" redirects /event/{slug} → /event/{slug}/ so relative asset URLs resolve correctly.
+    // "/{**path}" matches /event/{slug}/... (with trailing slash or deeper paths).
+    slugGroup.MapGet("", (HttpContext ctx) =>
+    {
+        var slug = ctx.GetRouteValue("slug");
+        return Results.Redirect($"/event/{slug}/", permanent: true);
+    });
     slugGroup.MapGet("/{**path}", ServeIndex);
 }
 

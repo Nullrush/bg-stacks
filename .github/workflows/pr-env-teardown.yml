@@ -42,7 +42,7 @@ jobs:
           # Find labeled revision before removing the label, then deactivate it
           REVISION=$(az containerapp revision list -n "$APP_NAME" -g "$RG" \
             --output json 2>/dev/null | \
-            jq -r ".[] | select(.properties.label == \"pr-${PR_NUMBER}\") | .name" || echo "")
+            jq -r ".[] | select(.properties.label == \"pr-${PR_NUMBER}\") | .name" 2>/dev/null | head -n 1)
           az containerapp revision label remove \
             -n "$APP_NAME" -g "$RG" --label "pr-${PR_NUMBER}" 2>/dev/null || true
           if [[ -n "$REVISION" ]]; then
@@ -108,7 +108,7 @@ jobs:
 
               SWEEP_REV=$(az containerapp revision list -n "$APP_NAME" -g "$RG" \
                 --output json 2>/dev/null | \
-                jq -r ".[] | select(.properties.label == \"pr-${PR_NUMBER}\") | .name" || echo "")
+                jq -r ".[] | select(.properties.label == \"pr-${PR_NUMBER}\") | .name" 2>/dev/null | head -n 1)
               az containerapp revision label remove \
                 -n "$APP_NAME" -g "$RG" --label "pr-${PR_NUMBER}" 2>/dev/null || true
               if [[ -n "$SWEEP_REV" ]]; then

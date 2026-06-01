@@ -96,6 +96,16 @@ public class PathBasedRoutingTests : IClassFixture<CustomWebApplicationFactory>,
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
+    [Fact]
+    public async Task NoTrailingSlash_RedirectsToTrailingSlashForm()
+    {
+        var client = _pathBasedFactory.CreateClient(
+            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        var response = await client.GetAsync("/event/any-slug");
+        response.StatusCode.Should().Be(HttpStatusCode.MovedPermanently);
+        response.Headers.Location?.ToString().Should().Be("/event/any-slug/");
+    }
+
     // ── feature-flag off ─────────────────────────────────────────────────────────────────
 
     [Fact]
