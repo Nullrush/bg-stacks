@@ -1,4 +1,9 @@
 // ─── Service worker registration ─────────────────────────────────────────────
+// Note: the SW pre-caches /games.json, /mechanics.json, /categories.json at the
+// origin root. In path-based routing mode (/event/{slug}/), those root-relative
+// URLs 404, so SW install fails silently on first visit to a PR environment.
+// This is acceptable for throwaway PR envs but would need fixing before enabling
+// path-based routing on a production origin with real end-users.
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
