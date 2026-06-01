@@ -84,6 +84,10 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
+            if (pr.data.head.repo.full_name !== context.repo.full_name) {
+              core.setFailed(`PR is from a fork (${pr.data.head.repo.full_name}). No image was built for fork PRs — deploy is not supported.`);
+              return;
+            }
             const sha = pr.data.head.sha;
             const shortSha = sha.substring(0, 7);
             const prNumber = context.issue.number;

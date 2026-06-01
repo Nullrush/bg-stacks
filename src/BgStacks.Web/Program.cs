@@ -67,11 +67,13 @@ if (app.Configuration.GetValue<bool>("Events:PathBasedRouting"))
         await ctx.Response.SendFileAsync(filePath);
     }
 
-    // "" redirects /event/{slug} → /event/{slug}/ so relative asset URLs resolve correctly.
-    // "/{**path}" matches /event/{slug}/... (with trailing slash or deeper paths).
+    // "" redirects /event/{slug} → /event/{slug}/ so the SPA's relative fetches
+    // (games.json, mechanics.json, etc.) resolve under the correct base path.
+    // Uses the normalized EventSlug from Items (set by SlugRouteFilter) rather than
+    // the raw route value so the canonical lowercase form is always used.
     slugGroup.MapGet("", (HttpContext ctx) =>
     {
-        var slug = ctx.GetRouteValue("slug");
+        var slug = ctx.Items[EventMiddleware.SlugKey];
         return Results.Redirect($"/event/{slug}/", permanent: true);
     });
     slugGroup.MapGet("/{**path}", ServeIndex);
