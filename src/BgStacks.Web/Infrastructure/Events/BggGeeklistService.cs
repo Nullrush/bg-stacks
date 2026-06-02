@@ -18,7 +18,9 @@ public sealed class BggGeeklistService : IBggGeeklistService
     // Runs the background work. Production: fire-and-forget via Task.Run.
     // Tests: inject an awaiting runner so the first call blocks until the fetch completes.
     private readonly Func<Func<Task>, Task> _backgroundRunner;
-    private readonly ConcurrentDictionary<int, byte> _inFlight = new();
+    // Static so it's shared across all scoped instances — prevents duplicate background fetches
+    // when multiple requests arrive before the first one populates the cache.
+    private static readonly ConcurrentDictionary<int, byte> _inFlight = new();
 
     public BggGeeklistService(BggClient bgg, IBggThingService things, IFusionCache cache,
         int checkIntervalMinutes = 30, Func<Func<Task>, Task>? backgroundRunner = null)

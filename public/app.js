@@ -1516,14 +1516,16 @@ fetch('event.json').then(r => r.ok ? r.json() : null).catch(() => null).then(met
 });
 
 // Fetch a JSON endpoint, retrying on 202 (backend is still loading data from BGG).
+// Gives up after ~3 minutes (36 polls × 5 s) and returns the fallback.
 async function fetchWithBggRetry(url, fallback, onWaiting) {
-  while (true) {
+  for (let attempt = 0; attempt < 36; attempt++) {
     try {
       const r = await fetch(url);
       if (r.status === 202) { onWaiting?.(); await new Promise(res => setTimeout(res, 5000)); continue; }
       return r.ok ? await r.json() : fallback;
     } catch { return fallback; }
   }
+  return fallback;
 }
 
 tbody.innerHTML = '<tr><td colspan="13" class="loading">Loading…</td></tr>';
