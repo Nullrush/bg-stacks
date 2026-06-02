@@ -3,6 +3,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using BgStacks.Web.Infrastructure.Cache;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 
 namespace BgStacks.Web.Tests.Infrastructure.Cache;
@@ -10,7 +11,7 @@ namespace BgStacks.Web.Tests.Infrastructure.Cache;
 public class BlobDistributedCacheTests
 {
     private static (BlobDistributedCache sut, BlobClient blobClient) MakeWithBlob(
-        byte[] content, IDictionary<string, string>? metadata = null)
+        byte[] content, IDictionary<string, string>? metadata = null, string containerName = "cache")
     {
         var details = BlobsModelFactory.BlobDownloadDetails(metadata: metadata ?? new Dictionary<string, string>());
         var downloadResult = BlobsModelFactory.BlobDownloadResult(
@@ -24,12 +25,13 @@ public class BlobDistributedCacheTests
         container.GetBlobClient(Arg.Any<string>()).Returns(blobClient);
 
         var serviceClient = Substitute.For<BlobServiceClient>();
-        serviceClient.GetBlobContainerClient("cache").Returns(container);
+        serviceClient.GetBlobContainerClient(containerName).Returns(container);
 
-        return (new BlobDistributedCache(serviceClient), blobClient);
+        var options = Options.Create(new BlobOptions { CacheContainer = containerName });
+        return (new BlobDistributedCache(serviceClient, options), blobClient);
     }
 
-    private static BlobDistributedCache MakeWithNotFound()
+    private static BlobDistributedCache MakeWithNotFound(string containerName = "cache")
     {
         var blobClient = Substitute.For<BlobClient>();
         blobClient.DownloadContentAsync(Arg.Any<CancellationToken>())
@@ -39,9 +41,10 @@ public class BlobDistributedCacheTests
         container.GetBlobClient(Arg.Any<string>()).Returns(blobClient);
 
         var serviceClient = Substitute.For<BlobServiceClient>();
-        serviceClient.GetBlobContainerClient("cache").Returns(container);
+        serviceClient.GetBlobContainerClient(containerName).Returns(container);
 
-        return new BlobDistributedCache(serviceClient);
+        var options = Options.Create(new BlobOptions { CacheContainer = containerName });
+        return new BlobDistributedCache(serviceClient, options);
     }
 
     [Fact]
@@ -112,5 +115,14 @@ public class BlobDistributedCacheTests
     {
         var sut = MakeWithNotFound();
         await sut.RefreshAsync("any-key");
+    }
+
+    [Fact]
+    public async Task GetAsync_UsesConfiguredContainerName()
+    {
+        var data = new byte[] { 7 };
+        var (sut, blobClient) = MakeWithBlob(data, containerName: "cache-pr-42");
+        var result = await sut.GetAsync("some-key");
+        result.Should().BeEquivalentTo(data);
     }
 }

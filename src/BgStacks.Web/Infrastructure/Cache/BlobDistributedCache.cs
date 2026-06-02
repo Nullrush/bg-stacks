@@ -2,6 +2,7 @@ using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 
 namespace BgStacks.Web.Infrastructure.Cache;
 
@@ -10,8 +11,8 @@ public sealed class BlobDistributedCache : IDistributedCache
     private const string ExpiresKey = "expires";
     private readonly BlobContainerClient _container;
 
-    public BlobDistributedCache(BlobServiceClient blobService)
-        => _container = blobService.GetBlobContainerClient("cache");
+    public BlobDistributedCache(BlobServiceClient blobService, IOptions<BlobOptions> options)
+        => _container = blobService.GetBlobContainerClient(options.Value.CacheContainer);
 
     public byte[]? Get(string key)
     {

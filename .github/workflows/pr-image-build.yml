@@ -1,0 +1,47 @@
+# .github/workflows/pr-image-build.yml
+name: Build PR Image
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/bg-stacks
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Lowercase image name
+        id: image
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SHORT_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          IMAGE_NAME_LOWER="${IMAGE_NAME,,}"
+          SHORT="${SHORT_SHA:0:7}"
+          echo "tag=${REGISTRY}/${IMAGE_NAME_LOWER}:pr-${PR_NUMBER}-${SHORT}" >> $GITHUB_OUTPUT
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: src/BgStacks.Web/Dockerfile
+          push: true
+          tags: ${{ steps.image.outputs.tag }}

@@ -11,6 +11,10 @@ on:
       - '.github/workflows/app.yml'
   workflow_dispatch:
 
+concurrency:
+  group: container-app-ca-bgstacks-prod
+  cancel-in-progress: false
+
 permissions:
   id-token: write
   contents: read
@@ -94,13 +98,30 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Assert Container App is in Labels revisions mode
+        env:
+          RG: ${{ vars.AZURE_RESOURCE_GROUP }}
+        run: |
+          MODE=$(az containerapp show \
+            --name ca-bgstacks-prod \
+            --resource-group "$RG" \
+            --query properties.configuration.activeRevisionsMode \
+            --output tsv)
+          if [[ "$MODE" != "Labels" ]]; then
+            echo "::error::Container App is in '${MODE}' revisions mode, expected 'Labels'."
+            echo "::error::Run: az containerapp revision set-mode --name ca-bgstacks-prod --resource-group <rg> --mode labels"
+            echo "::error::Then apply the prod label to the current revision before re-running this workflow."
+            exit 1
+          fi
+
       - name: Update Container App image
         run: |
           SHA_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$(git rev-parse --short HEAD)"
           az containerapp update \
             --name ca-bgstacks-prod \
             --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
-            --image "$SHA_TAG"
+            --image "$SHA_TAG" \
+            --target-label prod
       - name: Post deployment summary
         if: success()
         run: |

@@ -50,4 +50,43 @@ public class EventsEndpointsTests : IClassFixture<CustomWebApplicationFactory>
             e.GetProperty("slug").GetString() == "past-event");
         ev.GetProperty("isUpcoming").GetBoolean().Should().BeFalse();
     }
+
+    [Fact]
+    public async Task GetEvents_PathBasedRoutingEnabled_ReturnsRelativeEventUrls()
+    {
+        await using var factory = new CustomWebApplicationFactory();
+        factory.EventRepository.Seed(new Event(
+            EventSlug.From("pb-url-test"), "PB URL Test",
+            new DateOnly(2026, 6, 12), isPublic: true));
+
+        await using var pathFactory = factory.WithWebHostBuilder(b => b.UseSetting("Events:PathBasedRouting", "true"));
+        var client = pathFactory.CreateClient();
+        var response = await client.GetAsync("/api/events");
+        var json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var ev = doc.RootElement.EnumerateArray()
+            .Single(e => e.GetProperty("slug").GetString() == "pb-url-test");
+        ev.GetProperty("url").GetString().Should().Be("/event/pb-url-test/");
+    }
+
+    [Fact]
+    public async Task GetEvents_PathBasedRoutingDisabled_ReturnsSubdomainUrls()
+    {
+        await using var factory = new CustomWebApplicationFactory();
+        factory.EventRepository.Seed(new Event(
+            EventSlug.From("subdomain-url-test"), "Subdomain URL Test",
+            new DateOnly(2026, 6, 12), isPublic: true));
+
+        var client = factory.CreateClient();   // no PathBasedRouting
+        var response = await client.GetAsync("/api/events");
+        var json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var ev = doc.RootElement.EnumerateArray()
+            .Single(e => e.GetProperty("slug").GetString() == "subdomain-url-test");
+        ev.GetProperty("url").GetString().Should().StartWith("https://subdomain-url-test.").And.EndWith("/");
+    }
 }
