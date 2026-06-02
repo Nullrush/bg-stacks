@@ -90,6 +90,30 @@ jobs:
           parameters-file: ./infra/parameters/main.bicepparam
           action-on-unmanage-resources: detach
           deny-settings-mode: denyDelete
+      - name: Restore Labels revisions mode and prod label
+        if: success()
+        env:
+          RG: ${{ vars.AZURE_RESOURCE_GROUP }}
+          APP_NAME: ca-bgstacks-prod
+        run: |
+          az extension add --name containerapp --upgrade --yes
+
+          # AVM module 0.22.1 does not support activeRevisionsMode: Labels and resets
+          # it to Single on every deploy. Restore Labels mode so PR env routing works.
+          az containerapp revision set-mode \
+            --name "$APP_NAME" --resource-group "$RG" --mode labels
+
+          # Re-apply the prod label to the currently active revision.
+          ACTIVE_REV=$(az containerapp revision list \
+            -n "$APP_NAME" -g "$RG" \
+            --query "[?properties.active].name | [0]" \
+            --output tsv)
+          if [[ -n "$ACTIVE_REV" ]]; then
+            az containerapp revision label add \
+              -n "$APP_NAME" -g "$RG" \
+              --revision "$ACTIVE_REV" --label prod
+          fi
+
       - name: Post stack outputs
         if: success()
         run: |
