@@ -1497,7 +1497,17 @@ syncControls();
 
 fetch('event.json').then(r => r.ok ? r.json() : null).catch(() => null).then(meta => {
   if (!meta) return;
-  document.title = meta.title + ' — P&W Index';
+  document.title = (meta.eventName || meta.title) + ' — P&W Index';
+  const kickerText = document.getElementById('kickerText');
+  if (kickerText) {
+    if (meta.eventName) {
+      kickerText.textContent = ' ' + meta.eventName;
+    } else {
+      kickerText.closest('.kicker').hidden = true;
+    }
+  }
+  const pageTitle = document.getElementById('pageTitle');
+  if (pageTitle && meta.title) pageTitle.textContent = meta.title;
   const link = document.getElementById('geeklistLink');
   if (link && meta.geeklistId) {
     link.href = `https://boardgamegeek.com/geeklist/${meta.geeklistId}/`;
@@ -1505,15 +1515,34 @@ fetch('event.json').then(r => r.ok ? r.json() : null).catch(() => null).then(met
   }
 });
 
+// Fetch a JSON endpoint, retrying on 202 (backend is still loading data from BGG).
+async function fetchWithBggRetry(url, fallback, onWaiting) {
+  while (true) {
+    try {
+      const r = await fetch(url);
+      if (r.status === 202) { onWaiting?.(); await new Promise(res => setTimeout(res, 5000)); continue; }
+      return r.ok ? await r.json() : fallback;
+    } catch { return fallback; }
+  }
+}
+
+tbody.innerHTML = '<tr><td colspan="13" class="loading">Loading…</td></tr>';
+
 // Load mechanics list, categories list, and game data in parallel.
 // games.json is a superset of bleemus's games.json — all existing
 // fields are preserved, plus mechanics, categories, description, thumbnail, etc.
 Promise.all([
-  fetch('games.json').then(r => r.json()),
-  fetch('mechanics.json').then(r => r.json()).catch(() => []),
-  fetch('categories.json').then(r => r.json()).catch(() => []),
+  fetchWithBggRetry('games.json', null, () => {
+    tbody.innerHTML = '<tr><td colspan="13" class="loading">Fetching game data from BoardGameGeek for the first time — this may take a minute…</td></tr>';
+  }),
+  fetchWithBggRetry('mechanics.json', []),
+  fetchWithBggRetry('categories.json', []),
   checkAuth(),
 ]).then(async ([games, mechanics, categories]) => {
+  if (!games) {
+    tbody.innerHTML = '<tr><td colspan="13" class="loading">Failed to load game data.</td></tr>';
+    return;
+  }
   MECHANICS  = mechanics;
   CATEGORIES = categories;
 

@@ -53,8 +53,29 @@ public class BggGeeklistServiceTests
         Description = "Donated by someone",
     };
 
+    // Runs the background work synchronously so tests don't need to poll.
+    private static readonly Func<Func<Task>, Task> SyncRunner = async f => await f();
+
     [Fact]
-    public async Task GetEventDataAsync_FirstCall_FetchesGeeklistAndAssembles()
+    public async Task GetEventDataAsync_FirstCall_ReturnsIsLoading()
+    {
+        var handler = new TestHttpMessageHandler(
+            new HttpResponseMessage(HttpStatusCode.OK)
+                { Content = new StringContent(MakeGeeklistXml(1000)) });
+        var bgg = MakeBggClient(handler);
+        var thingService = Substitute.For<IBggThingService>();
+        thingService.GetGameEntriesAsync(Arg.Any<IReadOnlyList<(int, string)>>(), Arg.Any<CancellationToken>())
+            .Returns([MakeGameEntry(42)]);
+        var sut = new BggGeeklistService(bgg, thingService, MakeInMemoryCache(), 30, SyncRunner);
+
+        var result = await sut.GetEventDataAsync(12345, TestSlug);
+
+        result.IsLoading.Should().BeTrue();
+        result.Data.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetEventDataAsync_SecondCall_ReturnsAssembledData()
     {
         var handler = new TestHttpMessageHandler(
             new HttpResponseMessage(HttpStatusCode.OK)
@@ -64,25 +85,27 @@ public class BggGeeklistServiceTests
         thingService.GetGameEntriesAsync(Arg.Any<IReadOnlyList<(int, string)>>(), Arg.Any<CancellationToken>())
             .Returns([MakeGameEntry(42)]);
         var cache = MakeInMemoryCache();
-        var sut = new BggGeeklistService(bgg, thingService, cache, checkIntervalMinutes: 30);
+        var sut = new BggGeeklistService(bgg, thingService, cache, 30, SyncRunner);
 
+        await sut.GetEventDataAsync(12345, TestSlug); // seeds the cache
         var result = await sut.GetEventDataAsync(12345, TestSlug);
 
-        result.Should().NotBeNull();
-        result!.Title.Should().Be("Test Geeklist");
-        result.EditTimestamp.Should().Be(1000L);
-        result.SlugValue.Should().Be("12345");
-        var games = JsonSerializer.Deserialize<JsonElement[]>(result.GamesJson)!;
+        result.IsLoading.Should().BeFalse();
+        result.Data.Should().NotBeNull();
+        result.Data!.Title.Should().Be("Test Geeklist");
+        result.Data.EditTimestamp.Should().Be(1000L);
+        result.Data.SlugValue.Should().Be("12345");
+        var games = JsonSerializer.Deserialize<JsonElement[]>(result.Data.GamesJson)!;
         games.Should().HaveCount(1);
         games[0].GetProperty("id").GetInt32().Should().Be(42);
         await thingService.Received(1).EnsureThingsAsync(
             Arg.Is<IReadOnlyList<int>>(ids => ids.Contains(42)), Arg.Any<CancellationToken>());
-        result.MechanicsJson.Should().Contain("Worker Placement");
-        result.CategoriesJson.Should().Contain("Strategy");
+        result.Data.MechanicsJson.Should().Contain("Worker Placement");
+        result.Data.CategoriesJson.Should().Contain("Strategy");
     }
 
     [Fact]
-    public async Task GetEventDataAsync_SecondCallWithinTtl_DoesNotHitBgg()
+    public async Task GetEventDataAsync_ThirdCallWithinTtl_DoesNotHitBgg()
     {
         var handler = new TestHttpMessageHandler(
             new HttpResponseMessage(HttpStatusCode.OK)
@@ -92,28 +115,31 @@ public class BggGeeklistServiceTests
         thingService.GetGameEntriesAsync(Arg.Any<IReadOnlyList<(int, string)>>(), Arg.Any<CancellationToken>())
             .Returns([MakeGameEntry(42)]);
         var cache = MakeInMemoryCache();
-        var sut = new BggGeeklistService(bgg, thingService, cache, checkIntervalMinutes: 30);
+        var sut = new BggGeeklistService(bgg, thingService, cache, 30, SyncRunner);
 
-        await sut.GetEventDataAsync(12345, TestSlug);
-        var result = await sut.GetEventDataAsync(12345, TestSlug);
+        await sut.GetEventDataAsync(12345, TestSlug); // seeds
+        await sut.GetEventDataAsync(12345, TestSlug); // cached
+        var result = await sut.GetEventDataAsync(12345, TestSlug); // still cached
 
         handler.RequestCount.Should().Be(1);
-        result.Should().NotBeNull();
+        result.Data.Should().NotBeNull();
     }
 
     [Fact]
-    public async Task GetEventDataAsync_BggApiException_ReturnsNull()
+    public async Task GetEventDataAsync_BggApiException_ReturnsNullAfterBackgroundFetch()
     {
         var handler = new TestHttpMessageHandler(
             new HttpResponseMessage(HttpStatusCode.NotFound));
         var bgg = MakeBggClient(handler);
         var thingService = Substitute.For<IBggThingService>();
-        var cache = MakeInMemoryCache();
-        var sut = new BggGeeklistService(bgg, thingService, cache, checkIntervalMinutes: 30);
+        var sut = new BggGeeklistService(bgg, thingService, MakeInMemoryCache(), 30, SyncRunner);
+
+        await sut.GetEventDataAsync(12345, TestSlug); // background fetch returns 404
 
         var result = await sut.GetEventDataAsync(12345, TestSlug);
 
-        result.Should().BeNull();
+        result.IsLoading.Should().BeFalse();
+        result.Data.Should().BeNull();
         await thingService.DidNotReceive().EnsureThingsAsync(
             Arg.Any<IReadOnlyList<int>>(), Arg.Any<CancellationToken>());
     }
@@ -127,10 +153,10 @@ public class BggGeeklistServiceTests
         var bgg = MakeBggClient(handler);
         var thingService = Substitute.For<IBggThingService>();
         var cache = MakeInMemoryCache();
-        var sut = new BggGeeklistService(bgg, thingService, cache, checkIntervalMinutes: 30);
+        var sut = new BggGeeklistService(bgg, thingService, cache, 30, SyncRunner);
 
-        await sut.GetEventDataAsync(12345, TestSlug);
-        await sut.GetEventDataAsync(12345, TestSlug);
+        await sut.GetEventDataAsync(12345, TestSlug); // background fetch → 404 cached
+        await sut.GetEventDataAsync(12345, TestSlug); // cache hit, no BGG call
 
         handler.RequestCount.Should().Be(1);
     }

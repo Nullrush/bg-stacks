@@ -212,10 +212,9 @@ public class BggClientTests
 
         await MakeClient(handler).GetThingsAsync(Enumerable.Range(1, 21));
 
-        // First path should have 20 comma-separated ids (19 commas)
-        handler.RequestedPaths[0].Count(c => c == ',').Should().Be(19);
-        // Second path should have 1 id (0 commas in the id list)
-        handler.RequestedPaths[1].Should().Contain("id=21");
+        // Chunks are fetched in parallel — check content regardless of which arrived first.
+        handler.RequestedPaths.Should().ContainSingle(p => p.Count(c => c == ',') == 19);
+        handler.RequestedPaths.Should().ContainSingle(p => p.Contains("id=21"));
     }
 
     [Fact]

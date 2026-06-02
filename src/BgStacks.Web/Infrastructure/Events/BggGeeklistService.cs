@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net;
 using System.Text.Json;
 using BggSdk;
@@ -14,78 +15,128 @@ public sealed class BggGeeklistService : IBggGeeklistService
     private readonly IBggThingService _things;
     private readonly IFusionCache _cache;
     private readonly int _checkIntervalMinutes;
+    // Runs the background work. Production: fire-and-forget via Task.Run.
+    // Tests: inject an awaiting runner so the first call blocks until the fetch completes.
+    private readonly Func<Func<Task>, Task> _backgroundRunner;
+    private readonly ConcurrentDictionary<int, byte> _inFlight = new();
 
     public BggGeeklistService(BggClient bgg, IBggThingService things, IFusionCache cache,
-        int checkIntervalMinutes = 30)
+        int checkIntervalMinutes = 30, Func<Func<Task>, Task>? backgroundRunner = null)
     {
         _bgg = bgg;
         _things = things;
         _cache = cache;
         _checkIntervalMinutes = checkIntervalMinutes;
+        _backgroundRunner = backgroundRunner ?? (f => { _ = Task.Run(f); return Task.CompletedTask; });
     }
 
-    public async Task<EventData?> GetEventDataAsync(int geeklistId, EventSlug slug,
+    public async Task<EventDataResult> GetEventDataAsync(int geeklistId, EventSlug slug,
         CancellationToken ct = default)
     {
         var checkInterval = TimeSpan.FromMinutes(Math.Max(_checkIntervalMinutes, 1));
         var cacheKey = $"bgg-event:v1:{geeklistId}";
 
-        var data = await _cache.GetOrSetAsync<EventData?>(
-            cacheKey,
-            async (ctx, token) =>
-            {
-                var stale = ctx.HasStaleValue ? ctx.StaleValue.GetValueOrDefault() : null;
+        // Fast path: fresh value in cache.
+        var fresh = await _cache.TryGetAsync<EventData?>(cacheKey, token: ct);
+        if (fresh.HasValue)
+            return ToResult(fresh.Value, slug);
 
-                BggSdk.Models.Geeklist geeklist;
-                try
+        // Stale (fail-safe protected) value — serve it and revalidate in background.
+        var stale = await _cache.TryGetAsync<EventData?>(
+            cacheKey, options => options.IsFailSafeEnabled = true, ct);
+        if (stale.HasValue)
+        {
+            _ = EnsureBackgroundFetch(geeklistId, cacheKey, checkInterval);
+            return ToResult(stale.Value, slug);
+        }
+
+        // Nothing cached — start background fetch and tell the client to wait.
+        await EnsureBackgroundFetch(geeklistId, cacheKey, checkInterval);
+        return new EventDataResult(null, IsLoading: true);
+    }
+
+    private Task EnsureBackgroundFetch(int geeklistId, string cacheKey, TimeSpan checkInterval)
+    {
+        if (_inFlight.TryAdd(geeklistId, 0))
+            return _backgroundRunner(() => BackgroundFetchAsync(geeklistId, cacheKey, checkInterval));
+        return Task.CompletedTask;
+    }
+
+    private async Task BackgroundFetchAsync(int geeklistId, string cacheKey, TimeSpan checkInterval)
+    {
+        try
+        {
+            await _cache.GetOrSetAsync<EventData?>(
+                cacheKey,
+                (ctx, token) => FetchAsync(geeklistId, ctx, token),
+                new FusionCacheEntryOptions
                 {
-                    geeklist = await _bgg.GetGeeklistAsync(geeklistId, token);
-                }
-                catch (BggApiException ex)
-                {
-                    var statusCode = (ex.InnerException as HttpRequestException)?.StatusCode;
-                    if (statusCode != HttpStatusCode.NotFound)
-                        throw;
-                    ctx.Options.Duration = TimeSpan.FromMinutes(5);
-                    ctx.Options.IsFailSafeEnabled = false;
-                    return null;
-                }
+                    Duration = checkInterval,
+                    IsFailSafeEnabled = true,
+                    FailSafeMaxDuration = TimeSpan.FromHours(24),
+                    FailSafeThrottleDuration = TimeSpan.FromSeconds(30),
+                },
+                CancellationToken.None);
+        }
+        catch { }
+        finally { _inFlight.TryRemove(geeklistId, out _); }
+    }
 
-                if (stale is not null && geeklist.EditTimestamp == stale.EditTimestamp)
-                    return stale;
+    private async Task<EventData?> FetchAsync(int geeklistId,
+        FusionCacheFactoryExecutionContext<EventData?> ctx, CancellationToken token)
+    {
+        var stale = ctx.HasStaleValue ? ctx.StaleValue.GetValueOrDefault() : null;
 
-                var objectIds = geeklist.Items.Select(i => i.ObjectId).Distinct().ToList();
-                await _things.EnsureThingsAsync(objectIds, token);
+        BggSdk.Models.Geeklist geeklist;
+        try
+        {
+            geeklist = await _bgg.GetGeeklistAsync(geeklistId, token);
+        }
+        catch (BggRetryException)
+        {
+            if (ctx.HasStaleValue) return ctx.StaleValue.GetValueOrDefault();
+            ctx.Options.Duration = TimeSpan.FromSeconds(15);
+            ctx.Options.IsFailSafeEnabled = false;
+            return null;
+        }
+        catch (BggApiException ex)
+        {
+            var statusCode = (ex.InnerException as HttpRequestException)?.StatusCode;
+            if (statusCode != HttpStatusCode.NotFound) throw;
+            ctx.Options.Duration = TimeSpan.FromMinutes(5);
+            ctx.Options.IsFailSafeEnabled = false;
+            return null;
+        }
 
-                var itemTuples = geeklist.Items
-                    .Select(i => (ObjectId: i.ObjectId, Body: i.Body))
-                    .ToList();
-                var entries = await _things.GetGameEntriesAsync(itemTuples, token);
+        if (stale is not null && geeklist.EditTimestamp == stale.EditTimestamp)
+            return stale;
 
-                var allMechanics = entries.SelectMany(e => e.Mechanics).Distinct().OrderBy(m => m).ToList();
-                var allCategories = entries.SelectMany(e => e.Categories).Distinct().OrderBy(c => c).ToList();
+        var objectIds = geeklist.Items.Select(i => i.ObjectId).Distinct().ToList();
+        await _things.EnsureThingsAsync(objectIds, token);
 
-                return new EventData
-                {
-                    SlugValue = geeklistId.ToString(),
-                    Title = geeklist.Title,
-                    GeeklistId = geeklistId,
-                    EditTimestamp = geeklist.EditTimestamp,
-                    GamesJson = JsonSerializer.Serialize(entries),
-                    MechanicsJson = JsonSerializer.Serialize(allMechanics),
-                    CategoriesJson = JsonSerializer.Serialize(allCategories),
-                };
-            },
-            new FusionCacheEntryOptions
-            {
-                Duration = checkInterval,
-                IsFailSafeEnabled = true,
-                FailSafeMaxDuration = TimeSpan.FromHours(24),
-                FailSafeThrottleDuration = TimeSpan.FromSeconds(30),
-            },
-            ct);
+        var itemTuples = geeklist.Items
+            .Select(i => (ObjectId: i.ObjectId, Body: i.Body))
+            .ToList();
+        var entries = await _things.GetGameEntriesAsync(itemTuples, token);
 
-        return data is null ? null :
-            data.SlugValue == slug.Value ? data : data with { SlugValue = slug.Value };
+        var allMechanics = entries.SelectMany(e => e.Mechanics).Distinct().OrderBy(m => m).ToList();
+        var allCategories = entries.SelectMany(e => e.Categories).Distinct().OrderBy(c => c).ToList();
+
+        return new EventData
+        {
+            SlugValue = geeklistId.ToString(),
+            Title = geeklist.Title,
+            GeeklistId = geeklistId,
+            EditTimestamp = geeklist.EditTimestamp,
+            GamesJson = JsonSerializer.Serialize(entries),
+            MechanicsJson = JsonSerializer.Serialize(allMechanics),
+            CategoriesJson = JsonSerializer.Serialize(allCategories),
+        };
+    }
+
+    private static EventDataResult ToResult(EventData? value, EventSlug slug)
+    {
+        if (value is null) return new EventDataResult(null);
+        return new EventDataResult(value.SlugValue == slug.Value ? value : value with { SlugValue = slug.Value });
     }
 }

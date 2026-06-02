@@ -13,7 +13,7 @@ public sealed class EventDataService
         _geeklist = geeklist;
     }
 
-    public async Task<EventData?> GetEventDataAsync(EventSlug slug, CancellationToken ct = default)
+    public async Task<EventDataResult> GetEventDataAsync(EventSlug slug, CancellationToken ct = default)
     {
         if (int.TryParse(slug.Value, out var numericId))
             return await _geeklist.GetEventDataAsync(numericId, slug, ct);
@@ -23,6 +23,6 @@ public sealed class EventDataService
         if (@event?.GeeklistId is int id)
             return await _geeklist.GetEventDataAsync(id, slug, ct);
 
-        return null;
+        return new EventDataResult(null);
     }
 }

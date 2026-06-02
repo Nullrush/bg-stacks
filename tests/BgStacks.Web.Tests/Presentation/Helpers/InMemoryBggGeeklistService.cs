@@ -9,7 +9,10 @@ public class InMemoryBggGeeklistService : IBggGeeklistService
 
     public void Seed(int geeklistId, EventData data) => _store[geeklistId] = data;
 
-    public Task<EventData?> GetEventDataAsync(int geeklistId, EventSlug slug,
+    public Task<EventDataResult> GetEventDataAsync(int geeklistId, EventSlug slug,
         CancellationToken ct = default)
-        => Task.FromResult(_store.GetValueOrDefault(geeklistId));
+    {
+        var data = _store.GetValueOrDefault(geeklistId);
+        return Task.FromResult(new EventDataResult(data));
+    }
 }

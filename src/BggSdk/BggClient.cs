@@ -57,15 +57,15 @@ public sealed class BggClient
     {
         ArgumentNullException.ThrowIfNull(ids);
         var idList = deduplicateIds ? ids.Distinct().ToList() : ids.ToList();
-        var results = new List<Thing>();
-        foreach (var chunk in idList.Chunk(20))
+        var chunkTasks = idList.Chunk(20).Select(async chunk =>
         {
             using var response = await SendWithRetryAsync(
                 $"thing?id={string.Join(",", chunk)}&stats=1", ct);
             var xml = await response.Content.ReadAsStringAsync(ct);
-            results.AddRange(ThingParser.Parse(xml));
-        }
-        return results;
+            return ThingParser.Parse(xml);
+        });
+        var batches = await Task.WhenAll(chunkTasks);
+        return batches.SelectMany(b => b).ToList();
     }
 
     private async Task<HttpResponseMessage> SendWithRetryAsync(

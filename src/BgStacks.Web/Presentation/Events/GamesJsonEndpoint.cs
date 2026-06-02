@@ -11,10 +11,11 @@ public static class GamesJsonEndpoint
         {
             if (ctx.Items[EventMiddleware.SlugKey] is not EventSlug slug)
                 return Results.NotFound();
-            var data = await service.GetEventDataAsync(slug, ctx.RequestAborted);
-            return data is null
+            var result = await service.GetEventDataAsync(slug, ctx.RequestAborted);
+            if (result.IsLoading) return Results.StatusCode(202);
+            return result.Data is null
                 ? Results.NotFound()
-                : Results.Ok(new { title = data.Title, geeklistId = data.GeeklistId });
+                : Results.Ok(new { title = result.Data.Title, geeklistId = result.Data.GeeklistId });
         }).RequireRateLimiting("event-data");
 
         app.MapGet("/games.json", (HttpContext ctx, EventDataService service) =>
@@ -35,9 +36,10 @@ public static class GamesJsonEndpoint
         if (ctx.Items[EventMiddleware.SlugKey] is not EventSlug slug)
             return Results.NotFound();
 
-        var data = await service.GetEventDataAsync(slug, ctx.RequestAborted);
-        return data is null
+        var result = await service.GetEventDataAsync(slug, ctx.RequestAborted);
+        if (result.IsLoading) return Results.StatusCode(202);
+        return result.Data is null
             ? Results.NotFound()
-            : Results.Content(selector(data), "application/json");
+            : Results.Content(selector(result.Data), "application/json");
     }
 }

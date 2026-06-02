@@ -1,3 +1,20 @@
+// BgStacks.Import — one-shot tool for enriching the production Cosmos DB from a BGG ranks CSV dump.
+//
+// Use this when you have a fresh BGG ranks export (e.g. from BGG1Tool) and want to push updated
+// ratings, BGG rank, and sub-category ranks into the game-stats container without waiting for the
+// lazy-load path in BggThingService to naturally refresh them. Also backfills yearPublished on
+// any game-details documents that are missing it.
+//
+// Only updates a game if the CSV has more usersrated votes than what's currently stored — so it's
+// safe to re-run and won't overwrite newer data with older data.
+//
+// Usage:
+//   dotnet run -- <csv-path> --connection-string "<cs>" [--database <db>] [--dry-run]
+//
+// The connection string can also be supplied via the AZURE_COSMOS_CONNECTION_STRING env var.
+// --dry-run with a valid connection string scans Cosmos and reports the delta without writing.
+// --dry-run without a connection string just validates that the CSV parses correctly.
+
 using System.Globalization;
 using System.Text.Json.Serialization;
 using Azure.Identity;
@@ -39,6 +56,9 @@ Console.WriteLine($"  {rows.Count:N0} rows");
 if (dryRun) Console.WriteLine("  [dry-run mode — no writes will occur]");
 
 // ── Connect ──────────────────────────────────────────────────────────────────
+// Explicit --endpoint always wins over the connection-string env var.
+if (endpoint is not null) connectionString = null;
+
 if (connectionString is null && endpoint is null)
 {
     if (dryRun)
