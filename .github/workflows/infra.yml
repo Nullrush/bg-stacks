@@ -99,20 +99,9 @@ jobs:
           az extension add --name containerapp --upgrade --yes
 
           # AVM module 0.22.1 does not support activeRevisionsMode: Labels and resets
-          # it to Single on every deploy. Restore Labels mode so PR env routing works.
+          # it to Single on every deploy. Restore Labels mode and re-pin the prod label.
           az containerapp revision set-mode \
-            --name "$APP_NAME" --resource-group "$RG" --mode labels
-
-          # Re-apply the prod label to the currently active revision.
-          ACTIVE_REV=$(az containerapp revision list \
-            -n "$APP_NAME" -g "$RG" \
-            --query "[?properties.active].name | [0]" \
-            --output tsv)
-          if [[ -n "$ACTIVE_REV" ]]; then
-            az containerapp revision label add \
-              -n "$APP_NAME" -g "$RG" \
-              --revision "$ACTIVE_REV" --label prod
-          fi
+            --name "$APP_NAME" --resource-group "$RG" --mode labels --target-label prod
 
       - name: Post stack outputs
         if: success()
