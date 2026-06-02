@@ -133,7 +133,6 @@ module cosmos 'br/public:avm/res/document-db/database-account:0.19.0' = {
     sqlDatabases: [
       {
         name: 'bgstacks'
-        autoscaleSettingsMaxThroughput: 1000
         containers: [
           {
             name: 'usertags'

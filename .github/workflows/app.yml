@@ -98,6 +98,9 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Install containerapp CLI extension
+        run: az extension add --name containerapp --upgrade --yes
+
       - name: Assert Container App is in Labels revisions mode
         env:
           RG: ${{ vars.AZURE_RESOURCE_GROUP }}
