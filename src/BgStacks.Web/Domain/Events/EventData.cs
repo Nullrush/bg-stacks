@@ -10,6 +10,9 @@ public sealed record EventData
     [JsonPropertyName("title")]
     public string Title { get; init; } = "";
 
+    [JsonPropertyName("geeklistId")]
+    public int? GeeklistId { get; init; }
+
     [JsonPropertyName("editTimestamp")]
     public long EditTimestamp { get; init; }
 

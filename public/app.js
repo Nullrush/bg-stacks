@@ -1495,6 +1495,16 @@ loadTags();
 hydrateState();
 syncControls();
 
+fetch('event.json').then(r => r.ok ? r.json() : null).catch(() => null).then(meta => {
+  if (!meta) return;
+  document.title = meta.title + ' — P&W Index';
+  const link = document.getElementById('geeklistLink');
+  if (link && meta.geeklistId) {
+    link.href = `https://boardgamegeek.com/geeklist/${meta.geeklistId}/`;
+    link.textContent = `geeklist ${meta.geeklistId}`;
+  }
+});
+
 // Load mechanics list, categories list, and game data in parallel.
 // games.json is a superset of bleemus's games.json — all existing
 // fields are preserved, plus mechanics, categories, description, thumbnail, etc.

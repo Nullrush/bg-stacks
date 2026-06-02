@@ -69,6 +69,7 @@ public sealed class BggGeeklistService : IBggGeeklistService
                 {
                     SlugValue = geeklistId.ToString(),
                     Title = geeklist.Title,
+                    GeeklistId = geeklistId,
                     EditTimestamp = geeklist.EditTimestamp,
                     GamesJson = JsonSerializer.Serialize(entries),
                     MechanicsJson = JsonSerializer.Serialize(allMechanics),

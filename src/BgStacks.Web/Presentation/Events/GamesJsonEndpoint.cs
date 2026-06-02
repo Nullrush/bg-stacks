@@ -7,6 +7,16 @@ public static class GamesJsonEndpoint
 {
     public static IEndpointRouteBuilder MapGameDataEndpoints(this IEndpointRouteBuilder app)
     {
+        app.MapGet("/event.json", async (HttpContext ctx, EventDataService service) =>
+        {
+            if (ctx.Items[EventMiddleware.SlugKey] is not EventSlug slug)
+                return Results.NotFound();
+            var data = await service.GetEventDataAsync(slug, ctx.RequestAborted);
+            return data is null
+                ? Results.NotFound()
+                : Results.Ok(new { title = data.Title, geeklistId = data.GeeklistId });
+        }).RequireRateLimiting("event-data");
+
         app.MapGet("/games.json", (HttpContext ctx, EventDataService service) =>
             ServeEventFile(ctx, service, data => data.GamesJson)).RequireRateLimiting("event-data");
 
