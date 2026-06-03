@@ -6,6 +6,5 @@ tests/
 docs/
 scripts/
 api/
-public/
 *.md
 .github/

@@ -10,36 +10,14 @@ Do not write planning or documentation files anywhere else in the repo.
 
 # Geekway 2026 Prime PnW — sortable game list
 
-Static site that displays the BoardGameGeek geeklist for Geekway 2026 Prime's Play & Win shelves as a sortable, filterable table. Deploys to Azure Static Web Apps.
+Sortable, filterable index of the Geekway 2026 Prime Play & Win geeklist. Served by the C# Container App — there is no separate static site deployment.
 
 ## Architecture
 
-No build step. `public/` is the deploy artifact.
-`public/index.html` is markup only; `public/app.js` does the fetch / render / sort / filter / state-persistence work; `public/styles.css` carries every visual rule. Everything is vanilla HTML/CSS/JS — no frameworks, no bundler.
+No build step. `src/BgStacks.Web/wwwroot/` is the frontend deploy artifact.
+`wwwroot/index.html` is markup only; `wwwroot/app.js` does the fetch / render / sort / filter / state-persistence work; `wwwroot/styles.css` carries every visual rule. Everything is vanilla HTML/CSS/JS — no frameworks, no bundler.
 
-The `api/` directory is an Azure Functions app (Node.js, CommonJS) that provides a `/api/tags` endpoint for cloud sync of wishlist/played tags. It talks to Azure Table Storage (`usertags` table). Auth is handled by Azure Static Web Apps' built-in identity providers (Google, Apple) via `/.auth/*` routes — the function reads the `x-ms-client-principal` header to identify the user.
-
-## Commands
-
-```bash
-npm install                     # one time, installs serve + swa-cli
-npm run dev                     # SWA CLI: serves public/ + api/ on http://localhost:4280
-npm run dev:thin                # serve public/ only on http://localhost:3000 (no API/auth)
-npm run refresh -- <csv-path>   # step 1: rebuild games.json from a BGG CSV export
-node scripts/enrich-from-bgg.js # step 2: add mechanics/categories/thumbnails/ranks to games.json
-npm run deploy                  # one-shot SWA CLI deploy (sources .env.local)
-
-# API tests (run from repo root, not api/)
-cd api && npm test
-```
-
-## Data pipeline
-
-`games.json` is produced in two steps:
-
-1. **`npm run refresh -- <csv-path>`** (`parse-bgg-csv.mjs`) — converts a BGG geeklist CSV export into `public/games.json` with player counts, play times, ratings, and poll data. Required CSV columns: `id`, `name`, `minplayers`, `maxplayers`, `playingtime`, `minplaytime`, `maxplaytime`, `average`, `bayesaverage`, `averageweight`, `usersrated`, and `1player` through `20player` (poll values: `B`/`R`/`N`). The CSV comes from a BGG geeklist export (e.g. via BGG1Tool).
-
-2. **`node scripts/enrich-from-bgg.js`** — fetches enriched data (mechanics, categories, thumbnails, descriptions, BGG rank, sub-category ranks) from the BGG API for each game and merges it into `games.json`. Results are cached in `scripts/.bgg-cache/` so the script is safe to interrupt and resume. Requests are throttled with a random 30–120 second delay to avoid taxing BGG. Pass `--merge-only` to skip fetching and just merge cached data.
+Game data is fetched on demand from the BGG API by the C# backend and cached in Azure Blob Storage (FusionCache L2) and Cosmos DB. There is no checked-in `games.json`.
 
 ## State the UI persists
 
@@ -80,29 +58,12 @@ Each entry in `games.json` uses verbose field names so the file is self-describi
 
 The runtime adds a derived `hybridRating = (avgRating + geekRating) / 2` after fetch (when `geekRating > 0`).
 
-## API backend (`api/`)
-
-- `api/tags.js` — Azure Functions entry point; routes GET/PUT `/api/tags`
-- `api/lib/handlers.js` — storage logic using `@azure/data-tables` (Azure Table Storage, table `usertags`, partition key = userId, row key = `'tags'`). Uses optimistic concurrency (eTag); returns `409` on conflict.
-- `api/lib/tagsFormat.js` — pure functions for converting between cloud format `{ want: [ids], played: [ids] }` and runtime format `{ [gameId]: { want?: true, played?: true } }`; also `mergeTags` and `tagsAreEqual`.
-- `api/lib/crypto-polyfill.js` — required before anything that needs `crypto` in the Azure Functions runtime.
-- `api/local.settings.json` — local dev config (gitignored); needs `AZURE_STORAGE_CONNECTION_STRING`.
-
-Cloud format stores game IDs as numbers. Runtime format uses string keys (object property names) but the IDs are numeric values. This asymmetry exists because `localStorage` JSON keys are always strings.
-
 ## Conventions
 
 - Keep dependencies near zero. The whole point is a single-page site that loads instantly.
 - Don't introduce a bundler or framework without a strong reason.
 - `SORT_KEYS` map keys in `app.js` are intentionally short (e.g. `pmn`, `tmn`, `ob`) because they appear in the URL (`?sort=...`). The *values* they map to use the verbose JSON field names. Changing a key breaks shared/bookmarked URLs.
-- `.env.local` is gitignored. The deployment token lives there for manual `npm run deploy`. Never commit it.
-
-## Deploy
-
-Two paths, both work:
-
-- **GitHub Actions (CI)** — workflow lives at `.github/workflows/azure-static-web-apps.yml`. Set `AZURE_STATIC_WEB_APPS_API_TOKEN` as a repo secret in GitHub. Pushing to `main` triggers a deploy.
-- **Manual SWA CLI** — put the deployment token in `.env.local` (copy `.env.local.example` first), then `npm run deploy`. Useful for ad-hoc pushes without going through CI.
+- **`wwwroot/` is the sole source of truth for all frontend assets.** Do not create duplicate copies elsewhere in the repo.
 
 ## C# Application (`src/BgStacks.Web/`)
 
