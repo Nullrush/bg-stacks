@@ -1059,8 +1059,8 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
   tbody tr:hover td { background: transparent; }
   tbody tr:last-child td { border-bottom: none; }
 
-  tbody tr:not(.expanded) td:not(.name):not(.card-detail) { display: none; }
-  tbody tr.expanded td:not(.name):not(.card-detail) { display: none; }
+  tbody tr:not(.expanded) td:not(.name):not(.card-detail):not(.loading) { display: none; }
+  tbody tr.expanded td:not(.name):not(.card-detail):not(.loading) { display: none; }
 
   /* Break out of table layout when expanded so both cells take full width */
   tbody tr.expanded { display: block; }

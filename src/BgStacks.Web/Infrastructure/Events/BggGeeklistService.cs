@@ -114,12 +114,30 @@ public sealed class BggGeeklistService : IBggGeeklistService
             return stale;
 
         var objectIds = geeklist.Items.Select(i => i.ObjectId).Distinct().ToList();
-        await _things.EnsureThingsAsync(objectIds, token);
-
         var itemTuples = geeklist.Items
             .Select(i => (ObjectId: i.ObjectId, Body: i.Body))
             .ToList();
+
+        bool bggFetchIncomplete = false;
+        try
+        {
+            await _things.EnsureThingsAsync(objectIds, token);
+        }
+        catch
+        {
+            bggFetchIncomplete = true;
+        }
+
         var entries = await _things.GetGameEntriesAsync(itemTuples, token);
+
+        if (entries.Count == 0 && bggFetchIncomplete)
+        {
+            // BGG fetch failed and Cosmos has nothing — cache null briefly to rate-limit retries.
+            if (ctx.HasStaleValue) return ctx.StaleValue.GetValueOrDefault();
+            ctx.Options.Duration = TimeSpan.FromSeconds(30);
+            ctx.Options.IsFailSafeEnabled = false;
+            return null;
+        }
 
         var allMechanics = entries.SelectMany(e => e.Mechanics).Distinct().OrderBy(m => m).ToList();
         var allCategories = entries.SelectMany(e => e.Categories).Distinct().OrderBy(c => c).ToList();

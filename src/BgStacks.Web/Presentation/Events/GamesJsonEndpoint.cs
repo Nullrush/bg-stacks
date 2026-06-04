@@ -15,7 +15,7 @@ public static class GamesJsonEndpoint
             if (result.IsLoading) return Results.StatusCode(202);
             return result.Data is null
                 ? Results.NotFound()
-                : Results.Ok(new { title = result.Data.Title, geeklistId = result.Data.GeeklistId });
+                : Results.Ok(new { title = result.Data.Title, geeklistId = result.Data.GeeklistId, eventName = result.EventName });
         }).RequireRateLimiting("event-data");
 
         app.MapGet("/games.json", (HttpContext ctx, EventDataService service) =>

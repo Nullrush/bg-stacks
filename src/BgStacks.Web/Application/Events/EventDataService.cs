@@ -21,7 +21,10 @@ public sealed class EventDataService
         var @event = await _events.GetAsync(slug, ct);
 
         if (@event?.GeeklistId is int id)
-            return await _geeklist.GetEventDataAsync(id, slug, ct);
+        {
+            var result = await _geeklist.GetEventDataAsync(id, slug, ct);
+            return result with { EventName = @event.Name };
+        }
 
         return new EventDataResult(null);
     }

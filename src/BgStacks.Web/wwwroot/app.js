@@ -1495,16 +1495,13 @@ loadTags();
 hydrateState();
 syncControls();
 
-fetch('event.json').then(r => r.ok ? r.json() : null).catch(() => null).then(meta => {
+fetchWithBggRetry('event.json', null).then(meta => {
   if (!meta) return;
-  document.title = (meta.eventName || meta.title) + ' — P&W Index';
+  document.title = (meta.eventName || meta.title) + ' | BG Stacks';
   const kickerText = document.getElementById('kickerText');
-  if (kickerText) {
-    if (meta.eventName) {
-      kickerText.textContent = ' ' + meta.eventName;
-    } else {
-      kickerText.closest('.kicker').hidden = true;
-    }
+  if (kickerText && meta.eventName) {
+    kickerText.textContent = ' ' + meta.eventName;
+    kickerText.closest('.kicker').hidden = false;
   }
   const pageTitle = document.getElementById('pageTitle');
   if (pageTitle && meta.title) pageTitle.textContent = meta.title;
@@ -1512,6 +1509,7 @@ fetch('event.json').then(r => r.ok ? r.json() : null).catch(() => null).then(met
   if (link && meta.geeklistId) {
     link.href = `https://boardgamegeek.com/geeklist/${meta.geeklistId}/`;
     link.textContent = `geeklist ${meta.geeklistId}`;
+    document.getElementById('geeklistSource').hidden = false;
   }
 });
 
@@ -1535,7 +1533,7 @@ tbody.innerHTML = '<tr><td colspan="13" class="loading">Loading…</td></tr>';
 // fields are preserved, plus mechanics, categories, description, thumbnail, etc.
 Promise.all([
   fetchWithBggRetry('games.json', null, () => {
-    tbody.innerHTML = '<tr><td colspan="13" class="loading">Fetching game data from BoardGameGeek for the first time — this may take a minute…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="13" class="loading">Fetching game data from BoardGameGeek for the first time. This may take a minute…</td></tr>';
   }),
   fetchWithBggRetry('mechanics.json', []),
   fetchWithBggRetry('categories.json', []),

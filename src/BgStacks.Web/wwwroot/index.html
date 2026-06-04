@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Geekway 2026 P&amp;W Index</title>
-<meta name="description" content="Sortable table of the games on the Play and Win shelves at Geekway Prime 2026, with player counts, weight, playtime, and BGG ratings.">
+<title>BG Stacks</title>
+<meta name="description" content="Sortable, filterable index of a board game library geeklist, with player counts, weight, playtime, and BGG ratings.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,15 +15,15 @@
 <meta name="theme-color" content="#0d9488">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="P&amp;W Index">
+<meta name="apple-mobile-web-app-title" content="BG Stacks">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
 <div class="page">
   <header>
-    <p class="kicker"><span class="dot"></span> Geekway 2026 / Prime</p>
-    <h1>Play &amp; Win Index</h1>
-    <p class="sub">Sortable lineup. Source <a href="https://boardgamegeek.com/geeklist/358871/geekway-2026-prime-pnw-lineup" target="_blank" rel="noopener">geeklist 358871</a>.</p>
+    <p class="kicker" hidden><span class="dot"></span><span id="kickerText"></span></p>
+    <h1 id="pageTitle"></h1>
+    <p class="sub">Sortable lineup<span id="geeklistSource" hidden>. Source <a href="#" target="_blank" rel="noopener" id="geeklistLink">geeklist</a></span>.</p>
     <div class="header-btns">
       <button type="button" class="btn icon-btn install-btn" id="installBtn" aria-label="Install app" title="Install app" hidden>⬇</button>
 
