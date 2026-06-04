@@ -49,14 +49,14 @@ public class EventDataServiceTests
         var @event = new Event(NamedSlug, "Geekway 2026 PnW",
             DateOnly.Parse("2026-05-22"), isPublic: true, geeklistId: 99999);
         eventRepo.GetAsync(NamedSlug).Returns(@event);
-        var expectedResult = new EventDataResult(MakeData(NamedSlug));
-        geeklistService.GetEventDataAsync(99999, NamedSlug, Arg.Any<CancellationToken>()).Returns(expectedResult);
+        var geeklistResult = new EventDataResult(MakeData(NamedSlug));
+        geeklistService.GetEventDataAsync(99999, NamedSlug, Arg.Any<CancellationToken>()).Returns(geeklistResult);
 
         var sut = new EventDataService(eventRepo, geeklistService);
 
         var result = await sut.GetEventDataAsync(NamedSlug);
 
-        result.Should().Be(expectedResult);
+        result.Should().Be(geeklistResult with { EventName = "Geekway 2026 PnW" });
         await geeklistService.Received(1).GetEventDataAsync(99999, NamedSlug, Arg.Any<CancellationToken>());
     }
 
