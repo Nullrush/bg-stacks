@@ -1,6 +1,6 @@
-const CACHE_VERSION = 'pnw-v7';
+const CACHE_VERSION = 'bg-stacks-v1';
 
-// Assets to pre-cache on install (app shell + data)
+// App shell assets — static, safe to pre-cache on install
 const PRECACHE = [
   '/',
   '/index.html',
@@ -10,12 +10,13 @@ const PRECACHE = [
   '/icon.svg',
   '/icon-192.png',
   '/icon-512.png',
-  '/games.json',
-  '/mechanics.json',
-  '/categories.json',
 ];
 
-// ─── Install: pre-cache all local assets ─────────────────────────────────────
+// Dynamic data endpoints — served network-first; only 200 responses are cached
+// (202 "still loading" must never be cached or they loop forever)
+const DATA_ENDPOINTS = ['/games.json', '/mechanics.json', '/categories.json', '/event.json'];
+
+// ─── Install: pre-cache app shell ────────────────────────────────────────────
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -37,42 +38,51 @@ self.addEventListener('activate', event => {
   );
 });
 
-// ─── Fetch: cache-first for same-origin, network-only for cross-origin ────────
+// ─── Fetch ────────────────────────────────────────────────────────────────────
 
 self.addEventListener('fetch', event => {
   const { request } = event;
 
-  // Only handle GET requests
   if (request.method !== 'GET') return;
 
-  // Let cross-origin requests (Google Fonts, BGG links) go straight to network
   if (!request.url.startsWith(self.location.origin)) return;
 
-  // Never intercept auth endpoints — they must always hit the network
   if (new URL(request.url).pathname.startsWith('/.auth')) return;
 
+  const pathname = new URL(request.url).pathname;
+
+  // Data endpoints: network-first, cache only 200s, fall back to cache offline
+  if (DATA_ENDPOINTS.some(p => pathname === p || pathname.endsWith(p))) {
+    event.respondWith(
+      fetch(request).then(response => {
+        if (response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_VERSION).then(c => c.put(request, clone));
+        }
+        return response;
+      }).catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // App shell: cache-first, stale-while-revalidate for HTML/JS/CSS
   event.respondWith(
     caches.match(request).then(cached => {
       if (cached) {
-        // Serve from cache immediately; refresh in the background for HTML/JS/CSS
-        const ext = new URL(request.url).pathname.split('.').pop();
+        const ext = pathname.split('.').pop();
         if (['html', 'js', 'css'].includes(ext) || request.url.endsWith('/')) {
-          const networkFetch = fetch(request).then(response => {
-            if (response.ok) {
+          fetch(request).then(response => {
+            if (response.status === 200) {
               const clone = response.clone();
               caches.open(CACHE_VERSION).then(c => c.put(request, clone));
             }
-            return response;
           }).catch(() => {});
-          // Return cache immediately, update in background
-          void networkFetch;
         }
         return cached;
       }
 
-      // Not cached yet — fetch and cache it
       return fetch(request).then(response => {
-        if (response.ok) {
+        if (response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_VERSION).then(c => c.put(request, clone));
         }
