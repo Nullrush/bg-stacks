@@ -135,14 +135,14 @@ h1 {
   margin: 0;
 }
 
-.sub a {
-  color: var(--text);
+.sub a, .kicker a {
+  color: inherit;
   text-decoration: underline;
   text-decoration-color: var(--border);
   text-underline-offset: 3px;
 }
 
-.sub a:hover { text-decoration-color: var(--accent); color: var(--accent); }
+.sub a:hover, .kicker a:hover { text-decoration-color: var(--accent); color: var(--accent); }
 
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(7px); }
@@ -1020,7 +1020,8 @@ table.ratings-expanded .rating-label-expanded { display: inline; }
 
 @media (max-width: 700px) {
   .page { padding: 20px 12px 40px; }
-  h1 { font-size: 28px; }
+  h1 { font-size: 28px; padding-right: 110px; }
+  .header-btns { top: 0; transform: none; }
 
   .auth-avatar-btn { width: 42px; height: 42px; }
   .auth-avatar { width: 38px; height: 38px; }

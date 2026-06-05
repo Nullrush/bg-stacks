@@ -7,7 +7,15 @@
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      // Force an update check on every load so a new SW activates without waiting
+      reg.update();
+    }).catch(() => {});
+    // When a new SW takes over (e.g. after cache-poisoning fix), reload so the
+    // clean SW handles all fetches from the start rather than mid-session.
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
   });
 }
 
@@ -1499,17 +1507,27 @@ fetchWithBggRetry('event.json', null).then(meta => {
   if (!meta) return;
   document.title = (meta.eventName || meta.title) + ' | BG Stacks';
   const kickerText = document.getElementById('kickerText');
-  if (kickerText && meta.eventName) {
-    kickerText.textContent = ' ' + meta.eventName;
-    kickerText.closest('.kicker').hidden = false;
+  if (kickerText) {
+    if (meta.eventName) {
+      kickerText.textContent = ' ' + meta.eventName;
+      kickerText.closest('.kicker').hidden = false;
+    } else if (meta.geeklistId) {
+      const a = document.createElement('a');
+      a.href = `https://boardgamegeek.com/geeklist/${meta.geeklistId}/`;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = `geeklist ${meta.geeklistId}`;
+      kickerText.append(' Source ', a);
+      kickerText.closest('.kicker').hidden = false;
+    }
   }
   const pageTitle = document.getElementById('pageTitle');
   if (pageTitle && meta.title) pageTitle.textContent = meta.title;
-  const link = document.getElementById('geeklistLink');
-  if (link && meta.geeklistId) {
-    link.href = `https://boardgamegeek.com/geeklist/${meta.geeklistId}/`;
-    link.textContent = `geeklist ${meta.geeklistId}`;
-    document.getElementById('geeklistSource').hidden = false;
+  const authorLink = document.getElementById('authorLink');
+  if (authorLink && meta.username) {
+    authorLink.href = `https://boardgamegeek.com/user/${meta.username}`;
+    authorLink.textContent = meta.username;
+    document.getElementById('geeklistAuthor').hidden = false;
   }
 });
 
