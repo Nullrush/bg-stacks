@@ -132,11 +132,12 @@ public sealed class BggGeeklistService : IBggGeeklistService
 
         if (entries.Count == 0 && bggFetchIncomplete)
         {
-            // BGG fetch failed and Cosmos has nothing — cache null briefly to rate-limit retries.
+            // BGG fetch failed and Cosmos has nothing to serve. Throwing here tells
+            // FusionCache not to cache anything, so _inFlight resets and the next
+            // client poll triggers a fresh background attempt (202 → keep polling).
             if (ctx.HasStaleValue) return ctx.StaleValue.GetValueOrDefault();
-            ctx.Options.Duration = TimeSpan.FromSeconds(30);
-            ctx.Options.IsFailSafeEnabled = false;
-            return null;
+            throw new InvalidOperationException(
+                $"BGG fetch incomplete for geeklist {geeklistId} and no cached data available.");
         }
 
         var allMechanics = entries.SelectMany(e => e.Mechanics).Distinct().OrderBy(m => m).ToList();
@@ -146,6 +147,7 @@ public sealed class BggGeeklistService : IBggGeeklistService
         {
             SlugValue = geeklistId.ToString(),
             Title = geeklist.Title,
+            Username = geeklist.Username,
             GeeklistId = geeklistId,
             EditTimestamp = geeklist.EditTimestamp,
             GamesJson = JsonSerializer.Serialize(entries),

@@ -13,6 +13,9 @@ public sealed record EventData
     [JsonPropertyName("geeklistId")]
     public int? GeeklistId { get; init; }
 
+    [JsonPropertyName("username")]
+    public string Username { get; init; } = "";
+
     [JsonPropertyName("editTimestamp")]
     public long EditTimestamp { get; init; }
 
